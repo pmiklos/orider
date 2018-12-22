@@ -1,0 +1,26 @@
+{
+  "name": "byteball-carpool",
+  "version": "1.0.0",
+  "description": "Carpooling for Byteballers",
+  "main": "carpool.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pmiklos/byteball-carpool.git"
+  },
+  "keywords": [
+    "byteball",
+    "carpool",
+    "smart",
+    "contract",
+    "crypto"
+  ],
+  "author": "Peter Miklos",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pmiklos/byteball-carpool/issues"
+  },
+  "homepage": "https://github.com/pmiklos/byteball-carpool#readme"
+}
