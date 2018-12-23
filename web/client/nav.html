@@ -1,0 +1,19 @@
+    <nav class="navbar navbar-expand-md fixed-top navbar-light bg-light">
+    <a class="navbar-brand" href="/">
+        <img src="/img/carpool-logo.png" width="30" height="30" alt="">
+        Carpool
+    </a>
+    <button class="navbar-toggler" type="button" ng-if="nav.visible()" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="navbar-collapse collapse" id="navbarNav" ng-if="nav.visible()">
+        <div class="navbar-nav mr-auto">
+            <a class="nav-item nav-link active" ng-class="{ active: nav.isActive('Carpools') }" ng-href="#!/carpools">Carpools</a>
+        </div>
+        <div class="navbar-nav">
+            <span class="navbar-text" ng-if="isLoggedIn()">Wallet: {{ connectedDeviceName }} | </span>
+            <a class="nav-item nav-link" ng-if="!isLoggedIn()" ng-href="#!/login">Login</a>
+            <a class="nav-item nav-link" ng-if="isLoggedIn()" href="#" ng-click="logout()">Logout</a>
+        </div>
+    </div>
+</nav>

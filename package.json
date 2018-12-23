@@ -19,6 +19,14 @@
   ],
   "author": "Peter Miklos",
   "license": "MIT",
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.4",
+    "headless-byteball": "github:byteball/headless-byteball#npm",
+    "jsonwebtoken": "^8.4.0",
+    "request": "^2.88.0",
+    "socket.io": "^2.2.0"
+  },
   "bugs": {
     "url": "https://github.com/pmiklos/byteball-carpool/issues"
   },

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Carpooling for Byteballers</title>
+
+    <meta name="description" content="Carpooling for Byteballers"/>
+    <meta name="keywords" content="crypto, crypto currency, byteball"/>
+    <meta name="fragment" content="!"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+    integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/offcanvas.css">
+</head>
+<body ng-controller="ApplicationController">
+
+<div class="modal fade" id="forbiddenWarning" tabindex="-1" role="dialog" aria-labelledby="forbiddenWarningLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forbiddenWarningLabel">Forbidden</h5>
+            </div>
+            <div class="modal-body">
+                Unfortunately you are not allowed to see this page, please log in!
+                <p>
+                    <a ng-href="#!/login" onclick="angular.element('#forbiddenWarning').modal('hide')">LOGIN</a>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-include src="'nav.html'"></ng-include>
+
+<div role="main" class="container">
+    <div class="my-3" ng-view autoscroll></div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/lib/offcanvas.js"></script>
+<script src="/lib/qrcode.js"></script>
+<script src="/lib/qrcode_UTF8.js"></script>
+<script src="/lib/angular-qrcode.js"></script>
+<script src="/app/app.js"></script>
+<script src="/app/ApplicationController.js"></script>
+<script src="/app/controllers/CarpoolsController.js"></script>
+<script src="/app/controllers/LoginController.js"></script>
+<script src="/app/services/AuthService.js"></script>
+<script src="/app/services/ByteballService.js"></script>
+<script src="/app/services/HttpInterceptor.js"></script>
+<script src="/app/services/SocketService.js"></script>
+
+</body>
+</html>

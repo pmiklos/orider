@@ -1,0 +1,23 @@
+<div class="row">
+    <div class="col-12">
+        <div class="row p-2" ng-repeat="ride in rides">
+            <div class="col-12 card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        {{ ride.departure | date:'medium'}} <br>
+                        {{ ride.driver.name }}
+                    </h5>
+                    <p>
+                        pickup: {{ ride.pickup}} <br>
+                        dropoff: {{ ride.dropoff}} <br>
+                    </p>
+                    <p>
+                        <ul class="list-inline">
+                            <li class="list-inline-item" ng-repeat="passenger in ride.passengers">{{ passenger.name }}</li>
+                        </ul>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

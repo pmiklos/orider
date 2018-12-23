@@ -1,0 +1,18 @@
+<div class="row">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <p>
+                    Scan the QR code or pair your wallet using
+                    the pairing code below.
+                </p>
+                <p>
+                    <a ng-href="{{pairingUrl}}">LOGIN</a>
+                </p>
+                <qrcode data="{{pairingUrl}}" size="180" version="7"></qrcode>
+                <br>
+                <input class="form-control" type="text" value="{{pairingCode}}"/>
+            </div>
+        </div>
+    </div>
+</div>
