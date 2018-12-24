@@ -33,7 +33,20 @@
             }];
 
             function createRide() {
+                var date = $scope.newRide.departureDate;
+                var time = $scope.newRide.departureTime;
 
+                var newRide = {
+                    driver: {
+                        name: "Alice Cooper"
+                    },
+                    passengers: []
+                };
+                newRide.departure = new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHours(), time.getMinutes());
+                newRide.seats = $scope.newRide.seats;
+                newRide.pickup = $scope.newRide.pickup;
+                newRide.dropoff = $scope.newRide.dropoff;
+                $scope.rides.push(newRide);
             }
 
             function toggleCreateRideForm(visible) {
