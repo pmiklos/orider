@@ -1,6 +1,6 @@
 (function () {
 
-    var app = angular.module("carpool", ["ngRoute", "monospaced.qrcode"]);
+    var app = angular.module("carpool", ["ngRoute", "ngCookies", "monospaced.qrcode"]);
 
     function fetchConfig() {
         var initInjector = angular.injector(["ng"]);

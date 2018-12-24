@@ -2,8 +2,17 @@
 
     var app = angular.module("carpool");
 
-    app.controller("CarpoolsController", ["$scope",
-        function ($scope) {
+    app.controller("CarpoolsController", ["$scope", "$cookies",
+        function ($scope, $cookies) {
+
+            $scope.hideCreateRideForm = "true" === $cookies.get("preferences.hideCreateRideForm");
+
+            $scope.newRide = {
+                minDeparture: new Date(),
+                departureDate: new Date(),
+                departureTime: new Date(),
+                seats: 2
+            };
 
             $scope.rides = [{
                 departure: 1288323623006,
@@ -22,6 +31,18 @@
                     }
                 ]
             }];
+
+            function createRide() {
+
+            }
+
+            function toggleCreateRideForm(visible) {
+                $scope.hideCreateRideForm = visible;
+                $cookies.put("preferences.hideCreateRideForm", $scope.hideCreateRideForm);
+            }
+
+            $scope.createRide = createRide;
+            $scope.toggleCreateRideForm = toggleCreateRideForm;
         }]);
 
 })();
