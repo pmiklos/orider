@@ -2,7 +2,7 @@
 
     var app = angular.module("carpool");
 
-    app.controller("CarpoolsController", ["$scope", "$cookies",
+    app.controller("RidesController", ["$scope", "$cookies",
         function ($scope, $cookies) {
 
             $scope.hideCreateRideForm = "true" === $cookies.get("preferences.hideCreateRideForm");

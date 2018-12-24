@@ -38,14 +38,9 @@
                     }
                 }
             })
-            .when("/carpools", {
-                nav: "Carpools",
-                templateUrl: "view/carpools.html",
-                controller: "CarpoolsController"
-            })
             .otherwise({
-                templateUrl: "view/carpools.html",
-                controller: "CarpoolsController"
+                templateUrl: "view/rides.html",
+                controller: "RidesController"
             });
     });
 
