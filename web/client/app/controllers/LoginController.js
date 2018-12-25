@@ -2,8 +2,8 @@
 
     var app = angular.module("carpool");
 
-    app.controller("LoginController", ["$scope", "$route", "$location", "$timeout", "byteball", "socket", "AuthService",
-        function ($scope, $route, $location, $timeout, byteball, socket, AuthService) {
+    app.controller("LoginController", ["$rootScope", "$scope", "$route", "$location", "$timeout", "byteball", "socket", "AuthService", "AccountService",
+        function ($rootScope, $scope, $route, $location, $timeout, byteball, socket, AuthService, AccountService) {
 
             var pariringCode = byteball.pairingCode(AuthService.getAuthCode());
 
@@ -18,7 +18,7 @@
                     document.getSelection().removeAllRanges();
                     $route.reload();
                 }, 5000);
-            });
+            }).then(AccountService.resolve);
 
             $scope.pairingCode = pariringCode;
             $scope.pairingUrl = byteball.pairingUrl(pariringCode);

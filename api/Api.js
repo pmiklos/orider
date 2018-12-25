@@ -8,11 +8,13 @@ const authEvents = new events.EventEmitter();
 
 const tokenService = require("../common/TokenService");
 
+const accountRepository = require("./AccountRepository");
 const authRepository = require("./AuthRepository");
 
-// Gloal resources
+const accountResource = require("./AccountResource");
 const authResource = require("./AuthResource");
 const configResource = require("./ConfigResource");
+
 
 function requestLogger(req, res, next) {
     console.error(`API: ${req.method} ${req.url} ${JSON.stringify(req.body)}`);
@@ -57,6 +59,7 @@ module.exports = function (webapp) {
     webapp.use("/api", configResource());
     webapp.use("/api/my", cookieParser());
     webapp.use("/api/my", accessTokenResolver);
+    webapp.use("/api/my", accountResource(accountRepository));
     webapp.use(errorHandler);
 
     return {

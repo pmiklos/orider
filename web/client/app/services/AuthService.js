@@ -34,6 +34,15 @@
                         return $q.reject({status: "timeout"});
                     }
                 });
+            },
+
+            logout: function() {
+                return $http.post("/api/auth/logout", {}).then(function(response) {
+                    return response.data;
+                }, function (error) {
+                    console.error("Failed to log out.");
+                    return $q.reject({status: "error"});
+                });
             }
         };
     }]);

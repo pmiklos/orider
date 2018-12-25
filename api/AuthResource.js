@@ -49,11 +49,18 @@ module.exports = function (authRepository, authEvents, tokenService) {
         });
     }
 
+    function logout(req, res) {
+        res.clearCookie("access_token").json({
+            status: "success"
+        });
+    }
+
     let authResource = express.Router();
 
     authResource.use("/auth", cookieParser());
     authResource.post('/auth/init', getAuthCode);
     authResource.post('/auth/token', getAuthToken);
+    authResource.post('/auth/logout', logout);
 
     return authResource;
 };

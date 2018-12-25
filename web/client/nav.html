@@ -13,7 +13,7 @@
             -->
         </div>
         <div class="navbar-nav">
-            <span class="navbar-text" ng-if="isLoggedIn()">Wallet: {{ connectedDeviceName }} | </span>
+            <span class="navbar-text" ng-if="isLoggedIn()">Wallet: {{ account.deviceName }} | </span>
             <a class="nav-item nav-link" ng-if="!isLoggedIn()" ng-href="#!/login">Login</a>
             <a class="nav-item nav-link" ng-if="isLoggedIn()" href="#" ng-click="logout()">Logout</a>
         </div>

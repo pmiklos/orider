@@ -63,6 +63,10 @@
         };
     }]);
 
+    app.run(function($rootScope, $location, $window, AccountService) {
+        AccountService.resolve();
+    });
+
     fetchConfig().then(bootstrapApplication);
 
 })();
