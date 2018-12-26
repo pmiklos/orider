@@ -19,6 +19,14 @@
                     console.error("Failed to fetch rides: " + errorResponse);
                     return $q.reject({status: "error"});
                 });
+            },
+            reserve: function (rideId) {
+                return $http.post(`/api/rides/${rideId}/reservations`).then(function (response) {
+                    return response.data;
+                }, function (errorResponse) {
+                    console.error("Failed to create reservation: " + errorResponse);
+                    return $q.reject({status: "error"});
+                });
             }
         };
     }]);

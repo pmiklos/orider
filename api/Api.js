@@ -11,11 +11,13 @@ const tokenService = require("../common/TokenService");
 const accountRepository = require("./AccountRepository");
 const authRepository = require("./AuthRepository");
 const ridesRepository = require("./RidesRepository");
+const reservationsRepository = require("./ReservationsRepository");
 
 const accountResource = require("./AccountResource");
 const authResource = require("./AuthResource");
 const configResource = require("./ConfigResource");
 const RidesResource = require("./RidesResource");
+const ReservationsResource = require("./ReservationsResource");
 
 function requestLogger(req, res, next) {
     console.error(`API: ${req.method} ${req.url} ${JSON.stringify(req.body)}`);
@@ -55,18 +57,24 @@ function accessTokenResolver(req, res, next) {
 module.exports = function (webapp, mapService) {
 
     const ridesResource = RidesResource(ridesRepository, mapService);
+    const reservationsResource = ReservationsResource(reservationsRepository);
 
     webapp.use("/api", express.json());
     webapp.use("/api", requestLogger);
     webapp.use("/api", authResource(authRepository, authEvents, tokenService));
     webapp.use("/api", configResource());
-    webapp.use("/api/my", cookieParser());
-    webapp.use("/api/my", accessTokenResolver);
+    webapp.post("/api/*", cookieParser());
+    webapp.post("/api/*", accessTokenResolver);
+    webapp.get("/api/my/*", cookieParser());
+    webapp.get("/api/my/*", accessTokenResolver);
     webapp.use("/api/my", accountResource(accountRepository));
+    webapp.get("/api/my/reservations", reservationsResource.listByDevice);
     webapp.get("/api/rides", ridesResource.list);
-    webapp.post("/api/rides", cookieParser());
-    webapp.post("/api/rides", accessTokenResolver);
     webapp.post("/api/rides", ridesResource.create);
+    webapp.use("/api/rides/:id", ridesResource.fetch);
+    webapp.get("/api/rides/:id/reservations", reservationsResource.listByRide);
+    webapp.post("/api/rides/:id/reservations", reservationsResource.create);
+
     webapp.use(errorHandler);
 
     return {

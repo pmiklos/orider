@@ -14,17 +14,42 @@ function create(device, ride, callback) {
     });
 }
 
+function select(id, callback) {
+    db.query(`SELECT
+            rides.ride_id id,
+            rides.device,
+            rides.device driver,
+            rides.pickup_address pickupAddress,
+            rides.dropoff_address dropoffAddress,
+            strftime('%s', rides.departure) * 1000 departure,
+            rides.seats,
+            rides.price_per_seat pricePerSeat,
+            count(reservations.device) reservationCount
+        FROM cp_rides rides
+        LEFT JOIN cp_reservations reservations USING (ride_id)
+        WHERE ride_id = ?`, [id], (rows) => {
+        if (Array.isArray(rows) && rows.length === 1) {
+            return callback(null, rows[0]);
+        }
+        callback("Failed to find ride: " + JSON.stringify(rows));
+    });
+}
+
 function selectAll(from, size, callback) {
     db.query(`SELECT
-            device,
-            device driver,
-            pickup_address pickupAddress,
-            dropoff_address dropoffAddress,
-            strftime('%s', departure) * 1000 departure,
-            seats,
-            price_per_seat pricePerSeat
-        FROM cp_rides
---        WHERE departure > ${db.getNow()}
+            rides.ride_id id,
+            rides.device,
+            rides.device driver,
+            rides.pickup_address pickupAddress,
+            rides.dropoff_address dropoffAddress,
+            strftime('%s', rides.departure) * 1000 departure,
+            rides.seats,
+            rides.price_per_seat pricePerSeat,
+            count(reservations.device) reservationCount
+        FROM cp_rides rides
+        LEFT JOIN cp_reservations reservations USING (ride_id)
+        WHERE departure > ${db.getNow()}
+        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
         ORDER BY departure ASC
         LIMIT ${size} OFFSET ${from}`, [], (rows) => {
         if (Array.isArray(rows)) {
@@ -36,5 +61,6 @@ function selectAll(from, size, callback) {
 
 module.exports = {
     create,
+    select,
     selectAll
 };

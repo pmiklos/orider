@@ -29,7 +29,7 @@
                     <input class="form-control" type="number" min="1" max="4" id="seats" name="seats" ng-model="newRide.seats" required />
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-primary mt-md-3" type="submit">Create</button>
+                    <button class="btn btn-primary mt-md-3" type="submit" ng-disabled="createRideInProgress">Create</button>
                     <button class="btn btn-link mt-md-3" type="button" ng-click="toggleCreateRideForm(true)">Hide</button>
                 </div>
             </div>
@@ -52,13 +52,11 @@
                     <p>
                         Pick-up: {{ ride.pickupAddress }} <br>
                         Drop-off: {{ ride.dropoffAddress }} <br>
-                    </p>
-                    <p>
-                        <ul class="list-inline">
-                            <li class="list-inline-item" ng-repeat="passenger in ride.passengers">{{ passenger.name }}</li>
-                        </ul>
+                        {{ ride.seats - ride.reservationCount }} more left
                     </p>
                     <a class="card-link" ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}" target="carpool-map">Directions</a>
+                    <button class="btn btn-link card-link" type="button" ng-click="reserve(ride)" ng-if="isLoggedIn() && ride.id && ride.seats > ride.reservationCount && !isReserved(ride)">Reserve</button>
+                    <span class="card-link" ng-if="isReserved(ride)">Reserved</span>
                 </div>
             </div>
         </div>

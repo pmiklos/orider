@@ -40,7 +40,12 @@
             })
             .otherwise({
                 templateUrl: "view/rides.html",
-                controller: "RidesController"
+                controller: "RidesController",
+                resolve: {
+                    account: function(AccountService) {
+                        return AccountService.resolve();
+                    }
+                }
             });
     });
 
@@ -62,10 +67,6 @@
             return "";
         };
     }]);
-
-    app.run(function($rootScope, $location, $window, AccountService) {
-        AccountService.resolve();
-    });
 
     fetchConfig().then(bootstrapApplication);
 

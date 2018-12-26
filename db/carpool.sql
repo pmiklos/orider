@@ -13,3 +13,12 @@ CREATE TABLE cp_rides (
 );
 
 CREATE INDEX cp_rides_departure ON cp_rides(departure);
+
+CREATE TABLE cp_reservations (
+    ride_id INTEGER NOT NULL,
+    device CHAR(33) NOT NULL,
+    status VARCHAR NOT NULL DEFAULT 'reserved',
+    reservation_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (ride_id, device),
+    FOREIGN KEY (ride_id) REFERENCES cp_rides(ride_id)
+);

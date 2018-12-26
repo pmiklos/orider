@@ -26,6 +26,14 @@ module.exports = function (ridesRepository, mapService) {
         });
     }
 
+    function fetch(req, res, next) {
+        ridesRepository.select(req.params.id, (err, ride) => {
+           if (err) return next(err);
+           req.ride = ride;
+           next();
+        });
+    }
+
     function list(req, res, next) {
         let from = Number.parseInt(req.query.from) || 0;
         let size = Number.parseInt(req.query.size) || 10;
@@ -39,7 +47,8 @@ module.exports = function (ridesRepository, mapService) {
     }
 
     return {
-        list,
-        create
+        create,
+        fetch,
+        list
     };
 };
