@@ -69,6 +69,9 @@ module.exports = function (webapp, mapService) {
     webapp.get("/api/my/*", accessTokenResolver);
     webapp.use("/api/my", accountResource(accountRepository));
     webapp.get("/api/my/reservations", reservationsResource.listByDevice);
+    webapp.get("/api/my/rides", ridesResource.listByDevice);
+    webapp.use("/api/my/rides/:id", ridesResource.fetch);
+    webapp.get("/api/my/rides/:id", ridesResource.get);
     webapp.get("/api/rides", ridesResource.list);
     webapp.post("/api/rides", ridesResource.create);
     webapp.use("/api/rides/:id", ridesResource.fetch);

@@ -34,6 +34,10 @@ module.exports = function (ridesRepository, mapService) {
         });
     }
 
+    function get(req, res) {
+        res.json(req.ride);
+    }
+
     function list(req, res, next) {
         let from = Number.parseInt(req.query.from) || 0;
         let size = Number.parseInt(req.query.size) || 10;
@@ -46,9 +50,20 @@ module.exports = function (ridesRepository, mapService) {
         });
     }
 
+    function listByDevice(req, res, next) {
+        ridesRepository.selectAll(req.accessToken.dev, (err, rides) => {
+            if (err) return next(err);
+            res.json({
+                rides
+            });
+        });
+    }
+
     return {
         create,
+        get,
         fetch,
-        list
+        list,
+        listByDevice
     };
 };

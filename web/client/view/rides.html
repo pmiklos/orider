@@ -57,6 +57,7 @@
                     <a class="card-link" ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}" target="carpool-map">Directions</a>
                     <button class="btn btn-link card-link" type="button" ng-click="reserve(ride)" ng-if="isLoggedIn() && ride.id && ride.seats > ride.reservationCount && !isReserved(ride)">Reserve</button>
                     <span class="card-link" ng-if="isReserved(ride)">Reserved</span>
+                    <a class="card-link" ng-href="#!/my/ride/{{ ride.id }}" ng-if="isMyRide(ride)">Start</a>
                 </div>
             </div>
         </div>

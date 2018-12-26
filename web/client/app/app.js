@@ -38,6 +38,16 @@
                     }
                 }
             })
+            .when("/my/ride/:id", {
+                nav: "MyRide",
+                templateUrl: "view/myride.html",
+                controller: "MyRideController",
+                resolve: {
+                    account: function(AccountService) {
+                        return AccountService.resolve();
+                    }
+                }
+            })
             .otherwise({
                 templateUrl: "view/rides.html",
                 controller: "RidesController",

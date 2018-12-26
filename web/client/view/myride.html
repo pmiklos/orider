@@ -1,0 +1,22 @@
+<div ng-include="'/fragment/messages.html'"></div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="col-12 card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    {{ ride.departure | date:'MMM dd, yyyy HH:mm a'}} <br>
+                    {{ ride.driver.name }}
+                </h5>
+                <p>
+                    Pick-up: {{ ride.pickupAddress }} <br>
+                    Drop-off: {{ ride.dropoffAddress }} <br>
+                    {{ ride.seats - ride.reservationCount }} more left
+                </p>
+                <a class="card-link"
+                   ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}"
+                   target="carpool-map">Directions</a>
+            </div>
+        </div>
+    </div>
+</div>

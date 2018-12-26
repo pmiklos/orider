@@ -13,6 +13,7 @@ CREATE TABLE cp_rides (
 );
 
 CREATE INDEX cp_rides_departure ON cp_rides(departure);
+CREATE INDEX cp_rides_device ON cp_rides(device);
 
 CREATE TABLE cp_reservations (
     ride_id INTEGER NOT NULL,
@@ -22,3 +23,5 @@ CREATE TABLE cp_reservations (
     PRIMARY KEY (ride_id, device),
     FOREIGN KEY (ride_id) REFERENCES cp_rides(ride_id)
 );
+
+CREATE INDEX cp_reservations_device ON cp_reservations(device);

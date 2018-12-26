@@ -74,6 +74,10 @@
                 });
             }
 
+            function isMyRide(ride) {
+                return ride.device === $rootScope.account.device;
+            }
+
             function toggleCreateRideForm(visible) {
                 $scope.hideCreateRideForm = visible;
                 $cookies.put("preferences.hideCreateRideForm", $scope.hideCreateRideForm);
@@ -88,6 +92,7 @@
             $scope.createRide = createRide;
             $scope.reserve = reserve;
             $scope.isReserved = isReserved;
+            $scope.isMyRide = isMyRide;
             $scope.toggleCreateRideForm = toggleCreateRideForm;
         }]);
 

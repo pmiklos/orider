@@ -5,7 +5,7 @@
     app.controller("ApplicationController", ["$rootScope", "$scope", "$http", "$location", "$route", "AuthService",
         function ($rootScope, $scope, $http, $location, $route, AuthService) {
 
-            $scope.account = null;
+            $rootScope.account = null;
 
             $scope.nav = {
                 visible: function () {
@@ -41,16 +41,16 @@
             };
 
             $rootScope.setAccount = function (account) {
-                $scope.account = account;
+                $rootScope.account = account;
             };
 
             $rootScope.isLoggedIn = function () {
-                return angular.isObject($scope.account);
+                return angular.isObject($rootScope.account);
             };
 
             $scope.logout = function () {
                 AuthService.logout().then(function(response) {
-                    $scope.account = null;
+                    $rootScope.account = null;
                     $location.url("/");
                 }, function (error) {
                     $rootScope.showError("An error occurred while logging out.");

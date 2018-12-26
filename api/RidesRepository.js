@@ -59,8 +59,32 @@ function selectAll(from, size, callback) {
     });
 }
 
+function selectAllByDevice(device, callback) {
+    db.query(`SELECT
+            rides.ride_id id,
+            rides.device,
+            rides.device driver,
+            rides.pickup_address pickupAddress,
+            rides.dropoff_address dropoffAddress,
+            strftime('%s', rides.departure) * 1000 departure,
+            rides.seats,
+            rides.price_per_seat pricePerSeat,
+            count(reservations.device) reservationCount
+        FROM cp_rides rides
+        LEFT JOIN cp_reservations reservations USING (ride_id)
+        WHERE departure > ${db.getNow()}
+        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+        ORDER BY departure ASC`, [device], (rows) => {
+        if (Array.isArray(rows)) {
+            return callback(null, rows);
+        }
+        callback("Failed to find rides: " + JSON.stringify(rows));
+    });
+}
+
 module.exports = {
     create,
     select,
-    selectAll
+    selectAll,
+    selectAllByDevice
 };
