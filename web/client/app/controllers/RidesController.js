@@ -2,8 +2,8 @@
 
     var app = angular.module("carpool");
 
-    app.controller("RidesController", ["$scope", "$cookies",
-        function ($scope, $cookies) {
+    app.controller("RidesController", ["$rootScope", "$scope", "$cookies", "RidesService",
+        function ($rootScope, $scope, $cookies, RidesService) {
 
             $scope.hideCreateRideForm = "true" === $cookies.get("preferences.hideCreateRideForm");
 
@@ -14,39 +14,30 @@
                 seats: 2
             };
 
-            $scope.rides = [{
-                departure: 1288323623006,
-                pickup: "1000NW Main Street, Oakland",
-                dropoff: "304 2nd Street, San Francisco",
-                seats: 3,
-                driver: {
-                    name: "Alice Cooper"
-                },
-                passengers: [
-                    {
-                        name: "Bob Geldof"
-                    },
-                    {
-                        name: "Carlos Santana"
-                    }
-                ]
-            }];
+            RidesService.list(0, 10).then(function (response) {
+                $scope.rides = response.rides;
+            }, function (error) {
+                console.error(error);
+                $rootScope.showError("Failed to fetch rides", 5000);
+            });
 
             function createRide() {
                 var date = $scope.newRide.departureDate;
                 var time = $scope.newRide.departureTime;
 
-                var newRide = {
-                    driver: {
-                        name: "Alice Cooper"
-                    },
-                    passengers: []
-                };
-                newRide.departure = new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHours(), time.getMinutes());
+                var newRide = {};
+                newRide.departure = new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHours(), time.getMinutes()).getTime();
                 newRide.seats = $scope.newRide.seats;
-                newRide.pickup = $scope.newRide.pickup;
-                newRide.dropoff = $scope.newRide.dropoff;
-                $scope.rides.push(newRide);
+                newRide.pickupAddress = $scope.newRide.pickup;
+                newRide.dropoffAddress = $scope.newRide.dropoff;
+                newRide.pricePerSeat = 2000;
+
+                RidesService.create(newRide).then(function (createdRide) {
+                    $scope.rides.splice(0, 0, createdRide);
+                }, function (error) {
+                    console.error(error);
+                    $rootScope.showError("Failed to create ride", 5000);
+                });
             }
 
             function toggleCreateRideForm(visible) {

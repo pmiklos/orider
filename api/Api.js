@@ -10,11 +10,12 @@ const tokenService = require("../common/TokenService");
 
 const accountRepository = require("./AccountRepository");
 const authRepository = require("./AuthRepository");
+const ridesRepository = require("./RidesRepository");
 
 const accountResource = require("./AccountResource");
 const authResource = require("./AuthResource");
 const configResource = require("./ConfigResource");
-
+const RidesResource = require("./RidesResource");
 
 function requestLogger(req, res, next) {
     console.error(`API: ${req.method} ${req.url} ${JSON.stringify(req.body)}`);
@@ -51,7 +52,9 @@ function accessTokenResolver(req, res, next) {
     }
 }
 
-module.exports = function (webapp) {
+module.exports = function (webapp, mapService) {
+
+    const ridesResource = RidesResource(ridesRepository, mapService);
 
     webapp.use("/api", express.json());
     webapp.use("/api", requestLogger);
@@ -60,6 +63,10 @@ module.exports = function (webapp) {
     webapp.use("/api/my", cookieParser());
     webapp.use("/api/my", accessTokenResolver);
     webapp.use("/api/my", accountResource(accountRepository));
+    webapp.get("/api/rides", ridesResource.list);
+    webapp.post("/api/rides", cookieParser());
+    webapp.post("/api/rides", accessTokenResolver);
+    webapp.post("/api/rides", ridesResource.create);
     webapp.use(errorHandler);
 
     return {

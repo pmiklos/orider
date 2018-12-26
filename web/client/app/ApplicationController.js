@@ -44,7 +44,7 @@
                 $scope.account = account;
             };
 
-            $scope.isLoggedIn = function () {
+            $rootScope.isLoggedIn = function () {
                 return angular.isObject($scope.account);
             };
 

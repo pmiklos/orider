@@ -1,4 +1,6 @@
-<div class="row">
+<div ng-include="'/fragment/messages.html'"></div>
+
+<div class="row" ng-if="isLoggedIn()">
     <div class="col-12 bg-light pt-3" ng-hide="hideCreateRideForm">
         <form name="createRideForm" ng-submit="createRide()">
             <div class="form-row align-items-center">
@@ -48,14 +50,15 @@
                         {{ ride.driver.name }}
                     </h5>
                     <p>
-                        pickup: {{ ride.pickup}} <br>
-                        dropoff: {{ ride.dropoff}} <br>
+                        Pick-up: {{ ride.pickupAddress }} <br>
+                        Drop-off: {{ ride.dropoffAddress }} <br>
                     </p>
                     <p>
                         <ul class="list-inline">
                             <li class="list-inline-item" ng-repeat="passenger in ride.passengers">{{ passenger.name }}</li>
                         </ul>
                     </p>
+                    <a class="card-link" ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}" target="carpool-map">Directions</a>
                 </div>
             </div>
         </div>

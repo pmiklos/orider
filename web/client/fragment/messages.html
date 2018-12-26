@@ -1,0 +1,14 @@
+<div id="messages">
+    <div class="alert alert-danger alert-dismissible fade show col-lg-12" role="alert" ng-show="messages.error">
+        {{ messages.error }}
+        <button type="button" class="close" ng-click="clearMessages()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    <div class="alert alert-success alert-dismissible fade show col-lg-12" role="alert" ng-show="messages.info">
+        {{ messages.info }}
+        <button type="button" class="close" ng-click="clearMessages()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+</div>

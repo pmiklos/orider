@@ -54,3 +54,12 @@ Copy the provided nginx script (see etc/nginx.conf), change your domain name at 
 Install the SSL certificates:
 
     sudo certbot --nginx
+
+## Configuration
+
+The app uses [Google Geocoding API](https://developers.google.com/maps/documentation/geocoding/start) to translate addresses to geo locations.
+The API requires an API KEY you can set in the `~/.config/byteball-carpool/conf.json`:
+
+    {
+        "googleMapsApiKey": "YOUR GOOGLE MAP API KEY"
+    }

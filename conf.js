@@ -17,4 +17,6 @@ exports.KEYS_FILENAME = 'keys.json';
 exports.authSecret = "secret";
 exports.authTimeout = 300000; // the user has 5 minutes to confirm logon with pairing code
 
+exports.googleMapsApiKey = "GOOGLE MAPS API KEY";
+
 console.log('finished carpool conf');
