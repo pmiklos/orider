@@ -31,15 +31,51 @@ eventBus.once("headless_wallet_ready", () => {
         if (pairing_secret === config.permanent_paring_secret) {
             return device.sendMessageToDevice(from_address, "text", "Welcome to Carpooling for Byteballers");
         }
+    });
 
-        api.onAuthenticated({
-            id: pairing_secret,
-            data: {
-                device: from_address
-            }
-        });
+    eventBus.on("paired", (from_address, pairing_secret) => {
+        if (pairing_secret.startsWith("LOGIN-")) {
+            console.log(`[${from_address}] Logging in using ${pairing_secret}`);
 
-        device.sendMessageToDevice(from_address, "text", "Successfully logged in");
+            api.onAuthenticated({
+                id: pairing_secret,
+                data: {
+                    device: from_address
+                }
+            });
+
+            device.sendMessageToDevice(from_address, "text", "Successfully logged in");
+        }
     } );
 
+    eventBus.on("paired", (from_address, pairing_secret) => {
+        if (pairing_secret.startsWith("CHECKIN-")) {
+            console.log(`[${from_address}] Checking in using ${pairing_secret}`);
+
+            const checkInCode = pairing_secret.substring(8);
+
+            api.ridesRepository.selectByCheckInCode(checkInCode, (err, ride) => {
+                if (err) {
+                    console.error(`[${from_address}] Failed to check in with ${checkInCode}: ${err}`);
+                    return device.sendMessageToDevice(from_address, "text", "Something went wrong, try to check in again.");
+                }
+
+                api.reservationsRepository.checkin(ride.id, from_address, (err) => {
+                    if (err) {
+                        console.error(`[${from_address}] Failed to check in for ride ${ride.id}: ${err}`);
+                        return device.sendMessageToDevice(from_address, "text", "Something went wrong, try to check in again.");
+                    }
+
+                    web.send({
+                        id: ride.device,
+                        event: "checkin",
+                        data: {
+                            device: from_address
+                        }
+                    });
+                    device.sendMessageToDevice(from_address, "text", "You checked in for the ride");
+                });
+            });
+        }
+    });
 });

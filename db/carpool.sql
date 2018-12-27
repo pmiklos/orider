@@ -9,11 +9,13 @@ CREATE TABLE cp_rides (
     dropoff_lng FLOAT NOT NULL,
     departure DATETIME NOT NULL,
     seats TINYINT NOT NULL,
-    price_per_seat INTEGER NOT NULL
+    price_per_seat INTEGER NOT NULL,
+    checkin_code VARCHAR NOT NULL
 );
 
 CREATE INDEX cp_rides_departure ON cp_rides(departure);
 CREATE INDEX cp_rides_device ON cp_rides(device);
+CREATE INDEX cp_rides_checkin_code ON cp_rides(checkin_code);
 
 CREATE TABLE cp_reservations (
     ride_id INTEGER NOT NULL,

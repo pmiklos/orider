@@ -1,6 +1,15 @@
 "use strict";
 
-module.exports = function (ridesRepository, mapService) {
+module.exports = function (ridesRepository, authRepository, mapService) {
+
+    function board(req, res) {
+        const checkInCode = "CHECKIN-" + req.ride.checkInCode;
+        authRepository.insertPermanentPairingSecret(checkInCode, "5 MINUTES", () => {
+            res.json({
+                checkInCode
+            });
+        });
+    }
 
     function create(req, res, next) {
         mapService.geocode(req.body.pickupAddress, (err, pickupLocation) => {
@@ -60,6 +69,7 @@ module.exports = function (ridesRepository, mapService) {
     }
 
     return {
+        board,
         create,
         get,
         fetch,

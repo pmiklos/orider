@@ -4,6 +4,14 @@
 
     app.factory("MyRidesService", ["$q", "$http", function ($q, $http) {
         return {
+            board: function(id) {
+                return $http.post(`/api/my/rides/${id}/board`).then(function (response) {
+                    return response.data;
+                }, function (errorResponse) {
+                    console.error("Failed to start boarding: " + errorResponse);
+                    return $q.reject({status: "error"});
+                });
+            },
             get: function (id) {
                 return $http.get(`/api/my/rides/${id}`).then(function (response) {
                     return response.data;
@@ -17,6 +25,14 @@
                     return response.data;
                 }, function (errorResponse) {
                     console.error("Failed to fetch rides: " + errorResponse);
+                    return $q.reject({status: "error"});
+                });
+            },
+            listReservations: function (id) {
+                return $http.get(`/api/my/rides/${id}/reservations`).then(function (response) {
+                    return response.data;
+                }, function (errorResponse) {
+                    console.error("Failed to fetch reservations: " + errorResponse);
                     return $q.reject({status: "error"});
                 });
             }

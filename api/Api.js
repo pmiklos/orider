@@ -56,7 +56,7 @@ function accessTokenResolver(req, res, next) {
 
 module.exports = function (webapp, mapService) {
 
-    const ridesResource = RidesResource(ridesRepository, mapService);
+    const ridesResource = RidesResource(ridesRepository, authRepository, mapService);
     const reservationsResource = ReservationsResource(reservationsRepository);
 
     webapp.use("/api", express.json());
@@ -72,6 +72,8 @@ module.exports = function (webapp, mapService) {
     webapp.get("/api/my/rides", ridesResource.listByDevice);
     webapp.use("/api/my/rides/:id", ridesResource.fetch);
     webapp.get("/api/my/rides/:id", ridesResource.get);
+    webapp.get("/api/my/rides/:id/reservations", reservationsResource.listByRide);
+    webapp.post("/api/my/rides/:id/board", ridesResource.board);
     webapp.get("/api/rides", ridesResource.list);
     webapp.post("/api/rides", ridesResource.create);
     webapp.use("/api/rides/:id", ridesResource.fetch);
@@ -83,6 +85,8 @@ module.exports = function (webapp, mapService) {
     return {
         onAuthenticated(event) {
             authEvents.emit(event.id, event.data);
-        }
+        },
+        reservationsRepository,
+        ridesRepository
     }
 };

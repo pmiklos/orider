@@ -69,9 +69,20 @@ function selectAllByDevice(device, callback) {
     });
 }
 
+function checkin(rideId, device, callback) {
+    db.query(`UPDATE cp_reservations SET status = 'checkedin'
+        WHERE ride_id =? AND device = ? AND status IN ('reserved', 'checkedin')`, [rideId, device], (result) => {
+        if (result.affectedRows === 1) {
+            return callback(null);
+        }
+        callback(`Failed to check-in: ${rideId} ${device}, ${JSON.stringify(result)}`);
+    });
+}
+
 module.exports = {
     create,
     select,
     selectAllByRide,
-    selectAllByDevice
+    selectAllByDevice,
+    checkin
 };

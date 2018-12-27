@@ -2,18 +2,24 @@
 
 var db = require('byteballcore/db.js');
 
-const AUTH_TIMEOUT_INTERVAL = '5 MINUTES';
 
-function insertTempPairingSecret(pairingSecret, callback) {
-    let expiryDate = db.addTime(AUTH_TIMEOUT_INTERVAL);
+function insertPairingSecret(pairingSecret, isPermanent, timeout, callback) {
+    let expiryDate = db.addTime(timeout);
     db.query(
-        "INSERT " + db.getIgnore() + " INTO pairing_secrets (pairing_secret, is_permanent, expiry_date) VALUES (?, ?, " + expiryDate + ")", [pairingSecret, false],
+        "INSERT " + db.getIgnore() + " INTO pairing_secrets (pairing_secret, is_permanent, expiry_date) VALUES (?, ?, " + expiryDate + ")", [pairingSecret, isPermanent],
         function(result) {
             db.query("UPDATE pairing_secrets SET expiry_date = " + expiryDate + " WHERE pairing_secret = ?", [pairingSecret], function(result) {
                 callback();
             });
         }
     );
+}
+
+function insertTempPairingSecret(pairingSecret, timeout, callback) {
+    insertPairingSecret(pairingSecret, false, timeout, callback);
+}
+function insertPermanentPairingSecret(pairingSecret, timeout, callback) {
+    insertPairingSecret(pairingSecret, true, timeout, callback);
 }
 
 function verifyPairingSecret(pairingSecret, callback) {
@@ -32,5 +38,8 @@ function verifyPairingSecret(pairingSecret, callback) {
     });
 }
 
-module.exports.insertTempPairingSecret = insertTempPairingSecret;
-module.exports.verifyPairingSecret = verifyPairingSecret;
+module.exports = {
+    insertTempPairingSecret,
+    insertPermanentPairingSecret,
+    verifyPairingSecret
+};

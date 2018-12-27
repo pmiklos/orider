@@ -1,22 +1,42 @@
 <div ng-include="'/fragment/messages.html'"></div>
 
-<div class="row">
-    <div class="col-12">
-        <div class="col-12 card">
-            <div class="card-body">
-                <h5 class="card-title">
-                    {{ ride.departure | date:'MMM dd, yyyy HH:mm a'}} <br>
-                    {{ ride.driver.name }}
-                </h5>
-                <p>
-                    Pick-up: {{ ride.pickupAddress }} <br>
-                    Drop-off: {{ ride.dropoffAddress }} <br>
-                    {{ ride.seats - ride.reservationCount }} more left
-                </p>
-                <a class="card-link"
-                   ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}"
-                   target="carpool-map">Directions</a>
+<div class="row justify-content-center">
+    <div class="col-auto p-3 card border-dark" ng-if="checkInUrl">
+        <div class="mx-auto">
+            <qrcode data="{{ checkInUrl }}" size="280" version="7"></qrcode>
+        </div>
+        <div class="card-body">
+            <h3 class="car-title text-monospace text-center">Check-in</h3>
+            <p class="card-text"><small class="text-muted">Passengers have to scan to check in for the ride</small></p>
+        </div>
+    </div>
+    <div class="col-12 col-md-8 card border-light">
+        <div class="card-body">
+            <h5 class="card-title">
+                {{ ride.departure | date:'MMM dd, yyyy HH:mm a'}} <br>
+                {{ ride.driver.name }}
+            </h5>
+            <p>
+                Pick-up: {{ ride.pickupAddress }} <br>
+                Drop-off: {{ ride.dropoffAddress }} <br>
+                {{ ride.seats - ride.reservationCount }} more left
+            </p>
+            <div>
+                Checked in:
+                <ul class="list-unstyled">
+                    <li ng-repeat="reservation in reservations | filter: 'checkedin'">{{ reservation.name }}</li>
+                </ul>
+
+                Waiting for checking in:
+                <ul class="list-unstyled">
+                    <li ng-repeat="reservation in reservations | filter: 'reserved'">{{ reservation.name }}</li>
+                </ul>
             </div>
+            <button class="btn btn-primary card-link" type="button" ng-click="startBoarding()" ng-if="!checkInUrl">Start boarding</button>
+            <span class="card-link text-muted" ng-if="checkInUrl">Boarding now</span>
+            <a class="card-link"
+               ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}"
+               target="carpool-map">Directions</a>
         </div>
     </div>
 </div>

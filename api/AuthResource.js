@@ -5,11 +5,13 @@ const cookieParser = require('cookie-parser');
 const config = require("byteballcore/conf");
 const uuid = require("uuid/v4");
 
+const AUTH_TIMEOUT_INTERVAL = '5 MINUTES';
+
 module.exports = function (authRepository, authEvents, tokenService) {
 
     function getAuthCode(req, res) {
-        let authCode = uuid();
-        authRepository.insertTempPairingSecret(authCode, () => {
+        let authCode = "LOGIN-" + uuid();
+        authRepository.insertTempPairingSecret(authCode, AUTH_TIMEOUT_INTERVAL, () => {
             res.json({
                 authCode: authCode
             });
