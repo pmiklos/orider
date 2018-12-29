@@ -22,14 +22,14 @@
                 {{ ride.seats - ride.reservationCount }} more left
             </p>
             <div>
-                Checked in:
-                <ul class="list-unstyled">
-                    <li ng-repeat="reservation in reservations | filter: 'checkedin'">{{ reservation.name }}</li>
-                </ul>
-
                 Waiting for checking in:
                 <ul class="list-unstyled">
                     <li ng-repeat="reservation in reservations | filter: 'reserved'">{{ reservation.name }}</li>
+                </ul>
+
+                Checked in:
+                <ul class="list-unstyled">
+                    <li ng-repeat="reservation in reservations | filter: 'checkedin'">{{ reservation.name }}</li>
                 </ul>
             </div>
             <button class="btn btn-primary card-link" type="button" ng-click="startBoarding()" ng-if="!checkInUrl">Start boarding</button>

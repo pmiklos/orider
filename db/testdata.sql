@@ -1,3 +1,6 @@
+INSERT INTO cp_accounts(device, payout_address)
+VALUES ('0X7EJ4UUGYR3D2K2ZRLP557TMYOUKUCND', 'N6SOYZHMRFTGDOY52GOYJ6UQ5E3WZBZD');
+
 INSERT INTO cp_rides (device, pickup_address, pickup_lat, pickup_lng, dropoff_address, dropoff_lat, dropoff_lng, departure, seats, price_per_seat, checkin_code)
 VALUES
     ('0X7EJ4UUGYR3D2K2ZRLP557TMYOUKUCND', '1 1st Avenue, Oakland, CA', 37.7988443, -122.2591694, 'Union Square, San Francisco, CA', 37.787933, -122.4096922, '2019-03-31 09:00:00', 2, 2000, '4135b800-14c5-4b8a-bccf-4a41f96f5173'),

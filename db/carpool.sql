@@ -1,3 +1,9 @@
+CREATE TABLE cp_accounts (
+    device CHAR(33) NOT NULL PRIMARY KEY,
+    payout_address CHAR(32) NULL
+--    FOREIGN KEY (device) REFERENCES correspondent_addresses(device_address)
+);
+
 CREATE TABLE cp_rides (
     ride_id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     device CHAR(33) NOT NULL,
@@ -10,7 +16,8 @@ CREATE TABLE cp_rides (
     departure DATETIME NOT NULL,
     seats TINYINT NOT NULL,
     price_per_seat INTEGER NOT NULL,
-    checkin_code VARCHAR NOT NULL
+    checkin_code VARCHAR NOT NULL,
+    FOREIGN KEY (device) REFERENCES cp_accounts(device)
 );
 
 CREATE INDEX cp_rides_departure ON cp_rides(departure);
@@ -23,7 +30,8 @@ CREATE TABLE cp_reservations (
     status VARCHAR NOT NULL DEFAULT 'reserved',
     reservation_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (ride_id, device),
-    FOREIGN KEY (ride_id) REFERENCES cp_rides(ride_id)
+    FOREIGN KEY (ride_id) REFERENCES cp_rides(ride_id),
+    FOREIGN KEY (device) REFERENCES cp_accounts(device)
 );
 
 CREATE INDEX cp_reservations_device ON cp_reservations(device);

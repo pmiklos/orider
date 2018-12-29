@@ -86,6 +86,7 @@ module.exports = function (webapp, mapService) {
         onAuthenticated(event) {
             authEvents.emit(event.id, event.data);
         },
+        accountRepository,
         reservationsRepository,
         ridesRepository
     }

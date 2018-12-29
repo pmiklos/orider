@@ -10,6 +10,7 @@ const socketio = require('socket.io');
 
 const Web = require("./web/Web");
 const Api = require("./api/Api");
+const RideFeeContract = require("./contract/RideFeeContract");
 const googleMapService = require("./common/GoogleMapService");
 
 const httpPort = process.env.PORT || 8080;
@@ -22,6 +23,21 @@ const web = Web(webapp, ws);
 const api = Api(webapp, googleMapService);
 
 eventBus.once("headless_wallet_ready", () => {
+
+    headlessWallet.issueOrSelectStaticChangeAddress((address) => {
+        const paymentProcessorDevice = device.getMyDeviceAddress();
+        const paymentProcessorAddress = address;
+        const carpoolOracleAddress = address;
+        const rideFeeContract = RideFeeContract(paymentProcessorDevice, paymentProcessorAddress, carpoolOracleAddress);
+
+        console.error("Carpool oracle address: " + carpoolOracleAddress);
+
+        start(rideFeeContract);
+    });
+
+});
+
+function start(rideFeeContract) {
 
     httpServer.listen(httpPort, httpHost, () => {
         console.error("WEB started");
@@ -43,7 +59,6 @@ eventBus.once("headless_wallet_ready", () => {
                     device: from_address
                 }
             });
-
             device.sendMessageToDevice(from_address, "text", "Successfully logged in");
         }
     } );
@@ -60,7 +75,7 @@ eventBus.once("headless_wallet_ready", () => {
                     return device.sendMessageToDevice(from_address, "text", "Something went wrong, try to check in again.");
                 }
 
-                api.reservationsRepository.checkin(ride.id, from_address, (err) => {
+                api.reservationsRepository.checkin(ride.id, from_address, (err, reservation) => {
                     if (err) {
                         console.error(`[${from_address}] Failed to check in for ride ${ride.id}: ${err}`);
                         return device.sendMessageToDevice(from_address, "text", "Something went wrong, try to check in again.");
@@ -73,9 +88,35 @@ eventBus.once("headless_wallet_ready", () => {
                             device: from_address
                         }
                     });
+
                     device.sendMessageToDevice(from_address, "text", "You checked in for the ride");
+
+                    rideFeeContract.define({
+                        rideId: ride.id,
+                        driverDevice: ride.device,
+                        driverPayoutAddress: ride.payoutAddress,
+                        passengerDevice: from_address,
+                        passengerRefundAddress: reservation.payoutAddress,
+                        amount: ride.pricePerSeat
+                    }, (err, contractAddress, definition) => {
+                        const payments = [{
+                            address: contractAddress,
+                            amount: ride.pricePerSeat,
+                            asset: 'base'
+                        }];
+
+                        const definitions = {};
+                        definitions[contractAddress] = definition;
+
+                        const paymentJson = JSON.stringify({payments, definitions});
+                        const paymentJsonBase64 = Buffer(paymentJson).toString('base64');
+                        const paymentRequestCode = 'payment:' + paymentJsonBase64;
+                        const paymentRequestText = `[Please pay the fee for the ride](${paymentRequestCode})`;
+
+                        device.sendMessageToDevice(from_address, "text", paymentRequestText);
+                    });
                 });
             });
         }
     });
-});
+}

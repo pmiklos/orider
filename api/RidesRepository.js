@@ -38,18 +38,18 @@ function select(id, callback) {
 
 function selectByCheckInCode(checkInCode, callback) {
     db.query(`SELECT
-            rides.ride_id id,
-            rides.device,
-            rides.device driver,
-            rides.pickup_address pickupAddress,
-            rides.dropoff_address dropoffAddress,
-            strftime('%s', rides.departure) * 1000 departure,
-            rides.seats,
-            rides.price_per_seat pricePerSeat,
-            count(reservations.device) reservationCount,
-            rides.checkin_code checkInCode
-        FROM cp_rides rides
-        LEFT JOIN cp_reservations reservations USING (ride_id)
+            ride.ride_id id,
+            ride.device,
+            ride.device driver,
+            account.payout_address payoutAddress,
+            ride.pickup_address pickupAddress,
+            ride.dropoff_address dropoffAddress,
+            strftime('%s', ride.departure) * 1000 departure,
+            ride.seats,
+            ride.price_per_seat pricePerSeat,
+            ride.checkin_code checkInCode
+        FROM cp_rides ride
+        JOIN cp_accounts account USING (device)
         WHERE checkInCode = ?`, [checkInCode], (rows) => {
         if (Array.isArray(rows) && rows.length === 1) {
             return callback(null, rows[0]);
