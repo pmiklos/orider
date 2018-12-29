@@ -63,3 +63,20 @@ The API requires an API KEY you can set in the `~/.config/byteball-carpool/conf.
     {
         "googleMapsApiKey": "YOUR GOOGLE MAP API KEY"
     }
+
+## Manual testing
+
+Testing the app is very easy using docker. You can launch as many test wallets as you want to simulate a real life situation.
+Since carpools involve one driver and at least one passenger, premade scripts are available to launch a separate wallet for each.
+
+    # Start the driver wallet
+    npm run driver-wallet
+
+    # Start the passenger wallet
+    npm run passenger-wallet
+
+Both commands require to have docker installed on your linux machine. See detials in [bin/docker-wallet.sh](./bin/docker-wallet.sh)
+
+After launching the wallets use the [testnet faucet](https://byteball.org/testnet.html) to get some test bytes by pairing your wallet with the faucet bot using the pairing code below.
+
+    AxBxXDnPOzE/AxLHmidAjwLPFtQ6dK3k70zM0yKVeDzC@byteball.org/bb-test#0000

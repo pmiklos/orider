@@ -4,6 +4,8 @@
   "description": "Carpooling for Byteballers",
   "main": "carpool.js",
   "scripts": {
+    "driver-wallet": "./bin/docker-wallet.sh byteball-carpool-driver",
+    "passenger-wallet": "./bin/docker-wallet.sh byteball-carpool-passenger",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
