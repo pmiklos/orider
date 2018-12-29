@@ -13,12 +13,12 @@ function hasOutput(address, asset, amount) {
 }
 
 /**
- * @param {string} paymentProcessorDevice - BASE32 address of the device (the bot) that pays out the driver or refunds the passenger
- * @param {string} paymentProcessorAddress - BASE32 address of the author address that pays out the driver or refunds the passenger
+ * @param {string} payoutProcessorDevice - BASE32 address of the device (the bot) that pays out the driver or refunds the passenger
+ * @param {string} payoutProcessorAddress - BASE32 address of the author address that pays out the driver or refunds the passenger
  * @param {string} carpoolOracleAddress - BASE32 address of the oracle that post trip completion status
  * @returns {{define(RideFeeContractParams, RideFeeCallback): void}}
  */
-module.exports = function (paymentProcessorDevice, paymentProcessorAddress, carpoolOracleAddress) {
+module.exports = function (payoutProcessorDevice, payoutProcessorAddress, carpoolOracleAddress) {
 
     return {
 
@@ -47,7 +47,7 @@ module.exports = function (paymentProcessorDevice, paymentProcessorAddress, carp
             const definition = [
                 "or", [
                     ["and", [
-                        ["address", paymentProcessorAddress], // r.0.0.0
+                        ["address", payoutProcessorAddress], // r.0.0.0
                         hasOutput(p.driverPayoutAddress, 'base', p.amount),
                         ["in data feed", [
                             [carpoolOracleAddress],
@@ -55,7 +55,7 @@ module.exports = function (paymentProcessorDevice, paymentProcessorAddress, carp
                         ]]
                     ]],
                     ["and", [
-                        ["address", paymentProcessorAddress], // r.1.0.0
+                        ["address", payoutProcessorAddress], // r.1.0.0
                         hasOutput(p.passengerRefundAddress, 'base', p.amount),
                         ["in data feed", [
                             [carpoolOracleAddress],
@@ -81,14 +81,14 @@ module.exports = function (paymentProcessorDevice, paymentProcessorAddress, carp
 
             let signers = {
                 "r.0.0.0": {
-                    address: paymentProcessorAddress,
+                    address: payoutProcessorAddress,
                     member_signing_path: "r",
-                    device_address: paymentProcessorDevice
+                    device_address: payoutProcessorDevice
                 },
                 "r.1.0.0": {
-                    address: paymentProcessorAddress,
+                    address: payoutProcessorAddress,
                     member_signing_path: "r",
-                    device_address: paymentProcessorDevice
+                    device_address: payoutProcessorDevice
                 },
                 "r.2.0.0": {
                     address: p.driverPayoutAddress,

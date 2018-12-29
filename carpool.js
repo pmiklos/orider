@@ -25,10 +25,10 @@ const api = Api(webapp, googleMapService);
 eventBus.once("headless_wallet_ready", () => {
 
     headlessWallet.issueOrSelectStaticChangeAddress((address) => {
-        const paymentProcessorDevice = device.getMyDeviceAddress();
-        const paymentProcessorAddress = address;
+        const payoutProcessorDevice = device.getMyDeviceAddress();
+        const payoutProcessorAddress = address;
         const carpoolOracleAddress = address;
-        const rideFeeContract = RideFeeContract(paymentProcessorDevice, paymentProcessorAddress, carpoolOracleAddress);
+        const rideFeeContract = RideFeeContract(payoutProcessorDevice, payoutProcessorAddress, carpoolOracleAddress);
 
         console.error("Carpool oracle address: " + carpoolOracleAddress);
 
