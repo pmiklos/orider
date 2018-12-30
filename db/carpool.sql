@@ -29,6 +29,8 @@ CREATE TABLE cp_reservations (
     device CHAR(33) NOT NULL,
     status VARCHAR NOT NULL DEFAULT 'reserved',
     reservation_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    contract_address CHAR(32) NULL,
+    checkin_date DATETIME NULL,
     PRIMARY KEY (ride_id, device),
     FOREIGN KEY (ride_id) REFERENCES cp_rides(ride_id),
     FOREIGN KEY (device) REFERENCES cp_accounts(device)

@@ -61,7 +61,7 @@ function start(rideFeeContract) {
             });
             device.sendMessageToDevice(from_address, "text", "Successfully logged in");
         }
-    } );
+    });
 
     eventBus.on("paired", (from_address, pairing_secret) => {
         if (pairing_secret.startsWith("CHECKIN-")) {
@@ -75,21 +75,11 @@ function start(rideFeeContract) {
                     return device.sendMessageToDevice(from_address, "text", "Something went wrong, try to check in again.");
                 }
 
-                api.reservationsRepository.checkin(ride.id, from_address, (err, reservation) => {
+                api.reservationsRepository.select(ride.id, from_address, (err, reservation) => {
                     if (err) {
-                        console.error(`[${from_address}] Failed to check in for ride ${ride.id}: ${err}`);
+                        console.error(`[${from_address}] Failed to check in with ${checkInCode}: ${err}`);
                         return device.sendMessageToDevice(from_address, "text", "Something went wrong, try to check in again.");
                     }
-
-                    web.send({
-                        id: ride.device,
-                        event: "checkin",
-                        data: {
-                            device: from_address
-                        }
-                    });
-
-                    device.sendMessageToDevice(from_address, "text", "You checked in for the ride");
 
                     rideFeeContract.define({
                         rideId: ride.id,
@@ -99,21 +89,43 @@ function start(rideFeeContract) {
                         passengerRefundAddress: reservation.payoutAddress,
                         amount: ride.pricePerSeat
                     }, (err, contractAddress, definition) => {
-                        const payments = [{
-                            address: contractAddress,
-                            amount: ride.pricePerSeat,
-                            asset: 'base'
-                        }];
+                        if (err) {
+                            console.error(`[${from_address}] Failed to check in with ${checkInCode}, contract failed: ${err}`);
+                            return device.sendMessageToDevice(from_address, "text", "Something went wrong, try to check in again.");
+                        }
 
-                        const definitions = {};
-                        definitions[contractAddress] = definition;
+                        api.reservationsRepository.checkin(ride.id, from_address, contractAddress, (err) => {
+                            if (err) {
+                                console.error(`[${from_address}] Failed to check in for ride ${ride.id}: ${err}`);
+                                return device.sendMessageToDevice(from_address, "text", "Something went wrong, try to check in again.");
+                            }
 
-                        const paymentJson = JSON.stringify({payments, definitions});
-                        const paymentJsonBase64 = Buffer(paymentJson).toString('base64');
-                        const paymentRequestCode = 'payment:' + paymentJsonBase64;
-                        const paymentRequestText = `[Please pay the fee for the ride](${paymentRequestCode})`;
+                            web.send({
+                                id: ride.device,
+                                event: "checkin",
+                                data: {
+                                    device: from_address
+                                }
+                            });
 
-                        device.sendMessageToDevice(from_address, "text", paymentRequestText);
+                            device.sendMessageToDevice(from_address, "text", "You checked in for the ride");
+
+                            const payments = [{
+                                address: contractAddress,
+                                amount: ride.pricePerSeat,
+                                asset: 'base'
+                            }];
+
+                            const definitions = {};
+                            definitions[contractAddress] = definition;
+
+                            const paymentJson = JSON.stringify({payments, definitions});
+                            const paymentJsonBase64 = Buffer(paymentJson).toString('base64');
+                            const paymentRequestCode = 'payment:' + paymentJsonBase64;
+                            const paymentRequestText = `[Please pay the fee for the ride](${paymentRequestCode})`;
+
+                            device.sendMessageToDevice(from_address, "text", paymentRequestText);
+                        });
                     });
                 });
             });

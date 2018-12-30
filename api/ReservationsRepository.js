@@ -94,15 +94,22 @@ function selectAllByDevice(device, callback) {
 }
 
 /**
+ * @callback NoArgCallback
+ * @param {string|null=} err
+ */
+
+/**
  * @param {number} rideId
  * @param {string} device
- * @param {ReservationCallback} callback
+ * @param {string} contractAddress
+ * @param {NoArgCallback} callback
  */
-function checkin(rideId, device, callback) {
-    db.query(`UPDATE cp_reservations SET status = 'checkedin'
-        WHERE ride_id =? AND device = ? AND status IN ('reserved', 'checkedin')`, [rideId, device], (result) => {
+function checkin(rideId, device, contractAddress, callback) {
+    db.query(`UPDATE cp_reservations SET status = 'checkedin', checkin_date = ${db.getNow()}, contract_address = ?
+        WHERE ride_id = ? AND device = ? AND status IN ('reserved', 'checkedin')`,
+        [contractAddress, rideId, device], (result) => {
         if (result.affectedRows === 1) {
-            return select(rideId, device, callback);
+            return callback();
         }
         callback(`Failed to check-in: ${rideId} ${device}, ${JSON.stringify(result)}`);
     });
