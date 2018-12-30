@@ -59,8 +59,13 @@
                         Drop-off: {{ ride.dropoffAddress }} <br>
                         {{ ride.seats - ride.reservationCount }} more left
                     </p>
+                    <p ng-if="isBoarding(ride) || isCompleted(ride)">
+                        <span class="text-info" ng-if="isBoarding(ride)"><b>Boarding now</b></span>
+                        <span class="text-info" ng-if="isCompleted(ride)"><b>Completed</b></span>
+                    </p>
                     <a class="card-link" ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}" target="carpool-map">Directions</a>
-                    <button class="btn btn-link card-link" type="button" ng-click="reserve(ride)" ng-if="isAccountReady() && ride.id && ride.seats > ride.reservationCount && !isReserved(ride)">Reserve</button>
+                    <button class="btn btn-link card-link" type="button" ng-click="reserve(ride)"
+                            ng-if="isAccountReady() && ride.id && ride.seats > ride.reservationCount && !isReserved(ride) && !isCompleted(ride)">Reserve</button>
                     <span class="card-link" ng-if="isLoggedIn() && isReserved(ride)">Reserved</span>
                     <a class="card-link" ng-href="#!/my/ride/{{ ride.id }}" ng-if="isLoggedIn() && isMyRide(ride)">Start</a>
                 </div>

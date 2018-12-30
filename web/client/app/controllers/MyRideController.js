@@ -8,8 +8,11 @@
             $scope.ride = {};
 
             function fetchRide() {
-                return MyRidesService.get($routeParams.id).then(function (response) {
-                    $scope.ride = response;
+                return MyRidesService.get($routeParams.id).then(function (ride) {
+                    $scope.ride = ride;
+                    if (ride.status === 'boarding') {
+                        updateCheckInUrl(ride.checkInCode);
+                    }
                 }, function (error) {
                     console.error(error);
                     $rootScope.showError("Failed to fetch ride", 5000);
@@ -18,13 +21,36 @@
 
             function startBoarding() {
                 return MyRidesService.board($routeParams.id).then(function (response) {
-                    const checkInCode = byteball.pairingCode(response.checkInCode);
-                    $scope.checkInUrl = byteball.pairingUrl(checkInCode);
-                    console.log(checkInCode);
+                    updateCheckInUrl(response.checkInCode);
+                    $scope.ride.status = response.status;
                 }, function (error) {
                     console.error(error);
                     $rootScope.showError("Failed to start boarding", 5000);
                 });
+            }
+
+            function completeRide() {
+                return MyRidesService.complete($routeParams.id).then(function (response) {
+                    $scope.checkInUrl = null;
+                    $scope.ride.status = response.status;
+                }, function (error) {
+                    console.error(error);
+                    $rootScope.showError("Failed to complete ride", 5000);
+                });
+            }
+
+            function updateCheckInUrl(checkInCode) {
+                const pairingCode = byteball.pairingCode(checkInCode);
+                $scope.checkInUrl = byteball.pairingUrl(pairingCode);
+                console.log(pairingCode);
+            }
+
+            function isBoarding() {
+                return $scope.ride.status === 'boarding';
+            }
+
+            function isCompleted() {
+                return $scope.ride.status === 'completed';
             }
 
             function fetchReservations() {
@@ -43,6 +69,9 @@
             fetchRide().then(fetchReservations);
 
             $scope.startBoarding = startBoarding;
+            $scope.completeRide = completeRide;
+            $scope.isBoarding = isBoarding;
+            $scope.isCompleted = isCompleted;
         }]);
 
 })();

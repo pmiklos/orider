@@ -17,17 +17,19 @@ CREATE TABLE cp_rides (
     seats TINYINT NOT NULL,
     price_per_seat INTEGER NOT NULL,
     checkin_code VARCHAR NOT NULL,
+    status VARCHAR NOT NULL DEFAULT 'created' -- created, boarding, completed
     FOREIGN KEY (device) REFERENCES cp_accounts(device)
 );
 
 CREATE INDEX cp_rides_departure ON cp_rides(departure);
 CREATE INDEX cp_rides_device ON cp_rides(device);
 CREATE INDEX cp_rides_checkin_code ON cp_rides(checkin_code);
+CREATE INDEX cp_rides_status ON cp_rides(status);
 
 CREATE TABLE cp_reservations (
     ride_id INTEGER NOT NULL,
     device CHAR(33) NOT NULL,
-    status VARCHAR NOT NULL DEFAULT 'reserved',
+    status VARCHAR NOT NULL DEFAULT 'reserved', -- reserved, checkedin, checkedout
     reservation_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     contract_address CHAR(32) NULL,
     checkin_date DATETIME NULL,

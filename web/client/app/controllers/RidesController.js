@@ -74,6 +74,14 @@
                 });
             }
 
+            function isBoarding(ride) {
+                return ride.status === 'boarding';
+            }
+
+            function isCompleted(ride) {
+                return ride.status === 'completed';
+            }
+
             function isMyRide(ride) {
                 return ride.device === $rootScope.account.device;
             }
@@ -93,6 +101,8 @@
             $scope.reserve = reserve;
             $scope.isReserved = isReserved;
             $scope.isMyRide = isMyRide;
+            $scope.isBoarding = isBoarding;
+            $scope.isCompleted = isCompleted;
             $scope.toggleCreateRideForm = toggleCreateRideForm;
         }]);
 

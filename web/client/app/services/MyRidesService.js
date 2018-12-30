@@ -12,6 +12,14 @@
                     return $q.reject({status: "error"});
                 });
             },
+            complete: function(id) {
+                return $http.post(`/api/my/rides/${id}/complete`).then(function (response) {
+                    return response.data;
+                }, function (errorResponse) {
+                    console.error("Failed to complete ride: " + JSON.stringify(errorResponse));
+                    return $q.reject({status: "error"});
+                });
+            },
             get: function (id) {
                 return $http.get(`/api/my/rides/${id}`).then(function (response) {
                     return response.data;

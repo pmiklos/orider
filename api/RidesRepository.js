@@ -3,6 +3,25 @@
 const db = require("byteballcore/db.js");
 const uuid = require("uuid/v4");
 
+function board(rideId, callback) {
+    updateStatus(rideId, ['created'], 'boarding', callback);
+}
+
+function complete(rideId, callback) {
+    // TODO save driver's location
+    updateStatus(rideId, ['boarding'], 'completed', callback);
+}
+
+function updateStatus(rideId, fromStatuses, toStatus, callback) {
+    db.query(`UPDATE cp_rides SET status = ? WHERE ride_id = ? AND status in (?)
+    `, [toStatus, rideId, fromStatuses], (result) => {
+        if (result.affectedRows === 1) {
+            return callback(null, toStatus);
+        }
+        callback(`Failed to update ride (${rideId}) status to ${toStatus}`);
+    });
+}
+
 function create(device, ride, callback) {
     db.query(`INSERT INTO cp_rides (device, pickup_address, pickup_lat, pickup_lng, dropoff_address, dropoff_lat, dropoff_lng, departure, seats, price_per_seat, checkin_code)
             VALUES (?, ?, ?, ?, ?, ?, ?, datetime(? / 1000, 'unixepoch'), ?, ?, ?)
@@ -25,7 +44,8 @@ function select(id, callback) {
             rides.seats,
             rides.price_per_seat pricePerSeat,
             count(reservations.device) reservationCount,
-            rides.checkin_code checkInCode
+            rides.checkin_code checkInCode,
+            rides.status
         FROM cp_rides rides
         LEFT JOIN cp_reservations reservations USING (ride_id)
         WHERE ride_id = ?`, [id], (rows) => {
@@ -47,7 +67,8 @@ function selectByCheckInCode(checkInCode, callback) {
             strftime('%s', ride.departure) * 1000 departure,
             ride.seats,
             ride.price_per_seat pricePerSeat,
-            ride.checkin_code checkInCode
+            ride.checkin_code checkInCode,
+            ride.status
         FROM cp_rides ride
         JOIN cp_accounts account USING (device)
         WHERE checkInCode = ?`, [checkInCode], (rows) => {
@@ -68,11 +89,12 @@ function selectAll(from, size, callback) {
             strftime('%s', rides.departure) * 1000 departure,
             rides.seats,
             rides.price_per_seat pricePerSeat,
+            rides.status,
             count(reservations.device) reservationCount
         FROM cp_rides rides
         LEFT JOIN cp_reservations reservations USING (ride_id)
         WHERE departure > ${db.getNow()}
-        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
         ORDER BY departure ASC
         LIMIT ${size} OFFSET ${from}`, [], (rows) => {
         if (Array.isArray(rows)) {
@@ -92,11 +114,12 @@ function selectAllByDevice(device, callback) {
             strftime('%s', rides.departure) * 1000 departure,
             rides.seats,
             rides.price_per_seat pricePerSeat,
+            rides.status,
             count(reservations.device) reservationCount
         FROM cp_rides rides
         LEFT JOIN cp_reservations reservations USING (ride_id)
         WHERE departure > ${db.getNow()}
-        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8
+        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
         ORDER BY departure ASC`, [device], (rows) => {
         if (Array.isArray(rows)) {
             return callback(null, rows);
@@ -106,6 +129,8 @@ function selectAllByDevice(device, callback) {
 }
 
 module.exports = {
+    board,
+    complete,
     create,
     select,
     selectAll,

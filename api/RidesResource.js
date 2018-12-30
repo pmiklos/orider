@@ -2,11 +2,24 @@
 
 module.exports = function (ridesRepository, authRepository, mapService) {
 
-    function board(req, res) {
+    function board(req, res, next) {
         const checkInCode = "CHECKIN-" + req.ride.checkInCode;
-        authRepository.insertPermanentPairingSecret(checkInCode, "5 MINUTES", () => {
+        authRepository.insertPermanentPairingSecret(checkInCode, "30 MINUTES", () => {
+            ridesRepository.board(req.ride.id, (err, status) => {
+                if (err) return next(err);
+                res.json({
+                    checkInCode,
+                    status
+                });
+            });
+        });
+    }
+
+    function complete(req, res, next) {
+        ridesRepository.complete(req.ride.id, (err, status) => {
+            if (err) return next(err);
             res.json({
-                checkInCode
+                status
             });
         });
     }
@@ -70,6 +83,7 @@ module.exports = function (ridesRepository, authRepository, mapService) {
 
     return {
         board,
+        complete,
         create,
         get,
         fetch,

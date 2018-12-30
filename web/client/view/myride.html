@@ -19,7 +19,9 @@
             <p>
                 Pick-up: {{ ride.pickupAddress }} <br>
                 Drop-off: {{ ride.dropoffAddress }} <br>
-                {{ ride.seats - ride.reservationCount }} more left
+                <a class="card-link"
+                   ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}"
+                   target="carpool-map">Directions</a>
             </p>
             <div>
                 Waiting for checking in:
@@ -32,11 +34,12 @@
                     <li ng-repeat="reservation in reservations | filter: 'checkedin'">{{ reservation.name }}</li>
                 </ul>
             </div>
-            <button class="btn btn-primary card-link" type="button" ng-click="startBoarding()" ng-if="!checkInUrl">Start boarding</button>
-            <span class="card-link text-muted" ng-if="checkInUrl">Boarding now</span>
-            <a class="card-link"
-               ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}"
-               target="carpool-map">Directions</a>
+            <div>
+                <button class="btn btn-primary card-link" type="button" ng-click="startBoarding()" ng-if="!checkInUrl && !isCompleted()">Start boarding</button>
+                <span class="card-link text-muted" ng-if="isBoarding()">Boarding now</span>
+                <button class="btn btn-primary card-link" type="button" ng-click="completeRide()" ng-if="!isCompleted()">Complete Ride</button>
+                <span class="card-link text-muted" ng-if="isCompleted()">Completed</span>
+            </div>
         </div>
     </div>
 </div>
