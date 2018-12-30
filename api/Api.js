@@ -13,7 +13,7 @@ const authRepository = require("./AuthRepository");
 const ridesRepository = require("./RidesRepository");
 const reservationsRepository = require("./ReservationsRepository");
 
-const accountResource = require("./AccountResource");
+const AccountResource = require("./AccountResource");
 const authResource = require("./AuthResource");
 const configResource = require("./ConfigResource");
 const RidesResource = require("./RidesResource");
@@ -56,6 +56,7 @@ function accessTokenResolver(req, res, next) {
 
 module.exports = function (webapp, mapService) {
 
+    const accountResource = AccountResource(accountRepository);
     const ridesResource = RidesResource(ridesRepository, authRepository, mapService);
     const reservationsResource = ReservationsResource(reservationsRepository);
 
@@ -67,7 +68,8 @@ module.exports = function (webapp, mapService) {
     webapp.post("/api/*", accessTokenResolver);
     webapp.get("/api/my/*", cookieParser());
     webapp.get("/api/my/*", accessTokenResolver);
-    webapp.use("/api/my", accountResource(accountRepository));
+    webapp.get("/api/my/account", accountResource.get);
+    webapp.post("/api/my/account", accountResource.createOrUpdate);
     webapp.get("/api/my/reservations", reservationsResource.listByDevice);
     webapp.get("/api/my/rides", ridesResource.listByDevice);
     webapp.use("/api/my/rides/:id", ridesResource.fetch);

@@ -29,8 +29,13 @@
                     <input class="form-control" type="number" min="1" max="4" id="seats" name="seats" ng-model="newRide.seats" required />
                 </div>
                 <div class="col-auto">
-                    <button class="btn btn-primary mt-md-3" type="submit" ng-disabled="createRideInProgress">Create</button>
+                    <button class="btn btn-primary mt-md-3" type="submit" ng-disabled="isAccountPending() || createRideInProgress" aria-describedby="createRideHelp">Create</button>
                     <button class="btn btn-link mt-md-3" type="button" ng-click="toggleCreateRideForm(true)">Hide</button>
+                </div>
+            </div>
+            <div class="form-row" ng-if="isAccountPending()">
+                <div class="col">
+                    <small id="createRideHelp" class="text-muted">Complete <a ng-href="#!/my/account">your profile</a> to create new rides or reserve one</small>
                 </div>
             </div>
         </form>
@@ -55,7 +60,7 @@
                         {{ ride.seats - ride.reservationCount }} more left
                     </p>
                     <a class="card-link" ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}" target="carpool-map">Directions</a>
-                    <button class="btn btn-link card-link" type="button" ng-click="reserve(ride)" ng-if="isLoggedIn() && ride.id && ride.seats > ride.reservationCount && !isReserved(ride)">Reserve</button>
+                    <button class="btn btn-link card-link" type="button" ng-click="reserve(ride)" ng-if="isAccountReady() && ride.id && ride.seats > ride.reservationCount && !isReserved(ride)">Reserve</button>
                     <span class="card-link" ng-if="isLoggedIn() && isReserved(ride)">Reserved</span>
                     <a class="card-link" ng-href="#!/my/ride/{{ ride.id }}" ng-if="isLoggedIn() && isMyRide(ride)">Start</a>
                 </div>

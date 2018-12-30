@@ -1,19 +1,29 @@
 "use strict";
 
-const express = require("express");
-
 module.exports = function (accountRepository) {
 
-    function getAccount(req, res, next) {
+    function get(req, res, next) {
         accountRepository.select(req.accessToken.dev, (err, account) => {
             if (err) return next(err);
             res.json(account);
         });
     }
 
-    let accountResource = express.Router();
+    function createOrUpdate(req, res, next) {
+        const updatedAccount = {
+            payoutAddress: req.body.payoutAddress
+        };
 
-    accountResource.get("/account", getAccount);
+        accountRepository.upsert(req.accessToken.dev, updatedAccount, (err) => {
+            if (err) return next(err);
 
-    return accountResource;
+            get(req, res, next);
+        });
+    }
+
+    return {
+        get,
+        createOrUpdate
+    };
+
 };

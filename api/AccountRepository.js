@@ -2,23 +2,14 @@
 
 const db = require("byteballcore/db.js");
 
-function create(device, callback) {
-    db.query(`INSERT ${db.getIgnore()} INTO cp_accounts(device) VALUES (?)`, [device], (result) => {
-        if (result.affectedRows === 1) {
-            return callback(null);
-        }
-        callback(`Failed to created account for ${device}`);
-    });
-}
-
 function select(device, callback) {
     db.query(`SELECT
-            device_address device,
-            payout_address payoutAddress,
-            correspondent.name deviceName
-        FROM cp_accounts
-        JOIN correspondent_devices correspondent ON device_address = device
-        WHERE device = ?`, [device], (rows) => {
+            correspondent.device_address device,
+            correspondent.name deviceName,
+            account.payout_address payoutAddress
+        FROM correspondent_devices correspondent
+        LEFT JOIN cp_accounts account ON device_address = device
+        WHERE device_address = ?`, [device], (rows) => {
         if (Array.isArray(rows) && rows.length === 1) {
             return callback(null, rows[0]);
         }
@@ -26,7 +17,23 @@ function select(device, callback) {
     });
 }
 
+function upsert(device, account, callback) {
+    db.query(`INSERT ${db.getIgnore()} INTO cp_accounts(device, payout_address) VALUES (?, ?)`, [device, account.payoutAddress], (insertResult) => {
+        if (insertResult.affectedRows === 1) {
+            return callback(null);
+        }
+
+        db.query(`UPDATE cp_accounts SET payout_address = ? WHERE device = ?`, [account.payoutAddress, device], (updateResult) => {
+            if (updateResult.affectedRows === 1) {
+                return callback(null);
+            }
+
+            callback(`Failed to update account for ${device}. Account was ${JSON.stringify(account)}`);
+        });
+    });
+}
+
 module.exports = {
-    create,
-    select
+    select,
+    upsert
 };

@@ -48,6 +48,16 @@
                     }
                 }
             })
+            .when("/my/account", {
+                nav: "MyAccount",
+                templateUrl: "view/myaccount.html",
+                controller: "MyAccountController",
+                resolve: {
+                    account: function(AccountService) {
+                        return AccountService.resolve();
+                    }
+                }
+            })
             .otherwise({
                 templateUrl: "view/rides.html",
                 controller: "RidesController",

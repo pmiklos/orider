@@ -48,6 +48,15 @@
                 return angular.isObject($rootScope.account);
             };
 
+            $rootScope.isAccountReady = function () {
+                return angular.isObject($rootScope.account)
+                    && angular.isString($rootScope.account.payoutAddress);
+            };
+
+            $rootScope.isAccountPending = function () {
+                return !$rootScope.isAccountReady();
+            };
+
             $scope.logout = function () {
                 AuthService.logout().then(function(response) {
                     $rootScope.account = null;
