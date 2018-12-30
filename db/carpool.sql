@@ -17,7 +17,11 @@ CREATE TABLE cp_rides (
     seats TINYINT NOT NULL,
     price_per_seat INTEGER NOT NULL,
     checkin_code VARCHAR NOT NULL,
-    status VARCHAR NOT NULL DEFAULT 'created' -- created, boarding, completed
+    status VARCHAR NOT NULL DEFAULT 'created', -- created, boarding, completed
+    arrival_date DATETIME NULL,
+    arrival_lat FLOAT NULL,
+    arrival_lng FLOAT NULL,
+    arrival_accuracy FLOAT NULL,
     FOREIGN KEY (device) REFERENCES cp_accounts(device)
 );
 

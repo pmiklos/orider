@@ -2,8 +2,8 @@
 
     var app = angular.module("carpool");
 
-    app.controller("ApplicationController", ["$rootScope", "$scope", "$http", "$location", "$route", "AuthService",
-        function ($rootScope, $scope, $http, $location, $route, AuthService) {
+    app.controller("ApplicationController", ["$rootScope", "$scope", "$http", "$location", "$route", "$timeout", "AuthService",
+        function ($rootScope, $scope, $http, $location, $route, $timeout, AuthService) {
 
             $rootScope.account = null;
 
@@ -19,9 +19,10 @@
             function showMessage(severity, msg, timeout) {
                 $scope.messages = [];
                 $scope.messages[severity] = msg;
+                $rootScope.$apply();
 
                 if (!angular.isUndefined(timeout)) {
-                    setTimeout(function () {
+                    $timeout(function () {
                         $rootScope.clearMessages();
                         $rootScope.$apply();
                     }, timeout);
@@ -30,6 +31,10 @@
 
             $rootScope.showInfo = function (msg, timeout) {
                 showMessage("info", msg, timeout);
+            };
+
+            $rootScope.showWarning = function (msg, timeout) {
+                showMessage("warn", msg, timeout);
             };
 
             $rootScope.showError = function (msg, timeout) {

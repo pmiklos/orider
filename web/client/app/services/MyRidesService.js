@@ -12,8 +12,8 @@
                     return $q.reject({status: "error"});
                 });
             },
-            complete: function(id) {
-                return $http.post(`/api/my/rides/${id}/complete`).then(function (response) {
+            complete: function(id, arrivalLocation) {
+                return $http.post(`/api/my/rides/${id}/complete`, arrivalLocation).then(function (response) {
                     return response.data;
                 }, function (errorResponse) {
                     console.error("Failed to complete ride: " + JSON.stringify(errorResponse));

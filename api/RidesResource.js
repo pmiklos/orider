@@ -16,7 +16,9 @@ module.exports = function (ridesRepository, authRepository, mapService) {
     }
 
     function complete(req, res, next) {
-        ridesRepository.complete(req.ride.id, (err, status) => {
+        const arrivalLocation = req.body;
+
+        ridesRepository.complete(req.ride.id, arrivalLocation, (err, status) => {
             if (err) return next(err);
             res.json({
                 status

@@ -30,19 +30,52 @@
             }
 
             function completeRide() {
-                return MyRidesService.complete($routeParams.id).then(function (response) {
-                    $scope.checkInUrl = null;
-                    $scope.ride.status = response.status;
-                }, function (error) {
-                    console.error(error);
-                    $rootScope.showError("Failed to complete ride", 5000);
-                });
+
+                function complete(arrivalLocation) {
+                    return MyRidesService.complete($routeParams.id, arrivalLocation).then(function (response) {
+                        $scope.checkInUrl = null;
+                        $scope.ride.status = response.status;
+                    }, function (error) {
+                        console.error(error);
+                        $rootScope.showError("Failed to complete ride", 5000);
+                    });
+                }
+
+                if ("geolocation" in navigator) {
+                    navigator.geolocation.getCurrentPosition(function(position) {
+                        console.log(position.coords);
+                        complete({
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude,
+                            accuracy: position.coords.accuracy
+                        });
+                    }, function (error) {
+                        if (error.code === error.PERMISSION_DENIED) {
+                            $rootScope.showError("Please enable location tracking to complete the ride", 5000);
+                        } else {
+                            $rootScope.showWarning("Failed to acquire location, completing anyways", 5000);
+                            complete({});
+                        }
+                        console.error(error.message);
+                    }, {
+                        maximumAge: 5000,
+                        timeout: 60000,
+                        enableHighAccuracy: false
+                    });
+                } else {
+                    console.error("Geolocation API is not available");
+                    complete({});
+                }
             }
 
             function updateCheckInUrl(checkInCode) {
                 const pairingCode = byteball.pairingCode(checkInCode);
                 $scope.checkInUrl = byteball.pairingUrl(pairingCode);
                 console.log(pairingCode);
+            }
+
+            function isCreated() {
+                return $scope.ride.status === 'created';
             }
 
             function isBoarding() {
@@ -70,6 +103,7 @@
 
             $scope.startBoarding = startBoarding;
             $scope.completeRide = completeRide;
+            $scope.isCreated = isCreated;
             $scope.isBoarding = isBoarding;
             $scope.isCompleted = isCompleted;
         }]);

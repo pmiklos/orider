@@ -7,9 +7,20 @@ function board(rideId, callback) {
     updateStatus(rideId, ['created'], 'boarding', callback);
 }
 
-function complete(rideId, callback) {
-    // TODO save driver's location
-    updateStatus(rideId, ['boarding'], 'completed', callback);
+function complete(rideId, arrivalLocation, callback) {
+    db.query(`UPDATE cp_rides SET
+        status = 'completed',
+        arrival_date = ${db.getNow()},
+        arrival_lat = ?,
+        arrival_lng = ?,
+        arrival_accuracy = ?
+        WHERE ride_id = ? AND status in ('boarding')
+    `, [arrivalLocation.latitude, arrivalLocation.longitude, arrivalLocation.accuracy, rideId], (result) => {
+        if (result.affectedRows === 1) {
+            return callback(null, 'completed');
+        }
+        callback(`Failed to update ride (${rideId}) status to 'completed'`);
+    });
 }
 
 function updateStatus(rideId, fromStatuses, toStatus, callback) {
