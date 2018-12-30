@@ -35,7 +35,7 @@
                 </ul>
             </div>
             <div>
-                <button class="btn btn-primary card-link" type="button" ng-click="startBoarding()" ng-if="!checkInUrl && !isCompleted()">Start boarding</button>
+                <button class="btn btn-primary card-link" type="button" ng-click="startBoarding()" ng-if="!isBoarding() && !isCompleted()">Start boarding</button>
                 <span class="card-link text-muted" ng-if="isBoarding()">Boarding now</span>
                 <button class="btn btn-primary card-link" type="button" ng-click="completeRide()" ng-if="!isCompleted()">Complete Ride</button>
                 <span class="card-link text-muted" ng-if="isCompleted()">Completed</span>
