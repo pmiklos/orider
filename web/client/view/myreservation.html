@@ -1,0 +1,30 @@
+<div ng-include="'/fragment/messages.html'"></div>
+
+<div class="row justify-content-center">
+    <div class="col-12 col-md-8 card border-light">
+        <div class="card-body">
+            <h3 class="card-title">
+                {{ ride.departure | date:'MMM dd, yyyy HH:mm a'}} <br>
+            </h3>
+            <p>
+                Driver: {{ ride.driver }}
+            </p>
+            <p>
+                Pick-up: {{ ride.pickupAddress }} <br>
+                Drop-off: {{ ride.dropoffAddress }} <br>
+                <a class="card-link"
+                   ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}"
+                   target="carpool-map">Directions</a>
+            </p>
+            <p>
+                <span class="text-info" ng-if="isRideBoarding()"><b>Boarding now</b></span>
+            </p>
+            <div>
+                <span class="card-link text-muted" ng-if="isReserved()">Reserved</span>
+                <span class="card-link text-muted" ng-if="isCheckedIn()">Checked-in</span>
+                <button class="btn btn-primary card-link" type="button" ng-click="completeRide()" ng-if="!isCompleted()" ng-disabled="!isCheckedIn()">Complete Ride</button>
+                <span class="card-link text-muted" ng-if="isCompleted()">Completed</span>
+            </div>
+        </div>
+    </div>
+</div>

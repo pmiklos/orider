@@ -2,6 +2,22 @@
 
 const db = require("byteballcore/db.js");
 
+function complete(rideId, device, arrivalLocation, callback) {
+    db.query(`UPDATE cp_reservations SET
+        status = 'completed',
+        arrival_date = ${db.getNow()},
+        arrival_lat = ?,
+        arrival_lng = ?,
+        arrival_accuracy = ?
+        WHERE ride_id = ? AND device = ? AND status in ('checkedin')
+    `, [arrivalLocation.latitude, arrivalLocation.longitude, arrivalLocation.accuracy, rideId, device], (result) => {
+        if (result.affectedRows === 1) {
+            return callback(null, 'completed');
+        }
+        callback(`Failed to update reservation (${rideId}, ${device}) status to 'completed'`);
+    });
+}
+
 function create(rideId, device, callback) {
     db.query(`INSERT ${db.getIgnore()} INTO cp_reservations (ride_id, device)
         SELECT ride_id, ? FROM cp_rides
@@ -116,6 +132,7 @@ function checkin(rideId, device, contractAddress, callback) {
 }
 
 module.exports = {
+    complete,
     create,
     select,
     selectAllByRide,

@@ -2,6 +2,19 @@
 
 module.exports = function (reservationRepository) {
 
+    function complete(req, res, next) {
+        const rideId = req.params.id;
+        const device = req.accessToken.dev;
+        const arrivalLocation = req.body;
+
+        reservationRepository.complete(rideId, device, arrivalLocation, (err, status) => {
+            if (err) return next(err);
+            res.json({
+                status
+            });
+        });
+    }
+
     function create(req, res, next) {
         const rideId = req.ride.id;
         const device = req.accessToken.dev;
@@ -13,6 +26,16 @@ module.exports = function (reservationRepository) {
                 if (err) return next(err);
                 res.json(reservation);
             });
+        });
+    }
+
+    function get(req, res, next) {
+        const rideId = req.params.id;
+        const device = req.accessToken.dev;
+
+        reservationRepository.select(rideId, device, (err, reservation) => {
+            if (err) return next(err);
+            res.json(reservation);
         });
     }
 
@@ -39,6 +62,8 @@ module.exports = function (reservationRepository) {
     }
 
     return {
+        get,
+        complete,
         create,
         listByRide,
         listByDevice

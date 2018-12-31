@@ -19,7 +19,6 @@
             function showMessage(severity, msg, timeout) {
                 $scope.messages = [];
                 $scope.messages[severity] = msg;
-                $rootScope.$apply();
 
                 if (!angular.isUndefined(timeout)) {
                     $timeout(function () {

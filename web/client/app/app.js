@@ -48,6 +48,16 @@
                     }
                 }
             })
+            .when("/my/reservations/:id", {
+                nav: "MyReservation",
+                templateUrl: "view/myreservation.html",
+                controller: "MyReservationController",
+                resolve: {
+                    account: function(AccountService) {
+                        return AccountService.resolve();
+                    }
+                }
+            })
             .when("/my/account", {
                 nav: "MyAccount",
                 templateUrl: "view/myaccount.html",

@@ -37,6 +37,10 @@ CREATE TABLE cp_reservations (
     reservation_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     contract_address CHAR(32) NULL,
     checkin_date DATETIME NULL,
+    arrival_date DATETIME NULL,
+    arrival_lat FLOAT NULL,
+    arrival_lng FLOAT NULL,
+    arrival_accuracy FLOAT NULL,
     PRIMARY KEY (ride_id, device),
     FOREIGN KEY (ride_id) REFERENCES cp_rides(ride_id),
     FOREIGN KEY (device) REFERENCES cp_accounts(device)

@@ -56,6 +56,7 @@
                             $rootScope.showWarning("Failed to acquire location, completing anyways", 5000);
                             complete({});
                         }
+                        $rootScope.$apply(); // error messages don't seem to show up consistently without it
                         console.error(error.message);
                     }, {
                         maximumAge: 5000,
