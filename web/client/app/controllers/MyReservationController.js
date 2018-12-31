@@ -31,6 +31,7 @@
                 function complete(arrivalLocation) {
                     return MyReservationsService.complete($routeParams.id, arrivalLocation).then(function (response) {
                         $scope.reservation.status = response.status;
+                        $scope.reservation.completionScore = response.completionScore;
                     }, function (error) {
                         console.error(error);
                         $rootScope.showError("Failed to complete reservations", 5000);

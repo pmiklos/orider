@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function (ridesRepository, authRepository, mapService) {
+module.exports = function (ridesRepository, authRepository, mapService, completionScoring) {
 
     function board(req, res, next) {
         const checkInCode = "CHECKIN-" + req.ride.checkInCode;
@@ -16,12 +16,16 @@ module.exports = function (ridesRepository, authRepository, mapService) {
     }
 
     function complete(req, res, next) {
+        const ride = req.ride;
         const arrivalLocation = req.body;
 
-        ridesRepository.complete(req.ride.id, arrivalLocation, (err, status) => {
+        const completionScore = completionScoring.score(ride, arrivalLocation);
+
+        ridesRepository.complete(ride.id, arrivalLocation, completionScore, (err, status) => {
             if (err) return next(err);
             res.json({
-                status
+                status,
+                completionScore
             });
         });
     }
@@ -59,6 +63,10 @@ module.exports = function (ridesRepository, authRepository, mapService) {
     }
 
     function get(req, res) {
+        delete req.ride.pickupLat;
+        delete req.ride.pickupLng;
+        delete req.ride.dropoffLat;
+        delete req.ride.dropoffLng;
         res.json(req.ride);
     }
 

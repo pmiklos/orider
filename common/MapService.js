@@ -1,6 +1,7 @@
 "use strict";
 
 const config = require("byteballcore/conf");
+const geodatasource = require("./geodatasource");
 const googleMapsClient = require('@google/maps').createClient({
     key: config.googleMapsApiKey
 });
@@ -19,5 +20,6 @@ function geocode(address, callback) {
 }
 
 module.exports = {
-    geocode
+    geocode,
+    distance: geodatasource.distance
 };

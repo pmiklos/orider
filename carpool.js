@@ -11,7 +11,7 @@ const socketio = require('socket.io');
 const Web = require("./web/Web");
 const Api = require("./api/Api");
 const RideFeeContract = require("./contract/RideFeeContract");
-const googleMapService = require("./common/GoogleMapService");
+const mapService = require("./common/MapService");
 
 const httpPort = process.env.PORT || 8080;
 const httpHost = process.env.IP || "127.0.0.1";
@@ -20,7 +20,7 @@ const webapp = express();
 const httpServer = http.Server(webapp);
 const ws = socketio(httpServer);
 const web = Web(webapp, ws);
-const api = Api(webapp, googleMapService);
+const api = Api(webapp, mapService);
 
 eventBus.once("headless_wallet_ready", () => {
 

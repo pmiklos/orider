@@ -1,16 +1,23 @@
 "use strict";
 
-module.exports = function (reservationRepository) {
+module.exports = function (reservationRepository, ridesRepository, completionScoring) {
 
     function complete(req, res, next) {
         const rideId = req.params.id;
         const device = req.accessToken.dev;
         const arrivalLocation = req.body;
 
-        reservationRepository.complete(rideId, device, arrivalLocation, (err, status) => {
+        ridesRepository.select(rideId, (err, ride) => {
             if (err) return next(err);
-            res.json({
-                status
+
+            const completionScore = completionScoring.score(ride, arrivalLocation);
+
+            reservationRepository.complete(rideId, device, arrivalLocation, completionScore, (err, status) => {
+                if (err) return next(err);
+                res.json({
+                    status,
+                    completionScore
+                });
             });
         });
     }

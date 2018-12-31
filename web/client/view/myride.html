@@ -37,7 +37,7 @@
                 <button class="btn btn-primary card-link" type="button" ng-click="startBoarding()" ng-if="!isBoarding() && !isCompleted()">Start boarding</button>
                 <span class="card-link text-muted" ng-if="isBoarding()">Boarding now</span>
                 <button class="btn btn-primary card-link" type="button" ng-click="completeRide()" ng-if="!isCompleted()" ng-disabled="isCreated()">Complete Ride</button>
-                <span class="card-link text-muted" ng-if="isCompleted()">Completed</span>
+                <span class="card-link text-muted" ng-if="isCompleted()">Completed ({{ ride.completionScore * 100 | number :0}}%)</span>
             </div>
         </div>
     </div>

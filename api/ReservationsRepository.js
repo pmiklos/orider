@@ -2,15 +2,16 @@
 
 const db = require("byteballcore/db.js");
 
-function complete(rideId, device, arrivalLocation, callback) {
+function complete(rideId, device, arrivalLocation, score, callback) {
     db.query(`UPDATE cp_reservations SET
         status = 'completed',
         arrival_date = ${db.getNow()},
         arrival_lat = ?,
         arrival_lng = ?,
-        arrival_accuracy = ?
+        arrival_accuracy = ?,
+        completion_score = ?
         WHERE ride_id = ? AND device = ? AND status in ('checkedin')
-    `, [arrivalLocation.latitude, arrivalLocation.longitude, arrivalLocation.accuracy, rideId, device], (result) => {
+    `, [arrivalLocation.latitude, arrivalLocation.longitude, arrivalLocation.accuracy, score, rideId, device], (result) => {
         if (result.affectedRows === 1) {
             return callback(null, 'completed');
         }
@@ -62,6 +63,7 @@ function select(rideId, device, callback) {
         device name, -- until we have attestation
         status,
         reservation_date reservationDate,
+        completion_score completionScore,
         account.payout_address payoutAddress
         FROM cp_reservations reservation
         JOIN cp_accounts account USING (device)

@@ -35,6 +35,7 @@
                     return MyRidesService.complete($routeParams.id, arrivalLocation).then(function (response) {
                         $scope.checkInUrl = null;
                         $scope.ride.status = response.status;
+                        $scope.ride.completionScore = response.completionScore;
                     }, function (error) {
                         console.error(error);
                         $rootScope.showError("Failed to complete ride", 5000);

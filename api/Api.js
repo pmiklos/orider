@@ -15,6 +15,7 @@ const reservationsRepository = require("./ReservationsRepository");
 
 const AccountResource = require("./AccountResource");
 const authResource = require("./AuthResource");
+const CompletionScoring = require("./CompletionScoring");
 const configResource = require("./ConfigResource");
 const RidesResource = require("./RidesResource");
 const ReservationsResource = require("./ReservationsResource");
@@ -56,9 +57,10 @@ function accessTokenResolver(req, res, next) {
 
 module.exports = function (webapp, mapService) {
 
+    const completionScoring = CompletionScoring(mapService);
     const accountResource = AccountResource(accountRepository);
-    const ridesResource = RidesResource(ridesRepository, authRepository, mapService);
-    const reservationsResource = ReservationsResource(reservationsRepository);
+    const ridesResource = RidesResource(ridesRepository, authRepository, mapService, completionScoring);
+    const reservationsResource = ReservationsResource(reservationsRepository, ridesRepository, completionScoring);
 
     webapp.use("/api", express.json());
     webapp.use("/api", requestLogger);

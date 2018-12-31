@@ -7,15 +7,16 @@ function board(rideId, callback) {
     updateStatus(rideId, ['created'], 'boarding', callback);
 }
 
-function complete(rideId, arrivalLocation, callback) {
+function complete(rideId, arrivalLocation, score, callback) {
     db.query(`UPDATE cp_rides SET
         status = 'completed',
         arrival_date = ${db.getNow()},
         arrival_lat = ?,
         arrival_lng = ?,
-        arrival_accuracy = ?
+        arrival_accuracy = ?,
+        completion_score = ?
         WHERE ride_id = ? AND status in ('boarding')
-    `, [arrivalLocation.latitude, arrivalLocation.longitude, arrivalLocation.accuracy, rideId], (result) => {
+    `, [arrivalLocation.latitude, arrivalLocation.longitude, arrivalLocation.accuracy, score, rideId], (result) => {
         if (result.affectedRows === 1) {
             return callback(null, 'completed');
         }
@@ -50,13 +51,18 @@ function select(id, callback) {
             rides.device,
             rides.device driver,
             rides.pickup_address pickupAddress,
+            rides.pickup_lat pickupLat,
+            rides.pickup_lng pickupLng,
             rides.dropoff_address dropoffAddress,
+            rides.dropoff_lat dropoffLat,
+            rides.dropoff_lng dropoffLng,
             strftime('%s', rides.departure) * 1000 departure,
             rides.seats,
             rides.price_per_seat pricePerSeat,
             count(reservations.device) reservationCount,
             rides.checkin_code checkInCode,
-            rides.status
+            rides.status,
+            rides.completion_score completionScore
         FROM cp_rides rides
         LEFT JOIN cp_reservations reservations USING (ride_id)
         WHERE ride_id = ?`, [id], (rows) => {
