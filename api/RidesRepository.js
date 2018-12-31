@@ -39,7 +39,7 @@ function create(device, ride, callback) {
             VALUES (?, ?, ?, ?, ?, ?, ?, datetime(? / 1000, 'unixepoch'), ?, ?, ?)
     `, [device, ride.pickupAddress, ride.pickupLat, ride.pickupLng, ride.dropoffAddress, ride.dropoffLat, ride.dropoffLng, ride.departure, ride.seats, ride.pricePerSeat, uuid()], (result) => {
         if (result.affectedRows === 1) {
-            return callback(null, ride);
+            return select(result.insertId, callback)
         }
         callback(`Failed to insert ride: ${device}, ${JSON.stringify(ride)}`);
     });

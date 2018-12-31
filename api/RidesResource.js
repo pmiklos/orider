@@ -1,5 +1,15 @@
 "use strict";
 
+function deleteCoordinates(ride) {
+    if (typeof ride === "object") {
+        delete ride.pickupLat;
+        delete ride.pickupLng;
+        delete ride.dropoffLat;
+        delete ride.dropoffLng;
+    }
+    return ride;
+}
+
 module.exports = function (ridesRepository, authRepository, mapService, completionScoring) {
 
     function board(req, res, next) {
@@ -48,7 +58,7 @@ module.exports = function (ridesRepository, authRepository, mapService, completi
 
                 ridesRepository.create(req.accessToken.dev, ride, (err, ride) => {
                     if (err) return next(err);
-                    res.json(ride);
+                    res.json(deleteCoordinates(ride));
                 });
             });
         });
@@ -63,11 +73,7 @@ module.exports = function (ridesRepository, authRepository, mapService, completi
     }
 
     function get(req, res) {
-        delete req.ride.pickupLat;
-        delete req.ride.pickupLng;
-        delete req.ride.dropoffLat;
-        delete req.ride.dropoffLng;
-        res.json(req.ride);
+        res.json(deleteCoordinates(req.ride));
     }
 
     function list(req, res, next) {
