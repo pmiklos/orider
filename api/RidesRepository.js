@@ -97,6 +97,8 @@ function selectByCheckInCode(checkInCode, callback) {
 }
 
 function selectAll(from, size, callback) {
+    const aDayBefore = db.addTime('-1 DAY');
+
     db.query(`SELECT
             rides.ride_id id,
             rides.device,
@@ -110,7 +112,7 @@ function selectAll(from, size, callback) {
             count(reservations.device) reservationCount
         FROM cp_rides rides
         LEFT JOIN cp_reservations reservations USING (ride_id)
-        WHERE departure > ${db.getNow()}
+        WHERE departure > ${aDayBefore}
         GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
         ORDER BY departure ASC
         LIMIT ${size} OFFSET ${from}`, [], (rows) => {
@@ -122,6 +124,8 @@ function selectAll(from, size, callback) {
 }
 
 function selectAllByDevice(device, callback) {
+    const aDayBefore = db.addTime('-1 DAY');
+
     db.query(`SELECT
             rides.ride_id id,
             rides.device,
@@ -135,7 +139,7 @@ function selectAllByDevice(device, callback) {
             count(reservations.device) reservationCount
         FROM cp_rides rides
         LEFT JOIN cp_reservations reservations USING (ride_id)
-        WHERE departure > ${db.getNow()}
+        WHERE departure > ${aDayBefore}
         GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
         ORDER BY departure ASC`, [device], (rows) => {
         if (Array.isArray(rows)) {
