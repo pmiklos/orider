@@ -11,6 +11,7 @@ const socketio = require('socket.io');
 const Web = require("./web/Web");
 const Api = require("./api/Api");
 const RideFeeContract = require("./contract/RideFeeContract");
+const CarpoolOracle = require("./job/CarpoolOracle");
 const mapService = require("./common/MapService");
 
 const httpPort = process.env.PORT || 8080;
@@ -29,9 +30,11 @@ eventBus.once("headless_wallet_ready", () => {
         const payoutProcessorAddress = address;
         const carpoolOracleAddress = address;
         const rideFeeContract = RideFeeContract(payoutProcessorDevice, payoutProcessorAddress, carpoolOracleAddress);
+        const carpoolOracle = CarpoolOracle(carpoolOracleAddress, headlessWallet, api.ridesRepository);
 
         console.error("Carpool oracle address: " + carpoolOracleAddress);
 
+        carpoolOracle.start();
         start(rideFeeContract);
     });
 

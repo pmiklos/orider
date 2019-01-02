@@ -149,12 +149,45 @@ function selectAllByDevice(device, callback) {
     });
 }
 
+function selectAllPayable(callback) {
+    db.query(`SELECT
+            ride.ride_id rideId,
+            ride.completion_score driverScore,
+            sum(reservation.completion_score) passengerScore,
+            count(reservation.completion_score) scoredPassengerCount,
+            count(*) passengerCount
+        FROM cp_rides ride
+        JOIN cp_reservations reservation USING (ride_id)
+        WHERE
+            ride.status = 'completed'
+            AND ride.oracle_value IS NULL
+            AND reservation.status IN ('checkedin', 'completed')
+        GROUP BY ride_id
+    `, [], (rows) => {
+        if (Array.isArray(rows)) {
+            return callback(null, rows);
+        }
+        callback("Failed to find payable rides " + JSON.stringify(rows));
+    });
+}
+
+function payout(rideId, rideStatus, callback) {
+    db.query(`UPDATE cp_rides SET oracle_value = ? WHERE ride_id = ? AND oracle_value IS NULL`, [rideStatus, rideId], (result) => {
+        if (result.affectedRows === 1) {
+            return callback();
+        }
+        callback(`Failed to update oracle value (${rideId}) to ${rideStatus}`);
+    });
+}
+
 module.exports = {
     board,
     complete,
     create,
+    payout,
     select,
     selectAll,
     selectAllByDevice,
-    selectByCheckInCode
+    selectByCheckInCode,
+    selectAllPayable
 };

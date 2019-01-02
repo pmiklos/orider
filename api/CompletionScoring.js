@@ -13,7 +13,7 @@ module.exports = function (mapService) {
                 const correctedDropoffDistanceKm = Math.max(0, dropoffDistanceKm - accuracyKm);
                 return 1 - Math.min(1, correctedDropoffDistanceKm / rideDistanceKm);
             }
-            return 0;
+            return 1; // assume trip is completed 100% when the location is not sent by the client
         }
 
     };

@@ -23,6 +23,7 @@ CREATE TABLE cp_rides (
     arrival_lng FLOAT NULL,
     arrival_accuracy FLOAT NULL,
     completion_score FLOAT NULL,
+    oracle_value VARCHAR NULL, -- INCOMPLETE, COMPLETED
     FOREIGN KEY (device) REFERENCES cp_accounts(device)
 );
 
@@ -34,7 +35,7 @@ CREATE INDEX cp_rides_status ON cp_rides(status);
 CREATE TABLE cp_reservations (
     ride_id INTEGER NOT NULL,
     device CHAR(33) NOT NULL,
-    status VARCHAR NOT NULL DEFAULT 'reserved', -- reserved, checkedin, checkedout
+    status VARCHAR NOT NULL DEFAULT 'reserved', -- reserved, checkedin, completed
     reservation_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     contract_address CHAR(32) NULL,
     checkin_date DATETIME NULL,
