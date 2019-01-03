@@ -171,6 +171,23 @@ function selectAllPayable(callback) {
     });
 }
 
+function selectAllByOracleUnit(units, callback) {
+    db.query(`SELECT
+            ride.ride_id rideId,
+            ride.device device,
+            ride.oracle_value oracleValue,
+            account.payout_address payoutAddress
+        FROM cp_rides ride
+        JOIN cp_accounts account USING (device)
+        WHERE oracle_unit IN (?)
+    `, [units], (rows) => {
+        if (Array.isArray(rows)) {
+            return callback(null, rows);
+        }
+        callback("Failed to find payable rides " + JSON.stringify(rows));
+    });
+}
+
 function payout(rideId, rideStatus, oracleUnit, callback) {
     db.query(`UPDATE cp_rides SET oracle_value = ?, oracle_unit = ? WHERE ride_id = ? AND oracle_value IS NULL`,
         [rideStatus, oracleUnit, rideId], (result) => {
@@ -189,6 +206,7 @@ module.exports = {
     select,
     selectAll,
     selectAllByDevice,
+    selectAllByOracleUnit,
     selectByCheckInCode,
     selectAllPayable
 };

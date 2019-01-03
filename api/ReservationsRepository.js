@@ -81,8 +81,11 @@ function selectAllByRide(rideId, callback) {
         device,
         device name, -- until we have attestation
         status,
-        reservation_date reservationDate
+        reservation_date reservationDate,
+        contract_address contractAddress,
+        account.payout_address payoutAddress
         FROM cp_reservations
+        LEFT JOIN cp_accounts account USING (device)
         WHERE ride_id = ?
         ORDER BY reservation_date`, [rideId], (rows) => {
         if (Array.isArray(rows)) {

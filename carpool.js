@@ -12,6 +12,7 @@ const Web = require("./web/Web");
 const Api = require("./api/Api");
 const RideFeeContract = require("./contract/RideFeeContract");
 const CarpoolOracle = require("./job/CarpoolOracle");
+const PayoutProcessor = require("./job/PayoutProcessor");
 const mapService = require("./common/MapService");
 
 const httpPort = process.env.PORT || 8080;
@@ -134,4 +135,8 @@ function start(rideFeeContract) {
             });
         }
     });
+
+    const payoutProcessor = PayoutProcessor(headlessWallet, api.ridesRepository, api.reservationsRepository);
+
+    eventBus.on("my_transactions_became_stable", payoutProcessor.payoutRides);
 }
