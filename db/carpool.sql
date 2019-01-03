@@ -24,6 +24,7 @@ CREATE TABLE cp_rides (
     arrival_accuracy FLOAT NULL,
     completion_score FLOAT NULL,
     oracle_value VARCHAR NULL, -- INCOMPLETE, COMPLETED
+    oracle_unit CHAR(44) NULL,
     FOREIGN KEY (device) REFERENCES cp_accounts(device)
 );
 

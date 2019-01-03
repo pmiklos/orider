@@ -19,11 +19,11 @@ module.exports = function (carpoolOracleAddress, headlessWallet, ridesRepository
         composer.composeDataFeedJoint(carpoolOracleAddress, datafeed, headlessWallet.signer, composer.getSavingCallbacks({
             ifNotEnoughFunds: errorHandler,
             ifError: errorHandler,
-            ifOk: function (objJoint) {
-                network.broadcastJoint(objJoint);
-                ridesRepository.payout(rideId, rideStatus, (err) => {
+            ifOk: function (joint) {
+                network.broadcastJoint(joint);
+                ridesRepository.payout(rideId, rideStatus, joint.unit.unit, (err) => {
                     if (err) return console.error(`[ORACLE] failed to save ${rideStatus} status for ride ${rideId}`);
-                    console.error(`[ORACLE] stored status for ride ${rideId}`);
+                    console.error(`[ORACLE] stored status for ride ${rideId} in unit ${joint.unit.unit}`);
                 });
             }
         }));
@@ -36,7 +36,7 @@ module.exports = function (carpoolOracleAddress, headlessWallet, ridesRepository
 
         const participationRate = totalVoters / totalPeople;
 
-        if (participationRate < 0.5) {
+        if (participationRate <= 0.5) {
             return; // skip and wait until more than half the people completed the ride
         }
 

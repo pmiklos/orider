@@ -171,12 +171,13 @@ function selectAllPayable(callback) {
     });
 }
 
-function payout(rideId, rideStatus, callback) {
-    db.query(`UPDATE cp_rides SET oracle_value = ? WHERE ride_id = ? AND oracle_value IS NULL`, [rideStatus, rideId], (result) => {
+function payout(rideId, rideStatus, oracleUnit, callback) {
+    db.query(`UPDATE cp_rides SET oracle_value = ?, oracle_unit = ? WHERE ride_id = ? AND oracle_value IS NULL`,
+        [rideStatus, oracleUnit, rideId], (result) => {
         if (result.affectedRows === 1) {
             return callback();
         }
-        callback(`Failed to update oracle value (${rideId}) to ${rideStatus}`);
+        callback(`Failed to update oracle value (${rideId}) to ${rideStatus} for unit ${oracleUnit}`);
     });
 }
 
