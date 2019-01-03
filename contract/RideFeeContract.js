@@ -47,7 +47,7 @@ module.exports = function (payoutProcessorDevice, payoutProcessorAddress, carpoo
             const definition = [
                 "or", [
                     ["and", [
-                        ["address", payoutProcessorAddress], // r.0.0.0
+                        ["address", payoutProcessorAddress], // r.0.0
                         hasOutput(p.driverPayoutAddress, 'base', p.amount),
                         ["in data feed", [
                             [carpoolOracleAddress],
@@ -55,7 +55,7 @@ module.exports = function (payoutProcessorDevice, payoutProcessorAddress, carpoo
                         ]]
                     ]],
                     ["and", [
-                        ["address", payoutProcessorAddress], // r.1.0.0
+                        ["address", payoutProcessorAddress], // r.1.0
                         hasOutput(p.passengerRefundAddress, 'base', p.amount),
                         ["in data feed", [
                             [carpoolOracleAddress],
@@ -63,14 +63,14 @@ module.exports = function (payoutProcessorDevice, payoutProcessorAddress, carpoo
                         ]]
                     ]],
                     ["and", [
-                        ["address", p.driverPayoutAddress], // r.2.0.0
+                        ["address", p.driverPayoutAddress], // r.2.0
                         ["in data feed", [
                             [carpoolOracleAddress],
                             RIDE_STATUS_DATAFEED, "=", `RIDE-${p.rideId}-COMPLETED`
                         ]]
                     ]],
                     ["and", [
-                        ["address", p.passengerRefundAddress], // r.3.0.0
+                        ["address", p.passengerRefundAddress], // r.3.0
                         ["in data feed", [
                             [carpoolOracleAddress],
                             RIDE_STATUS_DATAFEED, "=", `RIDE-${p.rideId}-INCOMPLETE`
@@ -80,22 +80,22 @@ module.exports = function (payoutProcessorDevice, payoutProcessorAddress, carpoo
             ];
 
             let signers = {
-                "r.0.0.0": {
+                "r.0.0": {
                     address: payoutProcessorAddress,
                     member_signing_path: "r",
                     device_address: payoutProcessorDevice
                 },
-                "r.1.0.0": {
+                "r.1.0": {
                     address: payoutProcessorAddress,
                     member_signing_path: "r",
                     device_address: payoutProcessorDevice
                 },
-                "r.2.0.0": {
+                "r.2.0": {
                     address: p.driverPayoutAddress,
                     member_signing_path: "r",
                     device_address: p.driverDevice
                 },
-                "r.3.0.0": {
+                "r.3.0": {
                     address: p.passengerRefundAddress,
                     member_signing_path: "r",
                     device_address: p.passengerDevice
