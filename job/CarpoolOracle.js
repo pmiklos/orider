@@ -13,7 +13,7 @@ module.exports = function (carpoolOracleAddress, headlessWallet, ridesRepository
         console.error("[ORACLE] posting " + JSON.stringify(datafeed));
 
         const errorHandler = function(err) {
-            console.error("[ORACLE] failed to post " + JSON.stringify(datafeed))
+            console.error(`[ORACLE] failed to post ${JSON.stringify(datafeed)}: ${err}`);
         };
 
         composer.composeDataFeedJoint(carpoolOracleAddress, datafeed, headlessWallet.signer, composer.getSavingCallbacks({
