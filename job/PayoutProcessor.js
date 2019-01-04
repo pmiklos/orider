@@ -11,7 +11,7 @@ module.exports = function (headlessWallet, ridesRepository, reservationsReposito
     }
 
     function payoutReservation(rideStatus, contract, driver, passenger) {
-        if (rideStatus === 'COMPLETE') {
+        if (rideStatus === 'COMPLETED') {
             makePayment(contract, driver.payoutAddress, driver.device);
         } else if (rideStatus === 'INCOMPLETE') {
             makePayment(contract, passenger.payoutAddress, passenger.device);
