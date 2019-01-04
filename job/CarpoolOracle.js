@@ -36,8 +36,8 @@ module.exports = function (carpoolOracleAddress, headlessWallet, ridesRepository
 
         const participationRate = totalVoters / totalPeople;
 
-        if (participationRate <= 0.5) {
-            return; // skip and wait until more than half the people completed the ride
+        if (participationRate <= 0.67) {
+            return; // skip and wait until more than two third of the people completed the ride
         }
 
         const averageScore = totalScore / totalVoters;
