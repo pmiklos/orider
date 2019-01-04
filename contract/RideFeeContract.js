@@ -3,6 +3,12 @@ const walletDefinedByAddresses = require("byteballcore/wallet_defined_by_address
 
 const RIDE_STATUS_DATAFEED = "RIDE_STATUS";
 
+/**
+ * The estimated fee of making a transfer out of the contract
+ * @type {number}
+ */
+const TYPICAL_FEE = 1500; // TODO could be lowered significantly by using definition templates I think
+
 function hasOutput(address, asset, amount) {
     return ["has", {
         what: "output",
@@ -48,7 +54,7 @@ module.exports = function (payoutProcessorDevice, payoutProcessorAddress, carpoo
                 "or", [
                     ["and", [
                         ["address", payoutProcessorAddress], // r.0.0
-                        hasOutput(p.driverPayoutAddress, 'base', p.amount),
+                        hasOutput(p.driverPayoutAddress, 'base', p.amount - TYPICAL_FEE),
                         ["in data feed", [
                             [carpoolOracleAddress],
                             RIDE_STATUS_DATAFEED, "=", `RIDE-${p.rideId}-COMPLETED`
@@ -56,7 +62,7 @@ module.exports = function (payoutProcessorDevice, payoutProcessorAddress, carpoo
                     ]],
                     ["and", [
                         ["address", payoutProcessorAddress], // r.1.0
-                        hasOutput(p.passengerRefundAddress, 'base', p.amount),
+                        hasOutput(p.passengerRefundAddress, 'base', p.amount - TYPICAL_FEE),
                         ["in data feed", [
                             [carpoolOracleAddress],
                             RIDE_STATUS_DATAFEED, "=", `RIDE-${p.rideId}-INCOMPLETE`
