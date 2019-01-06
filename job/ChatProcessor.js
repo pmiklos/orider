@@ -31,12 +31,14 @@ module.exports = function (ridesReporsitory, reservationsRepository) {
 
             if (rides.length > 0) {
                 const listOfRides = rides.map(ride => {
-                    const departure = new Date(ride.departure).toDateString();
+                    const departureDate = new Date(ride.departure).toDateString();
+                    const departureTime = new Date(ride.departure).toTimeString();
                     const reserved = ride.reservationDevices && ride.reservationDevices.includes(context.deviceAddress);
                     const reservable = ride.status === "created" || ride.status === "boarding";
                     const reserveCmd = reservable ? `\n[reserve](command:reserve ${ride.id})` : "";
 
-                    return `${departure} (${ride.status})\n`
+                    return `${departureDate} (${ride.status})\n`
+                        + `${departureTime}\n`
                         + `pick-up: ${ride.pickupAddress}\n`
                         + `drop-off: ${ride.dropoffAddress}`
                         + `${reserved ? "\nReserved" : reserveCmd}`
@@ -71,8 +73,13 @@ module.exports = function (ridesReporsitory, reservationsRepository) {
 
             if (reservations.length) {
                 const listOrReservations = reservations.map(reservation => {
-                    const departure = new Date(reservation.departure).toDateString();
-                    return `${departure}\npick-up: ${reservation.pickupAddress}\ndrop-off: ${reservation.dropoffAddress}\nstatus: ${reservation.status}`
+                    const departureDate = new Date(reservation.departure).toDateString();
+                    const departureTime = new Date(reservation.departure).toTimeString();
+                    return `${departureDate}\n`
+                        + `${departureTime}\n`
+                        + `pick-up: ${reservation.pickupAddress}\n`
+                        + `drop-off: ${reservation.dropoffAddress}\n`
+                        + `status: ${reservation.status}`;
                 }).reduce((acc, curr) => {
                     return `${acc}\n\n${curr}`;
                 });
