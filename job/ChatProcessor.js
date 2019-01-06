@@ -32,9 +32,14 @@ module.exports = function (ridesReporsitory, reservationsRepository) {
             if (rides.length > 0) {
                 const listOfRides = rides.map(ride => {
                     const departure = new Date(ride.departure).toDateString();
+                    const reserved = ride.reservationDevices && ride.reservationDevices.includes(context.deviceAddress);
                     const reservable = ride.status === "created" || ride.status === "boarding";
                     const reserveCmd = reservable ? `\n[reserve](command:reserve ${ride.id})` : "";
-                    return `${departure} (${ride.status})\npick-up: ${ride.pickupAddress}\ndrop-off: ${ride.dropoffAddress}${reserveCmd}`;
+
+                    return `${departure} (${ride.status})\n`
+                        + `pick-up: ${ride.pickupAddress}\n`
+                        + `drop-off: ${ride.dropoffAddress}`
+                        + `${reserved ? "\nReserved" : reserveCmd}`
                 }).reduce((acc, curr) => {
                     return acc + "\n\n" + curr;
                 });

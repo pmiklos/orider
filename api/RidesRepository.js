@@ -109,7 +109,8 @@ function selectAll(from, size, callback) {
             rides.seats,
             rides.price_per_seat pricePerSeat,
             rides.status,
-            count(reservations.device) reservationCount
+            count(reservations.device) reservationCount,
+            group_concat(reservations.device, ',') reservationDevices
         FROM cp_rides rides
         LEFT JOIN cp_reservations reservations USING (ride_id)
         WHERE departure > ${aDayBefore}
