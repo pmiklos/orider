@@ -13,6 +13,7 @@ const Api = require("./api/Api");
 const RideFeeContract = require("./contract/RideFeeContract");
 const CarpoolOracle = require("./job/CarpoolOracle");
 const PayoutProcessor = require("./job/PayoutProcessor");
+const ChatProcessor = require("./job/ChatProcessor");
 const mapService = require("./common/MapService");
 
 const httpPort = process.env.PORT || 8080;
@@ -43,13 +44,15 @@ eventBus.once("headless_wallet_ready", () => {
 
 function start(rideFeeContract) {
 
+    const chatProcessor = ChatProcessor(api.ridesRepository, api.reservationsRepository);
+
     httpServer.listen(httpPort, httpHost, () => {
         console.error("WEB started");
     });
 
     eventBus.on("paired", (from_address, pairing_secret) => {
-        if (pairing_secret === config.permanent_paring_secret) {
-            return device.sendMessageToDevice(from_address, "text", "Welcome to Carpooling for Byteballers");
+        if (pairing_secret === config.permanent_pairing_secret) {
+            return chatProcessor.welcome(from_address);
         }
     });
 
@@ -135,6 +138,8 @@ function start(rideFeeContract) {
             });
         }
     });
+
+    eventBus.on("text", chatProcessor.answer);
 
     const payoutProcessor = PayoutProcessor(headlessWallet, api.ridesRepository, api.reservationsRepository);
 
