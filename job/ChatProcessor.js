@@ -75,11 +75,13 @@ module.exports = function (ridesReporsitory, reservationsRepository) {
                 const listOrReservations = reservations.map(reservation => {
                     const departureDate = new Date(reservation.departure).toDateString();
                     const departureTime = new Date(reservation.departure).toTimeString();
-                    return `${departureDate}\n`
-                        + `${departureTime}\n`
+                    const checkedIn = reservation.status === "checkedin";
+                    const completeCmd = checkedIn ? `\n${WEB_URL}/#!/my/reservations/${reservation.rideId}`:"";
+                    return `${departureDate} ${departureTime}\n`
                         + `pick-up: ${reservation.pickupAddress}\n`
                         + `drop-off: ${reservation.dropoffAddress}\n`
-                        + `status: ${reservation.status}`;
+                        + `status: ${reservation.status}`
+                        + completeCmd;
                 }).reduce((acc, curr) => {
                     return `${acc}\n\n${curr}`;
                 });
