@@ -3,12 +3,13 @@
 const constants = require("byteballcore/constants");
 const device = require("byteballcore/device");
 
-
+// TODO make it reusable
 function isTestnet() {
     const byteballVersion = constants.version;
     return byteballVersion.endsWith("t");
 }
 
+// TODO make it reusable
 const WEB_URL = isTestnet() ? "https://carpool-test.byteball.market" : "https://carpool.byteball.market";
 const USAGE = `Carpooling for Byteballers
 ${WEB_URL}

@@ -59,7 +59,7 @@ module.exports = function (webapp, mapService) {
 
     const completionScoring = CompletionScoring(mapService);
     const accountResource = AccountResource(accountRepository);
-    const ridesResource = RidesResource(ridesRepository, authRepository, mapService, completionScoring);
+    const ridesResource = RidesResource(ridesRepository, reservationsRepository, authRepository, mapService, completionScoring);
     const reservationsResource = ReservationsResource(reservationsRepository, ridesRepository, completionScoring);
 
     webapp.use("/api", express.json());

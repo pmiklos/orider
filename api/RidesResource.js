@@ -1,5 +1,17 @@
 "use strict";
 
+const constants = require("byteballcore/constants");
+const device = require("byteballcore/device"); // would be better to a NotificationService as a depedency
+
+// TODO make it reusable
+function isTestnet() {
+    const byteballVersion = constants.version;
+    return byteballVersion.endsWith("t");
+}
+
+// TODO make it reusable
+const WEB_URL = isTestnet() ? "https://carpool-test.byteball.market" : "https://carpool.byteball.market";
+
 function deleteCoordinates(ride) {
     if (typeof ride === "object") {
         delete ride.pickupLat;
@@ -10,7 +22,7 @@ function deleteCoordinates(ride) {
     return ride;
 }
 
-module.exports = function (ridesRepository, authRepository, mapService, completionScoring) {
+module.exports = function (ridesRepository, reservationsRepository, authRepository, mapService, completionScoring) {
 
     function board(req, res, next) {
         const checkInCode = "CHECKIN-" + req.ride.checkInCode;
@@ -33,6 +45,16 @@ module.exports = function (ridesRepository, authRepository, mapService, completi
 
         ridesRepository.complete(ride.id, arrivalLocation, completionScore, (err, status) => {
             if (err) return next(err);
+
+            reservationsRepository.selectAllByRide(ride.id, (err, reservations) => {
+                if (err) return console.error("Failed to notify passengers to complete ride " + ride.id);
+
+                reservations.forEach(reservation => {
+                    device.sendMessageToDevice(reservation.device, "text",
+                        `You arrived! Please complete the ride by visiting the link below:\n${WEB_URL}/#!/my/reservations/${ride.id}`);
+                });
+            });
+
             res.json({
                 status,
                 completionScore
