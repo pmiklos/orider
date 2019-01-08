@@ -5,9 +5,20 @@
     app.controller("RidesController", ["$rootScope", "$scope", "$cookies", "RidesService", "MyReservationsService",
         function ($rootScope, $scope, $cookies, RidesService, MyReservationsService) {
 
+            const byte = 1;
+            const KB = byte * 1000;
+            const MB = KB * 1000;
+            const GB = MB * 1000;
+            const MIN_PRICE = 5 * KB;
+            const MAX_PRICE = 5 * GB;
+
             $scope.hideCreateRideForm = "true" === $cookies.get("preferences.hideCreateRideForm");
             $scope.createRideInProgress = false;
             $scope.myReservations = [];
+            $scope.unit = MB;
+            $scope.minPrice = MIN_PRICE / $scope.unit;
+            $scope.maxPrice = MAX_PRICE / $scope.unit;
+            $scope.priceStep = 1 / $scope.unit;
 
             $scope.newRide = {
                 minDeparture: new Date(),
@@ -45,7 +56,7 @@
                 newRide.seats = $scope.newRide.seats;
                 newRide.pickupAddress = $scope.newRide.pickup;
                 newRide.dropoffAddress = $scope.newRide.dropoff;
-                newRide.pricePerSeat = 2000;
+                newRide.pricePerSeat = Math.floor($scope.newRide.pricePerSeat * $scope.unit);
 
                 RidesService.create(newRide).then(function (createdRide) {
                     $scope.createRideInProgress = false;

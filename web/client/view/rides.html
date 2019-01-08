@@ -28,10 +28,19 @@
                     <label for="seats">Seats:</label>
                     <input class="form-control" type="number" min="1" max="4" id="seats" name="seats" ng-model="newRide.seats" required />
                 </div>
-                <div class="col-auto">
-                    <button class="btn btn-primary mt-md-3" type="submit" ng-disabled="isAccountPending() || createRideInProgress" aria-describedby="createRideHelp">Create</button>
-                    <button class="btn btn-link mt-md-3" type="button" ng-click="toggleCreateRideForm(true)">Hide</button>
+                <div class="form-group col-auto">
+                    <label for="pricePerSeat">Price per seat:</label>
+                    <div class="input-group">
+                        <input class="form-control" type="number" min="{{minPrice}}" max="{{maxPrice}}" step="{{priceStep}}" id="pricePerSeat" name="pricePerSeat" ng-model="newRide.pricePerSeat" required />
+                        <div class="input-group-append">
+                            <span class="input-group-text" id="unit">MBYTE</span>
+                        </div>
+                    </div>
                 </div>
+            </div>
+            <div class="">
+                <button class="btn btn-primary" type="submit" ng-disabled="isAccountPending() || createRideInProgress" aria-describedby="createRideHelp">Create</button>
+                <button class="btn btn-link" type="button" ng-click="toggleCreateRideForm(true)">Hide</button>
             </div>
             <div class="form-row" ng-if="isAccountPending()">
                 <div class="col">
