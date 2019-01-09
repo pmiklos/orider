@@ -28,9 +28,14 @@
                     <li ng-repeat="reservation in reservations | filter: 'reserved'">{{ reservation.name }}</li>
                 </ul>
 
+                <style>
+                    .payment .received {
+                        color: green;
+                    }
+                </style>
                 Checked in:
-                <ul class="list-unstyled">
-                    <li ng-repeat="reservation in reservations | filter: 'checkedin'">{{ reservation.name }}</li>
+                <ul class="list-unstyled payment">
+                    <li ng-class="reservation.paymentStatus" ng-repeat="reservation in reservations | filter: 'checkedin'">{{ reservation.name }}</li>
                 </ul>
             </div>
             <div>

@@ -11,7 +11,7 @@
                 return MyRidesService.get($routeParams.id).then(function (ride) {
                     $scope.ride = ride;
                     if (ride.status === 'boarding') {
-                        updateCheckInUrl(ride.checkInCode);
+                        updateCheckInUrl("CHECKIN-" + ride.checkInCode);
                     }
                 }, function (error) {
                     console.error(error);
@@ -96,9 +96,17 @@
                     $rootScope.showError("Failed to fetch reservations", 5000);
                 });
             }
+
             socket.on("checkin", function(data) {
                 console.log(data.device + " checked in");
                 fetchReservations();
+            });
+
+            socket.on("paymentReceived", function(data) {
+                console.log("Payment received for ride " + data.rideId);
+                if (data.rideId === $scope.ride.id) {
+                    fetchReservations();
+                }
             });
 
             fetchRide().then(fetchReservations);

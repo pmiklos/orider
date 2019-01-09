@@ -13,6 +13,7 @@ const Api = require("./api/Api");
 const RideFeeContract = require("./contract/RideFeeContract");
 const CarpoolOracle = require("./job/CarpoolOracle");
 const PayoutProcessor = require("./job/PayoutProcessor");
+const PaymentProcessor = require("./job/PaymentProcessor");
 const ChatProcessor = require("./job/ChatProcessor");
 const mapService = require("./common/MapService");
 
@@ -141,7 +142,9 @@ function start(rideFeeContract) {
 
     eventBus.on("text", chatProcessor.answer);
 
+    const paymentProcessor = PaymentProcessor(web, api.ridesRepository, api.reservationsRepository);
     const payoutProcessor = PayoutProcessor(headlessWallet, api.ridesRepository, api.reservationsRepository);
 
+    eventBus.on("new_my_transactions", paymentProcessor.reservationsReceived);
     eventBus.on("my_transactions_became_stable", payoutProcessor.payoutRides);
 }

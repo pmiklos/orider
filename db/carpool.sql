@@ -39,6 +39,7 @@ CREATE TABLE cp_reservations (
     status VARCHAR NOT NULL DEFAULT 'reserved', -- reserved, checkedin, completed
     reservation_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     contract_address CHAR(32) NULL,
+    payment_status VARCHAR NOT NULL DEFAULT 'unpaid', -- unpaid, received, paid, failed
     checkin_date DATETIME NULL,
     arrival_date DATETIME NULL,
     arrival_lat FLOAT NULL,
