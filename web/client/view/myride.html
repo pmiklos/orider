@@ -15,6 +15,9 @@
             <h5 class="card-title">
                 {{ ride.departure | date:'MMM dd, yyyy HH:mm a'}} <br>
             </h5>
+            <p ng-if="ride.oracleValue">
+                <a ng-href="{{ride.oracleUnitUrl}}" target="explorer">{{ ride.oracleValue}}</a>
+            </p>
             <p>
                 Pick-up: {{ ride.pickupAddress }} <br>
                 Drop-off: {{ ride.dropoffAddress }} <br>
@@ -37,6 +40,11 @@
                 <ul class="list-unstyled payment">
                     <li ng-class="reservation.paymentStatus" ng-repeat="reservation in reservations | filter: 'checkedin'">{{ reservation.name }}</li>
                 </ul>
+                Completed:
+                <ul class="list-unstyled payment">
+                    <li ng-class="reservation.paymentStatus" ng-repeat="reservation in reservations | filter: 'completed'">{{ reservation.name }} ({{ reservation.completionScore * 100 | number:0 }}%)</li>
+                </ul>
+
             </div>
             <div>
                 <button class="btn btn-primary card-link" type="button" ng-click="startBoarding()" ng-if="!isBoarding() && !isCompleted()">Start boarding</button>

@@ -83,6 +83,7 @@ function selectAllByRide(rideId, callback) {
         status,
         reservation_date reservationDate,
         contract_address contractAddress,
+        completion_score completionScore,
         payment_status paymentStatus,
         account.payout_address payoutAddress
         FROM cp_reservations

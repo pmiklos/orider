@@ -33,7 +33,7 @@ eventBus.once("headless_wallet_ready", () => {
         const payoutProcessorAddress = address;
         const carpoolOracleAddress = address;
         const rideFeeContract = RideFeeContract(payoutProcessorDevice, payoutProcessorAddress, carpoolOracleAddress);
-        const carpoolOracle = CarpoolOracle(carpoolOracleAddress, headlessWallet, api.ridesRepository);
+        const carpoolOracle = CarpoolOracle(carpoolOracleAddress, headlessWallet, web, api.ridesRepository);
 
         console.error("Carpool oracle address: " + carpoolOracleAddress);
 

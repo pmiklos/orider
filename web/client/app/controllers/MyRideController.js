@@ -13,6 +13,7 @@
                     if (ride.status === 'boarding') {
                         updateCheckInUrl("CHECKIN-" + ride.checkInCode);
                     }
+                    $scope.ride.oracleUnitUrl = byteball.explorerUrl(ride.oracleUnit);
                 }, function (error) {
                     console.error(error);
                     $rootScope.showError("Failed to fetch ride", 5000);
@@ -106,6 +107,13 @@
                 console.log("Payment received for ride " + data.rideId);
                 if (data.rideId === $scope.ride.id) {
                     fetchReservations();
+                }
+            });
+
+            socket.on("rideCompleted", function(data) {
+                console.log("Ride completed " + data.rideId);
+                if (data.rideId === $scope.ride.id) {
+                    fetchRide().then(fetchReservations());
                 }
             });
 

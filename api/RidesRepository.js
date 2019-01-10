@@ -62,7 +62,9 @@ function select(id, callback) {
             count(reservations.device) reservationCount,
             rides.checkin_code checkInCode,
             rides.status,
-            rides.completion_score completionScore
+            rides.completion_score completionScore,
+            rides.oracle_value oracleValue,
+            rides.oracle_unit oracleUnit
         FROM cp_rides rides
         LEFT JOIN cp_reservations reservations USING (ride_id)
         WHERE ride_id = ?`, [id], (rows) => {
@@ -153,6 +155,7 @@ function selectAllByDevice(device, callback) {
 function selectAllPayable(callback) {
     db.query(`SELECT
             ride.ride_id rideId,
+            ride.device device,
             ride.completion_score driverScore,
             sum(reservation.completion_score) passengerScore,
             count(reservation.completion_score) scoredPassengerCount,

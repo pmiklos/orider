@@ -3,9 +3,9 @@
 const composer = require('byteballcore/composer.js');
 const network = require('byteballcore/network.js');
 
-module.exports = function (carpoolOracleAddress, headlessWallet, ridesRepository) {
+module.exports = function (carpoolOracleAddress, headlessWallet, web, ridesRepository) {
 
-    function postRideStatus(rideId, rideStatus) {
+    function postRideStatus(rideId, rideStatus, callback) {
         const datafeed = {
             RIDE_STATUS: `RIDE-${rideId}-${rideStatus}`
         };
@@ -22,8 +22,9 @@ module.exports = function (carpoolOracleAddress, headlessWallet, ridesRepository
             ifOk: function (joint) {
                 network.broadcastJoint(joint);
                 ridesRepository.payout(rideId, rideStatus, joint.unit.unit, (err) => {
-                    if (err) return console.error(`[ORACLE] failed to save ${rideStatus} status for ride ${rideId}`);
+                    if (err) return callback(`[ORACLE] failed to save ${rideStatus} status for ride ${rideId}`);
                     console.error(`[ORACLE] stored status for ride ${rideId} in unit ${joint.unit.unit}`);
+                    callback(null);
                 });
             }
         }));
@@ -43,7 +44,16 @@ module.exports = function (carpoolOracleAddress, headlessWallet, ridesRepository
         const averageScore = totalScore / totalVoters;
         const rideStatus = averageScore > 0.95 ? "COMPLETED" : "INCOMPLETE";
 
-        postRideStatus(ride.rideId, rideStatus);
+        postRideStatus(ride.rideId, rideStatus, (err) => {
+            if (err) return console.error(err);
+            web.send({
+                id: ride.device,
+                event: "rideCompleted",
+                data: {
+                    rideId: ride.rideId
+                }
+            });
+        });
     }
 
     function processCompletedRides() {
