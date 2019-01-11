@@ -18,9 +18,11 @@ This chat interface lets you search for rides and make reservations:
 
 * [rides](command:rides) - list of rides
 * [reservations](command:reservations) - list of your reservations
+
+To set your payout/refund address, simply insert your address.
 `;
 
-module.exports = function (ridesReporsitory, reservationsRepository) {
+module.exports = function (accountRepository, ridesReporsitory, reservationsRepository) {
 
     function listRides(context, from) {
         const fetchFrom = Number.parseInt(from) || 0;
@@ -61,9 +63,14 @@ module.exports = function (ridesReporsitory, reservationsRepository) {
     function makeReservation(context, rideIdArg) {
         const rideId = Number.parseInt(rideIdArg);
 
-        reservationsRepository.create(rideId, context.deviceAddress, (err) => {
+        accountRepository.select(context.deviceAddress, (err, account) => {
             if (err) return context.somethingWentWrong(err);
-            context.reply("Reservation successfully made. Check [reservations](command:reservations)")
+            if (!account || !account.payoutAddress) return context.reply("To make a reservation please enter a payout address below. Incomplete rides will be refunded to this address");
+
+            reservationsRepository.create(rideId, context.deviceAddress, (err) => {
+                if (err) return context.somethingWentWrong(err);
+                context.reply("Reservation successfully made. Check [reservations](command:reservations)")
+            });
         });
     }
 
@@ -94,6 +101,13 @@ module.exports = function (ridesReporsitory, reservationsRepository) {
         });
     }
 
+    function setPayoutAddress(context, payoutAddress) {
+        accountRepository.upsert(context.deviceAddress, { payoutAddress }, (err) => {
+            if (err) return context.somethingWentWrong(err);
+            context.reply("Your payout address is set to " + payoutAddress);
+        });
+    }
+
     const commands = [
         {
             pattern: /hi|hello|yo/i,
@@ -101,7 +115,7 @@ module.exports = function (ridesReporsitory, reservationsRepository) {
                 context.reply("Hi, try [rides](command:rides) or [help](command:help) for detailed help");
             }
         }, {
-            pattern: /rides|more rides ([0-9]{2})/i,
+            pattern: /^rides|^more rides ([0-9]{1,2})/i,
             handler: listRides
         }, {
             pattern: /reserve ([0-9]+)/i,
@@ -109,6 +123,9 @@ module.exports = function (ridesReporsitory, reservationsRepository) {
         }, {
             pattern: /reservations/i,
             handler: listReservations
+        }, {
+            pattern: /([A-Z2-7]{32})/,
+            handler: setPayoutAddress
         }];
 
     function answer(deviceAddress, answer) {

@@ -45,7 +45,7 @@ eventBus.once("headless_wallet_ready", () => {
 
 function start(rideFeeContract) {
 
-    const chatProcessor = ChatProcessor(api.ridesRepository, api.reservationsRepository);
+    const chatProcessor = ChatProcessor(api.accountRepository, api.ridesRepository, api.reservationsRepository);
 
     httpServer.listen(httpPort, httpHost, () => {
         console.error("WEB started");

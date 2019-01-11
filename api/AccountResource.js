@@ -2,6 +2,25 @@
 
 module.exports = function (accountRepository) {
 
+    function accountReady(req, res, next) {
+        if (req.account && req.account.payoutAddress) {
+            return next();
+        }
+
+        next({
+            err: 404,
+            message: "Missing payout address"
+        });
+    }
+
+    function fetch(req, res, next) {
+        accountRepository.select(req.accessToken.dev, (err, account) => {
+            if (err) return next(err);
+            req.account = account;
+            next();
+        });
+    }
+
     function get(req, res, next) {
         accountRepository.select(req.accessToken.dev, (err, account) => {
             if (err) return next(err);
@@ -22,6 +41,8 @@ module.exports = function (accountRepository) {
     }
 
     return {
+        accountReady,
+        fetch,
         get,
         createOrUpdate
     };
