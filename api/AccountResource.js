@@ -8,7 +8,7 @@ module.exports = function (accountRepository) {
         }
 
         next({
-            err: 404,
+            status: 400,
             message: "Missing payout address"
         });
     }

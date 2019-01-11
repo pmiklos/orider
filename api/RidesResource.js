@@ -94,6 +94,18 @@ module.exports = function (ridesRepository, reservationsRepository, authReposito
         });
     }
 
+    function fetchMine(req, res, next) {
+        ridesRepository.select(req.params.id, (err, ride) => {
+            if (err) return next(err);
+            if (!ride || ride.device !== req.accessToken.dev) return next({
+                status: 404,
+                message: "No such ride"
+            });
+            req.ride = ride;
+            next();
+        });
+    }
+
     function get(req, res) {
         res.json(deleteCoordinates(req.ride));
     }
@@ -125,6 +137,7 @@ module.exports = function (ridesRepository, reservationsRepository, authReposito
         create,
         get,
         fetch,
+        fetchMine,
         list,
         listByDevice
     };

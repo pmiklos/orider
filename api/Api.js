@@ -76,7 +76,7 @@ module.exports = function (webapp, mapService) {
     webapp.get("/api/my/reservations/:id", reservationsResource.get);
     webapp.post("/api/my/reservations/:id/complete", reservationsResource.complete);
     webapp.get("/api/my/rides", ridesResource.listByDevice);
-    webapp.use("/api/my/rides/:id", ridesResource.fetch);
+    webapp.use("/api/my/rides/:id", ridesResource.fetchMine);
     webapp.get("/api/my/rides/:id", ridesResource.get);
     webapp.get("/api/my/rides/:id/reservations", reservationsResource.listByRide);
     webapp.post("/api/my/rides/:id/board", ridesResource.board);

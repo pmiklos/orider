@@ -17,6 +17,7 @@
                 }, function (error) {
                     console.error(error);
                     $rootScope.showError("Failed to fetch ride", 5000);
+                    $scope.ride = {};
                 });
             }
 
@@ -95,6 +96,7 @@
                 }, function (error) {
                     console.error(error);
                     $rootScope.showError("Failed to fetch reservations", 5000);
+                    $scope.reservations = [];
                 });
             }
 
