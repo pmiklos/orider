@@ -14,6 +14,7 @@ exports.KEYS_FILENAME = 'keys.json';
 //exports.control_addresses = [""];
 //exports.payout_address = "";
 
+exports.supportsHttps = true;
 exports.authSecret = "secret";
 exports.authTimeout = 300000; // the user has 5 minutes to confirm logon with pairing code
 

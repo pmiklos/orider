@@ -45,7 +45,8 @@ module.exports = function (authRepository, authEvents, tokenService) {
                 }, "7days");
                 res.cookie("access_token", accessToken, {
                     httpOnly: true,
-                    secure: false // set it to true for production
+                    secure: config.supportsHttps, // set it to true for production
+                    maxAge:  7 * 24 * 60 * 60 * 1000 // week
                 }).end();
             });
         });
