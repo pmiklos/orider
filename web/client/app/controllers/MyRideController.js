@@ -6,6 +6,8 @@
         function ($rootScope, $scope, $routeParams, byteball, socket, MyRidesService) {
 
             $scope.ride = {};
+            $scope.reservations = [];
+            $scope.totalCheckIns = 0;
 
             function fetchRide() {
                 return MyRidesService.get($routeParams.id).then(function (ride) {
