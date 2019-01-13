@@ -8,6 +8,7 @@
             $scope.ride = {};
             $scope.reservations = [];
             $scope.totalCheckIns = 0;
+            $scope.completedReservations = [];
 
             function fetchRide() {
                 return MyRidesService.get($routeParams.id).then(function (ride) {
@@ -96,6 +97,10 @@
                 return reservation.status === "checkedin";
             }
 
+            function completed(reservation) {
+                return reservation.status === "completed";
+            }
+
             function paid(reservation) {
                 return reservation.paymentStatus === "received" || reservation.paymentStatus === "paid";
             }
@@ -112,6 +117,7 @@
                         $scope.totalCheckIns = totalCheckIns;
                         $scope.paidCheckIns = paidCheckIns / totalReservations;
                         $scope.unpaidCheckIns = (totalCheckIns - paidCheckIns) / totalReservations;
+                        $scope.completedReservations = response.reservations.filter(completed);
                     }
                 }, function (error) {
                     console.error(error);

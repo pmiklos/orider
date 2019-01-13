@@ -31,16 +31,16 @@
                    target="carpool-map">Directions</a>
             </p>
             <div>
-                Completed:
-                <ul class="list-unstyled payment">
-                    <li ng-class="reservation.paymentStatus" ng-repeat="reservation in reservations | filter: 'completed'">{{ reservation.name }} ({{ reservation.completionScore * 100 | number:0 }}%)</li>
-                </ul>
-            </div>
-            <div>
                 <button class="btn btn-primary card-link" type="button" ng-click="startBoarding()" ng-if="!isBoarding() && !isCompleted()">Start boarding</button>
                 <span class="card-link text-muted" ng-if="isBoarding()">Boarding now</span>
                 <button class="btn btn-primary card-link" type="button" ng-click="completeRide()" ng-if="!isCompleted()" ng-disabled="isCreated()">Complete Ride</button>
                 <span class="card-link text-muted" ng-if="isCompleted()">Completed ({{ ride.completionScore * 100 | number :0}}%)</span>
+            </div>
+            <div ng-if="completedReservations.length > 0">
+                Passenger completion results:
+                <ul class="list-unstyled payment">
+                    <li ng-class="reservation.paymentStatus" ng-repeat="reservation in completedReservations">{{ reservation.name }} ({{ reservation.completionScore * 100 | number:0 }}%)</li>
+                </ul>
             </div>
         </div>
     </div>
