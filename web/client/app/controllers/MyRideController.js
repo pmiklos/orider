@@ -107,6 +107,7 @@
                         const totalCheckIns = response.reservations.filter(checkedIn).length;
                         const paidCheckIns = response.reservations.filter(paid).length;
 
+                        $scope.totalCheckIns = totalCheckIns;
                         $scope.paidCheckIns = paidCheckIns / totalReservations;
                         $scope.unpaidCheckIns = (totalCheckIns - paidCheckIns) / totalReservations;
                     }
