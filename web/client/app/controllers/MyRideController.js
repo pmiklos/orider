@@ -90,9 +90,26 @@
                 return $scope.ride.status === 'completed';
             }
 
+            function checkedIn(reservation) {
+                return reservation.status === "checkedin";
+            }
+
+            function paid(reservation) {
+                return reservation.paymentStatus === "received" || reservation.paymentStatus === "paid";
+            }
+
             function fetchReservations() {
                 return MyRidesService.listReservations($routeParams.id).then(function (response) {
                     $scope.reservations = response.reservations;
+
+                    if (Array.isArray(response.reservations) && response.reservations.length > 0) {
+                        const totalReservations = response.reservations.length;
+                        const totalCheckIns = response.reservations.filter(checkedIn).length;
+                        const paidCheckIns = response.reservations.filter(paid).length;
+
+                        $scope.paidCheckIns = paidCheckIns / totalReservations;
+                        $scope.unpaidCheckIns = (totalCheckIns - paidCheckIns) / totalReservations;
+                    }
                 }, function (error) {
                     console.error(error);
                     $rootScope.showError("Failed to fetch reservations", 5000);

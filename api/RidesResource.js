@@ -26,7 +26,7 @@ module.exports = function (ridesRepository, reservationsRepository, authReposito
 
     function board(req, res, next) {
         const checkInCode = "CHECKIN-" + req.ride.checkInCode;
-        authRepository.insertPermanentPairingSecret(checkInCode, "30 MINUTES", () => {
+        authRepository.insertPermanentPairingSecret(checkInCode, "24 HOURS", () => {
             ridesRepository.board(req.ride.id, (err, status) => {
                 if (err) return next(err);
                 res.json({
