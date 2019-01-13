@@ -2,8 +2,8 @@
 
     var app = angular.module("carpool");
 
-    app.controller("MyReservationController", ["$rootScope", "$scope", "$routeParams", "byteball", "socket", "MyReservationsService", "MyRidesService",
-        function ($rootScope, $scope, $routeParams, byteball, socket, MyReservationsService, MyRidesService) {
+    app.controller("MyReservationController", ["$rootScope", "$scope", "$routeParams", "byteball", "socket", "MyReservationsService", "RidesService",
+        function ($rootScope, $scope, $routeParams, byteball, socket, MyReservationsService, RidesService) {
 
             $scope.reservation = {};
             $scope.ride = {};
@@ -18,7 +18,7 @@
             }
 
             function fetchRide() {
-                return MyRidesService.get($routeParams.id).then(function (ride) {
+                return RidesService.get($routeParams.id).then(function (ride) {
                     $scope.ride = ride;
                 }, function (error) {
                     console.error(error);
