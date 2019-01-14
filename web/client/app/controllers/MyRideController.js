@@ -2,19 +2,63 @@
 
     var app = angular.module("carpool");
 
-    app.controller("MyRideController", ["$rootScope", "$scope", "$routeParams", "byteball", "socket", "MyRidesService",
-        function ($rootScope, $scope, $routeParams, byteball, socket, MyRidesService) {
+    app.controller("MyRideController", ["$rootScope", "$scope", "$routeParams", "$timeout", "byteball", "socket", "LocationService", "MyRidesService",
+        function ($rootScope, $scope, $routeParams, $timeout, byteball, socket, LocationService, MyRidesService) {
+
+            const AUTO_COMPLETION_TIMEOUT = 10 * 1000; // 10 sec
+            const AUTO_COMPLETION_COUNTDOWN = 50;
+            const AUTO_COMPLETION_COUNTDOWN_TIMEOUT = AUTO_COMPLETION_TIMEOUT / AUTO_COMPLETION_COUNTDOWN;
 
             $scope.ride = {};
             $scope.reservations = [];
             $scope.totalCheckIns = 0;
             $scope.completedReservations = [];
+            $scope.autoCompletionProgress = 0;
+
+            let locationWatchId = 0;
+            let autoCompletionTimer;
+
+            function startAutoCompletion(ride, countdown) {
+                if (countdown >= 0) {
+                    $scope.autoCompletionProgress = 1 - (countdown / AUTO_COMPLETION_COUNTDOWN);
+                    autoCompletionTimer = $timeout(startAutoCompletion, AUTO_COMPLETION_COUNTDOWN_TIMEOUT, true, ride, countdown - 1);
+                } else {
+                    angular.element('#rideAutoCompletion').modal('hide');
+                    completeRide();
+                }
+            }
+
+            function cancelCompletion() {
+                if (autoCompletionTimer) {
+                    $timeout.cancel(autoCompletionTimer);
+                }
+                angular.element('#rideAutoCompletion').modal('hide');
+            }
+
+            function trackRide(ride) {
+                LocationService.clear(locationWatchId);
+
+                locationWatchId = LocationService.watch(ride.dropoffLat, ride.dropoffLng, function(err) {
+                    if (err) return console.error(err);
+
+                    angular.element("#rideAutoCompletion").modal({
+                        backdrop: "static"
+                    });
+
+                    startAutoCompletion(ride, AUTO_COMPLETION_COUNTDOWN);
+                });
+
+                $scope.$on('$routeChangeStart', function() {
+                    LocationService.clear(locationWatchId);
+                });
+            }
 
             function fetchRide() {
                 return MyRidesService.get($routeParams.id).then(function (ride) {
                     $scope.ride = ride;
                     if (ride.status === 'boarding') {
                         updateCheckInUrl("CHECKIN-" + ride.checkInCode);
+                        trackRide(ride);
                     }
                     $scope.ride.oracleUnitUrl = byteball.explorerUrl(ride.oracleUnit);
                 }, function (error) {
@@ -28,6 +72,7 @@
                 return MyRidesService.board($routeParams.id).then(function (response) {
                     updateCheckInUrl(response.checkInCode);
                     $scope.ride.status = response.status;
+                    trackRide($scope.ride);
                 }, function (error) {
                     console.error(error);
                     $rootScope.showError("Failed to start boarding", 5000);
@@ -46,6 +91,8 @@
                         $rootScope.showError("Failed to complete ride", 5000);
                     });
                 }
+
+                LocationService.clear(locationWatchId);
 
                 if ("geolocation" in navigator) {
                     navigator.geolocation.getCurrentPosition(function(position) {
@@ -148,6 +195,7 @@
             fetchRide().then(fetchReservations);
 
             $scope.startBoarding = startBoarding;
+            $scope.cancelCompletion = cancelCompletion;
             $scope.completeRide = completeRide;
             $scope.isCreated = isCreated;
             $scope.isBoarding = isBoarding;
