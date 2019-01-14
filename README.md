@@ -64,6 +64,12 @@ The API requires an API KEY you can set in the `~/.config/byteball-carpool/conf.
         "googleMapsApiKey": "YOUR GOOGLE MAP API KEY"
     }
 
+By default the `access_token` that carries the data for the authenticated wallet is set as a secure cookie. On localhost development you might not have HTTPS set up. To turn secure cookie off set the `supportsHttps` to `false`:
+
+    {
+        "supportsHttps": false
+    }
+
 ## Manual testing
 
 Testing the app is very easy using docker. You can launch as many test wallets as you want to simulate a real life situation.
