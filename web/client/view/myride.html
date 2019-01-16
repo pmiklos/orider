@@ -1,5 +1,24 @@
 <div ng-include="'/fragment/messages.html'"></div>
 
+<div class="modal fade" id="rideAutoCompletion" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <h3>Completing ride</h3>
+                <p>
+                    <div class="progress">
+                        <div class="progress-bar bg-success" role="progressbar" style="width: {{ autoCompletionProgress * 100 | number:0 }}%" aria-valuenow="{{ autoCompletionProgress * 100 | number:0 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </p>
+                <p class="d-flex justify-content-center">
+                    <button class="btn btn-primary px-5" type="button" ng-click="cancelCompletion()">Cancel</button>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <div class="row justify-content-center">
     <div class="col-auto pt-3 card border-dark" ng-if="checkInUrl">
         <div class="mx-auto">

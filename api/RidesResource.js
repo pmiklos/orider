@@ -106,6 +106,10 @@ module.exports = function (ridesRepository, reservationsRepository, authReposito
         });
     }
 
+    function getMine(req, res) {
+        res.json(req.ride);
+    }
+
     function get(req, res) {
         res.json(deleteCoordinates(req.ride));
     }
@@ -136,6 +140,7 @@ module.exports = function (ridesRepository, reservationsRepository, authReposito
         complete,
         create,
         get,
+        getMine,
         fetch,
         fetchMine,
         list,
