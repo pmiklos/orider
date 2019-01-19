@@ -2,9 +2,9 @@
 
 const express = require("express");
 const router = express.Router();
-const config = require("byteballcore/conf");
-const constants = require("byteballcore/constants");
-const device = require("byteballcore/device");
+const config = require("ocore/conf");
+const constants = require("ocore/constants");
+const device = require("ocore/device");
 
 module.exports = function () {
 
@@ -20,7 +20,7 @@ module.exports = function () {
                 hub: config.hub,
                 devicePubKey: device.getMyDevicePubKey(),
                 protocol: isTestnet() ? "byteball-tn" : "byteball",
-                explorerUrl: isTestnet() ? "https://testnetexplorer.byteball.org/" : "https://explorer.byteball.org/"
+                explorerUrl: isTestnet() ? "https://testnetexplorer.obyte.org/" : "https://explorer.obyte.org/"
             }
         });
     });

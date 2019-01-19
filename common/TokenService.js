@@ -2,7 +2,7 @@
 
 const jwt = require("jsonwebtoken");
 const uuid = require("uuid/v4");
-const config = require("byteballcore/conf");
+const config = require("ocore/conf");
 
 const secret = config.authSecret;
 const issuer = "byteball-carpool";

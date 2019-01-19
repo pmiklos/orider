@@ -1,7 +1,7 @@
 "use strict";
 
-const constants = require("byteballcore/constants");
-const device = require("byteballcore/device");
+const constants = require("ocore/constants");
+const device = require("ocore/device");
 
 // TODO make it reusable
 function isTestnet() {
@@ -11,7 +11,7 @@ function isTestnet() {
 
 // TODO make it reusable
 const WEB_URL = isTestnet() ? "https://carpool-test.byteball.market" : "https://carpool.byteball.market";
-const USAGE = `Carpooling for Byteballers
+const USAGE = `Carpooling
 ${WEB_URL}
 
 This chat interface lets you search for rides and make reservations:

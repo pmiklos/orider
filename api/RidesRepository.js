@@ -1,6 +1,6 @@
 "use strict";
 
-const db = require("byteballcore/db.js");
+const db = require("ocore/db.js");
 const uuid = require("uuid/v4");
 
 function board(rideId, callback) {

@@ -1,6 +1,6 @@
 "use strict";
 
-const db = require("byteballcore/db.js");
+const db = require("ocore/db.js");
 
 function complete(rideId, device, arrivalLocation, score, callback) {
     db.query(`UPDATE cp_reservations SET

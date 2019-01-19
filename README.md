@@ -1,5 +1,5 @@
 # byteball-carpool
-Carpooling for Byteballers
+Carpooling for Obyte
 
 This project is submitted to [The Great Byteball Bot War Use-a-thon](https://wiki.byteball.org/Use-a-thon/botwar).
 
@@ -10,7 +10,7 @@ to the agreed destination.
 
 This is a simplified version of a ride sharing. The driver posts the pick-up location and destination in advance in a
 carpooling bulletin board where people can sign up and join the rides. Once they arrive at the pick-up location, they
-scan the QR code displayed on the driver's mobile screen with their Byteball wallet app to check-in for the ride. As
+scan the QR code displayed on the driver's mobile screen with their Obyte wallet app to check-in for the ride. As
 soon as they are ready to leave, the driver closes the check-in period and the smart contract is sent out to the riders who
 make the payment. The driver gets notified about the incoming payments and when all have paid, the trip starts. When they
 reach the destination and the driver completes the trip, the GPS coordinates are read and transmitted to the
@@ -37,7 +37,7 @@ Setting up the basic infrastructure on a bare Ubuntu 18 VPS (eg. [DigitalOcean](
     sudo apt-get update
     sudo apt-get install python-certbot-nginx
 
-Install the Carpooling for Byteballers application:
+Install the Carpooling application:
 
     # Clone the repo and install and run the app
     git clone https://github.com/pmiklos/byteball-carpool.git
@@ -83,6 +83,6 @@ Since carpools involve one driver and at least one passenger, premade scripts ar
 
 Both commands require to have docker installed on your linux machine. See detials in [bin/docker-wallet.sh](./bin/docker-wallet.sh)
 
-After launching the wallets use the [testnet faucet](https://byteball.org/testnet.html) to get some test bytes by pairing your wallet with the faucet bot using the pairing code below.
+After launching the wallets use the [testnet faucet](https://obyte.org/testnet.html) to get some test bytes by pairing your wallet with the faucet bot using the pairing code below.
 
-    AxBxXDnPOzE/AxLHmidAjwLPFtQ6dK3k70zM0yKVeDzC@byteball.org/bb-test#0000
+    AxBxXDnPOzE/AxLHmidAjwLPFtQ6dK3k70zM0yKVeDzC@obyte.org/bb-test#0000

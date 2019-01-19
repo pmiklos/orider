@@ -1,7 +1,7 @@
 "use strict";
 
-const constants = require("byteballcore/constants");
-const device = require("byteballcore/device"); // would be better to a NotificationService as a depedency
+const constants = require("ocore/constants");
+const device = require("ocore/device"); // would be better to a NotificationService as a depedency
 
 // TODO make it reusable
 function isTestnet() {

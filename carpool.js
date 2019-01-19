@@ -1,9 +1,9 @@
 "use strict";
 
-const config = require("byteballcore/conf");
-const device = require("byteballcore/device");
-const eventBus = require("byteballcore/event_bus");
-const headlessWallet = require("headless-byteball");
+const config = require("ocore/conf");
+const device = require("ocore/device");
+const eventBus = require("ocore/event_bus");
+const headlessWallet = require("headless-obyte");
 const express = require("express");
 const http = require("http");
 const socketio = require('socket.io');

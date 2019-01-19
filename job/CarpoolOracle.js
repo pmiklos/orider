@@ -1,7 +1,7 @@
 "use strict";
 
-const composer = require('byteballcore/composer.js');
-const network = require('byteballcore/network.js');
+const composer = require('ocore/composer.js');
+const network = require('ocore/network.js');
 
 module.exports = function (carpoolOracleAddress, headlessWallet, web, ridesRepository) {
 

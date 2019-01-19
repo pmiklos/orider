@@ -2,7 +2,7 @@
 
 const express = require("express");
 const cookieParser = require('cookie-parser');
-const config = require("byteballcore/conf");
+const config = require("ocore/conf");
 const uuid = require("uuid/v4");
 
 const AUTH_TIMEOUT_INTERVAL = '5 MINUTES';

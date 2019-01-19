@@ -1,5 +1,5 @@
 "use strict";
-const walletDefinedByAddresses = require("byteballcore/wallet_defined_by_addresses");
+const walletDefinedByAddresses = require("ocore/wallet_defined_by_addresses");
 
 const RIDE_STATUS_DATAFEED = "RIDE_STATUS";
 

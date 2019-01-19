@@ -6,7 +6,7 @@ exports.bLight = true;
 exports.bStaticChangeAddress = true;
 
 exports.storage = 'sqlite';
-exports.hub = 'byteball.org/bb-test';
+exports.hub = 'obyte.org/bb-test';
 exports.deviceName = 'Carpooling';
 exports.permanent_pairing_secret = '0000';
 exports.KEYS_FILENAME = 'keys.json';

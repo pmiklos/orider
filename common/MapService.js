@@ -1,6 +1,6 @@
 "use strict";
 
-const config = require("byteballcore/conf");
+const config = require("ocore/conf");
 const geodatasource = require("./geodatasource");
 const googleMapsClient = require('@google/maps').createClient({
     key: config.googleMapsApiKey

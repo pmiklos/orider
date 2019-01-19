@@ -1,6 +1,6 @@
 "use strict";
 
-var db = require('byteballcore/db.js');
+var db = require('ocore/db.js');
 
 
 function insertPairingSecret(pairingSecret, isPermanent, timeout, callback) {

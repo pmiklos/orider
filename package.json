@@ -1,7 +1,7 @@
 {
   "name": "byteball-carpool",
   "version": "1.0.0",
-  "description": "Carpooling for Byteballers",
+  "description": "Carpooling for Obyte",
   "main": "carpool.js",
   "scripts": {
     "driver-wallet": "./bin/docker-wallet.sh byteball-carpool-driver",
@@ -13,10 +13,9 @@
     "url": "git+https://github.com/pmiklos/byteball-carpool.git"
   },
   "keywords": [
-    "byteball",
+    "obyte",
     "carpool",
-    "smart",
-    "contract",
+    "smartcontract",
     "crypto"
   ],
   "author": "Peter Miklos",
@@ -25,7 +24,7 @@
     "@google/maps": "^0.5.5",
     "cookie-parser": "^1.4.3",
     "express": "^4.16.4",
-    "headless-byteball": "github:byteball/headless-byteball#npm",
+    "headless-obyte": "github:byteball/headless-obyte#npm",
     "jsonwebtoken": "^8.4.0",
     "request": "^2.88.0",
     "socket.io": "^2.2.0"

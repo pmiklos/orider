@@ -1,6 +1,6 @@
 "use strict";
 
-const db = require("byteballcore/db.js");
+const db = require("ocore/db.js");
 
 function select(device, callback) {
     db.query(`SELECT
