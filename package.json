@@ -26,6 +26,7 @@
     "express": "^4.16.4",
     "headless-obyte": "github:byteball/headless-obyte#npm",
     "jsonwebtoken": "^8.4.0",
+    "ocore": "github:byteball/ocore.git#npm",
     "request": "^2.88.0",
     "socket.io": "^2.2.0"
   },
