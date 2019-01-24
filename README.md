@@ -43,6 +43,7 @@ Install the Carpooling application:
     git clone https://github.com/pmiklos/byteball-carpool.git
     cd byteball-carpool
     npm install
+    npm dedupe # to remove duplicate ocore module
     node carpool.js
     
 Copy the provided nginx script (see etc/nginx.conf), change your domain name at `server_name`.
