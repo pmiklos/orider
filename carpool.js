@@ -12,6 +12,7 @@ const Web = require("./web/Web");
 const Api = require("./api/Api");
 const RideFeeContract = require("./contract/RideFeeContract");
 const CarpoolOracle = require("./job/CarpoolOracle");
+const OverdueReservationProcessor = require("./job/OverdueReservationProcessor");
 const PayoutProcessor = require("./job/PayoutProcessor");
 const PaymentProcessor = require("./job/PaymentProcessor");
 const ChatProcessor = require("./job/ChatProcessor");
@@ -34,10 +35,13 @@ eventBus.once("headless_wallet_ready", () => {
         const carpoolOracleAddress = address;
         const rideFeeContract = RideFeeContract(payoutProcessorDevice, payoutProcessorAddress, carpoolOracleAddress);
         const carpoolOracle = CarpoolOracle(carpoolOracleAddress, headlessWallet, web, api.ridesRepository);
+        const overdueReservationProcessor = OverdueReservationProcessor(api.reservationsRepository);
 
         console.error("Carpool oracle address: " + carpoolOracleAddress);
 
         carpoolOracle.start();
+        overdueReservationProcessor.start();
+
         start(rideFeeContract);
     });
 

@@ -51,7 +51,9 @@ module.exports = function (ridesRepository, reservationsRepository, authReposito
 
                 reservations.forEach(reservation => {
                     device.sendMessageToDevice(reservation.device, "text",
-                        `You arrived! Please complete the ride by visiting the link below:\n${WEB_URL}/#!/my/reservations/${ride.id}`);
+                        `You arrived! Please complete the ride by visiting the link below in 5 minutes or do nothing ` +
+                        `if you accept the driver's score: ${completionScore.toFixed(2) * 100}%\n` +
+                        `${WEB_URL}/#!/my/reservations/${ride.id}`);
                 });
             });
 

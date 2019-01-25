@@ -19,6 +19,34 @@ function complete(rideId, device, arrivalLocation, score, callback) {
     });
 }
 
+/**
+ * @callback OverdueCompletionCallback
+ * @param {number} updatedReservationCount
+ */
+
+/**
+ * @param callback OverdueCompletionCallback
+ */
+function completeAllOverdue(callback) {
+    const fiveMinutesEarlier = db.addTime('-5 MINUTES');
+
+    db.query(`UPDATE cp_reservations AS reservation
+        SET status = 'completed',
+            completion_score = (
+                    SELECT completion_score FROM cp_rides ride
+                    WHERE ride.ride_id = reservation.ride_id
+                )
+        WHERE reservation.status = 'checkedin'
+            AND EXISTS (
+                    SELECT 1 FROM cp_rides ride
+                    WHERE ride.ride_id = reservation.ride_id
+                        AND ride.arrival_date < ${fiveMinutesEarlier}
+                )
+        `, [], (result) => {
+        callback(result.affectedRows);
+    });
+}
+
 function create(rideId, device, callback) {
     db.query(`INSERT ${db.getIgnore()} INTO cp_reservations (ride_id, device)
         SELECT ride_id, ? FROM cp_rides
@@ -173,6 +201,7 @@ function paymentReceived(rideId, device, callback) {
 
 module.exports = {
     complete,
+    completeAllOverdue,
     create,
     select,
     selectAllByRide,
