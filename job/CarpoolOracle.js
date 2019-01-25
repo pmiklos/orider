@@ -42,7 +42,7 @@ module.exports = function (carpoolOracleAddress, headlessWallet, web, ridesRepos
         }
 
         const averageScore = totalScore / totalVoters;
-        const rideStatus = averageScore > 0.95 ? "COMPLETED" : "INCOMPLETE";
+        const rideStatus = averageScore < 0.75 ? "INCOMPLETE" : "COMPLETED";
 
         postRideStatus(ride.rideId, rideStatus, (err) => {
             if (err) return console.error(err);
