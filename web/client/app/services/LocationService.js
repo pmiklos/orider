@@ -4,7 +4,9 @@
 
     app.factory("LocationService", [function() {
 
-        const locationSettings = {
+        const MAX_DROP_OFF_DISTANCE = 0.075;
+
+        const ACCURATE_LOCATION_SETTINGS = {
             maximumAge: 5000,
             timeout: 60000,
             enableHighAccuracy: true
@@ -18,7 +20,7 @@
 
                     const correctedDropoffDistanceKm = Math.max(0, dropoffDistanceKm - accuracyKm);
 
-                    if (correctedDropoffDistanceKm < 0.05) {
+                    if (correctedDropoffDistanceKm < MAX_DROP_OFF_DISTANCE) {
                         navigator.geolocation.clearWatch(watchId);
                         callback();
                     }
@@ -30,7 +32,7 @@
                     } else {
                         callback("Timed out while acquiring position");
                     }
-                }, locationSettings);
+                }, ACCURATE_LOCATION_SETTINGS);
                 return watchId;
             } else {
                 callback("Location service is not available");
