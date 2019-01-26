@@ -10,7 +10,7 @@ function isTestnet() {
 }
 
 // TODO make it reusable
-const WEB_URL = isTestnet() ? "https://carpool-test.byteball.market" : "https://carpool.byteball.market";
+const WEB_URL = isTestnet() ? "https://carpool-test.byteball.market" : "https://orider.obyte.app";
 
 function deleteCoordinates(ride) {
     if (typeof ride === "object") {

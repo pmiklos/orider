@@ -10,8 +10,8 @@ function isTestnet() {
 }
 
 // TODO make it reusable
-const WEB_URL = isTestnet() ? "https://carpool-test.byteball.market" : "https://carpool.byteball.market";
-const USAGE = `Carpooling
+const WEB_URL = isTestnet() ? "https://carpool-test.byteball.market" : "https://orider.obyte.app";
+const USAGE = `Carpooling with ORider
 ${WEB_URL}
 
 This chat interface lets you search for rides and make reservations:
