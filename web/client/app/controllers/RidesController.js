@@ -52,7 +52,7 @@
                 var time = $scope.newRide.departureTime;
 
                 var newRide = {};
-                newRide.departure = new Date(date.getFullYear(), date.getMonth(), date.getDate(), time.getHours(), time.getMinutes()).getTime();
+                newRide.departure = new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), time.getUTCHours(), time.getUTCMinutes()).getTime();
                 newRide.seats = $scope.newRide.seats;
                 newRide.pickupAddress = $scope.newRide.pickup;
                 newRide.dropoffAddress = $scope.newRide.dropoff;
