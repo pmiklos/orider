@@ -36,7 +36,7 @@ function updateStatus(rideId, fromStatuses, toStatus, callback) {
 
 function create(device, ride, callback) {
     db.query(`INSERT INTO cp_rides (device, pickup_address, pickup_lat, pickup_lng, dropoff_address, dropoff_lat, dropoff_lng, departure, seats, price_per_seat, checkin_code)
-            VALUES (?, ?, ?, ?, ?, ?, ?, datetime(? / 1000, 'unixepoch', 'localtime'), ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?, datetime(? / 1000, 'unixepoch'), ?, ?, ?)
     `, [device, ride.pickupAddress, ride.pickupLat, ride.pickupLng, ride.dropoffAddress, ride.dropoffLat, ride.dropoffLng, ride.departure, ride.seats, ride.pricePerSeat, uuid()], (result) => {
         if (result.affectedRows === 1) {
             return select(result.insertId, callback)
