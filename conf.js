@@ -20,4 +20,6 @@ exports.authTimeout = 300000; // the user has 5 minutes to confirm logon with pa
 
 exports.googleMapsApiKey = "GOOGLE MAPS API KEY";
 
+// exports.rideFeeContractTemplate = "hash of unit of the contract template"
+
 console.log('finished carpool conf');

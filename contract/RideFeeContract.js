@@ -7,7 +7,7 @@ const RIDE_STATUS_DATAFEED = "RIDE_STATUS";
  * The estimated fee of making a transfer out of the contract
  * @type {number}
  */
-const TYPICAL_FEE = 1500; // TODO could be lowered significantly by using definition templates I think
+const TYPICAL_FEE = 1000;
 
 function hasOutput(address, asset, amount) {
     return ["has", {
@@ -29,7 +29,60 @@ module.exports = function (payoutProcessorDevice, payoutProcessorAddress, carpoo
     return {
 
         /**
+         * @param {Object} headlessWallet - the current headless-obyte module instance
+         */
+        defineTemplate(headlessWallet, callback) {
+            const definition = [
+                "or", [
+                    ["and", [
+                        ["address", payoutProcessorAddress], // r.0.0
+                        hasOutput("$driverPayoutAddress", 'base', "$amount"),
+                        ["in data feed", [
+                            [carpoolOracleAddress],
+                            RIDE_STATUS_DATAFEED, "=", "RIDE-$rideId-COMPLETED"
+                        ]]
+                    ]],
+                    ["and", [
+                        ["address", payoutProcessorAddress], // r.1.0
+                        hasOutput("$passengerRefundAddress", 'base', "$amount"),
+                        ["in data feed", [
+                            [carpoolOracleAddress],
+                            RIDE_STATUS_DATAFEED, "=", "RIDE-$rideId-INCOMPLETE"
+                        ]]
+                    ]],
+                    ["and", [
+                        ["address", "$driverPayoutAddress"], // r.2.0
+                        ["in data feed", [
+                            [carpoolOracleAddress],
+                            RIDE_STATUS_DATAFEED, "=", "RIDE-$rideId-COMPLETED"
+                        ]]
+                    ]],
+                    ["and", [
+                        ["address", "$passengerRefundAddress"], // r.3.0
+                        ["in data feed", [
+                            [carpoolOracleAddress],
+                            RIDE_STATUS_DATAFEED, "=", "RIDE-$rideId-INCOMPLETE"
+                        ]]
+                    ]]
+                ]
+            ];
+
+            const composer = require('ocore/composer.js');
+            const network = require('ocore/network.js');
+
+            composer.composeDefinitionTemplateJoint(carpoolOracleAddress, definition, headlessWallet.signer, composer.getSavingCallbacks({
+                ifNotEnoughFunds: callback,
+                ifError: callback,
+                ifOk: function(joint){
+                    network.broadcastJoint(joint);
+                    callback(null, joint.unit.unit);
+                }
+            }));
+        },
+
+        /**
          * @typedef {Object} RideFeeContractParams
+         * @property {string} templateHash - the unit hash of the contract definition template
          * @property {number} rideId - the ride identifier that will be included in the oracle datafeed when the trip completes
          * @property {string} driverDevice - the BASE32 address of the driver's device
          * @property {string} driverPayoutAddress - the BASE32 address of the driver to which the ride fee is paid out on trip completion
@@ -51,41 +104,17 @@ module.exports = function (payoutProcessorDevice, payoutProcessorAddress, carpoo
          */
         define(p, callback) {
             const definition = [
-                "or", [
-                    ["and", [
-                        ["address", payoutProcessorAddress], // r.0.0
-                        hasOutput(p.driverPayoutAddress, 'base', p.amount - TYPICAL_FEE),
-                        ["in data feed", [
-                            [carpoolOracleAddress],
-                            RIDE_STATUS_DATAFEED, "=", `RIDE-${p.rideId}-COMPLETED`
-                        ]]
-                    ]],
-                    ["and", [
-                        ["address", payoutProcessorAddress], // r.1.0
-                        hasOutput(p.passengerRefundAddress, 'base', p.amount - TYPICAL_FEE),
-                        ["in data feed", [
-                            [carpoolOracleAddress],
-                            RIDE_STATUS_DATAFEED, "=", `RIDE-${p.rideId}-INCOMPLETE`
-                        ]]
-                    ]],
-                    ["and", [
-                        ["address", p.driverPayoutAddress], // r.2.0
-                        ["in data feed", [
-                            [carpoolOracleAddress],
-                            RIDE_STATUS_DATAFEED, "=", `RIDE-${p.rideId}-COMPLETED`
-                        ]]
-                    ]],
-                    ["and", [
-                        ["address", p.passengerRefundAddress], // r.3.0
-                        ["in data feed", [
-                            [carpoolOracleAddress],
-                            RIDE_STATUS_DATAFEED, "=", `RIDE-${p.rideId}-INCOMPLETE`
-                        ]]
-                    ]]
+                "definition template", [
+                    p.templateHash, {
+                        "driverPayoutAddress": p.driverPayoutAddress,
+                        "passengerRefundAddress": p.passengerRefundAddress,
+                        "amount": p.amount - TYPICAL_FEE,
+                        "rideId": p.rideId
+                    }
                 ]
             ];
 
-            let signers = {
+            const signers = {
                 "r.0.0": {
                     address: payoutProcessorAddress,
                     member_signing_path: "r",

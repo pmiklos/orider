@@ -16,6 +16,7 @@ const OverdueReservationProcessor = require("./job/OverdueReservationProcessor")
 const PayoutProcessor = require("./job/PayoutProcessor");
 const PaymentProcessor = require("./job/PaymentProcessor");
 const ChatProcessor = require("./job/ChatProcessor");
+const FirstTimeInitializer = require("./job/FirstTimeInitializer");
 const mapService = require("./common/MapService");
 
 const httpPort = process.env.PORT || 8080;
@@ -36,13 +37,15 @@ eventBus.once("headless_wallet_ready", () => {
         const rideFeeContract = RideFeeContract(payoutProcessorDevice, payoutProcessorAddress, carpoolOracleAddress);
         const carpoolOracle = CarpoolOracle(carpoolOracleAddress, headlessWallet, web, api.ridesRepository);
         const overdueReservationProcessor = OverdueReservationProcessor(api.reservationsRepository);
+        const firstTimeInitializer = FirstTimeInitializer(headlessWallet, rideFeeContract);
 
         console.error("Carpool oracle address: " + carpoolOracleAddress);
 
-        carpoolOracle.start();
-        overdueReservationProcessor.start();
-
-        start(rideFeeContract);
+        firstTimeInitializer.start(() => {
+            carpoolOracle.start();
+            overdueReservationProcessor.start();
+            start(rideFeeContract);
+        });
     });
 
 });
@@ -94,6 +97,7 @@ function start(rideFeeContract) {
                     }
 
                     rideFeeContract.define({
+                        templateHash: config.rideFeeContractTemplate,
                         rideId: ride.id,
                         driverDevice: ride.device,
                         driverPayoutAddress: ride.payoutAddress,
