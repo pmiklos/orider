@@ -68,21 +68,32 @@
         <div class="row p-2" ng-repeat="ride in rides">
             <div class="col-12 card">
                 <div class="card-body">
-                    <h5 class="card-title">
-                        {{ ride.departure | date:'MMM dd, yyyy HH:mm a'}} <br>
-                        {{ ride.driver.name }}
-                        <small ng-if="ride.averageScore >= 0 && ride.totalRides >= 0"><star-rating rating="ride.averageScore * 5"/>, {{ ride.totalRides }} rides</small><br>
-                        <small>{{ ride.pricePerSeat | MBYTE | number }} MBYTE</small>
+                    <h5 class="row card-title">
+                        <div class="col-auto bg-light border border-secondary text-dark rounded text-center py-2">
+                            <b>{{ ride.departure | date:'d'}}</b> <br>
+                            <small>{{ ride.departure | date:'MMM'}}</small>
+                        </div>
+                        <div class="col">
+                            {{ ride.driver.name }}
+                            <small ng-if="ride.averageScore >= 0 && ride.totalRides >= 0"><star-rating rating="ride.averageScore * 5"/>, {{ ride.totalRides }} rides</small><br>
+                            <small>{{ ride.pricePerSeat | MBYTE | number }} MBYTE</small>
+                            <div ng-if="isBoarding(ride) || isCompleted(ride)">
+                                <small class="text-info" ng-if="isBoarding(ride)"><b>Boarding now</b></small>
+                                <small class="text-info" ng-if="isCompleted(ride)"><b>Completed</b></small>
+                            </div>
+                        </div>
                     </h5>
-                    <p>
-                        Pick-up: {{ ride.pickupAddress }} <br>
-                        Drop-off: {{ ride.dropoffAddress }} <br>
-                        {{ ride.seats - ride.reservationCount }} more left
-                    </p>
-                    <p ng-if="isBoarding(ride) || isCompleted(ride)">
-                        <span class="text-info" ng-if="isBoarding(ride)"><b>Boarding now</b></span>
-                        <span class="text-info" ng-if="isCompleted(ride)"><b>Completed</b></span>
-                    </p>
+                    <div class="row card-text mb-3">
+                        <div class="col-auto text-center px-2">
+                            <b>{{ ride.departure | date:'hh:mm'}}</b><br>
+                            <b>{{ ride.departure | date:'a'}}</b>
+                        </div>
+                        <div class="col">
+                            {{ ride.pickupAddress }} <br>
+                            {{ ride.dropoffAddress }} <br>
+                            {{ ride.seats - ride.reservationCount }} more left
+                        </div>
+                    </div>
                     <a class="card-link" ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}" target="carpool-map">Directions</a>
                     <button class="btn btn-link card-link" type="button" ng-click="reserve(ride)"
                             ng-if="isAccountReady() && ride.id && ride.seats > ride.reservationCount && !isReserved(ride) && !isCompleted(ride) && !isMyRide(ride)">Reserve</button>
