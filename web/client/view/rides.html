@@ -104,7 +104,7 @@
         </div>
         <div class="row p-2">
             <div class="col">
-                <button class="btn btn-primary" ng-click="fetchRides()" ng-disabled="fetchNoMore">More</button>
+                <button class="btn btn-primary" ng-click="fetchRides()" ng-if="rides && rides.length" ng-disabled="fetchNoMore">More</button>
             </div>
         </div>
     </div>
