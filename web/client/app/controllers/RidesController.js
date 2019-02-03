@@ -14,11 +14,14 @@
 
             $scope.hideCreateRideForm = "true" === $cookies.get("preferences.hideCreateRideForm");
             $scope.createRideInProgress = false;
-            $scope.myReservations = [];
             $scope.unit = MB;
             $scope.minPrice = MIN_PRICE / $scope.unit;
             $scope.maxPrice = MAX_PRICE / $scope.unit;
             $scope.priceStep = 1 / $scope.unit;
+            $scope.rides = [];
+            $scope.page = 0;
+            $scope.fetchSize = 10;
+            $scope.fetchNoMore = false;
 
             $scope.newRide = {
                 minDeparture: new Date(),
@@ -27,18 +30,14 @@
                 seats: 2
             };
 
-            function fetchMyReservations() {
-                return MyReservationsService.list().then(function (response) {
-                    $scope.myReservations = response.reservations;
-                }, function (error) {
-                    console.error(error);
-                    $rootScope.showError("Failed to fetch reservations", 5000);
-                });
-            }
-
             function fetchRides() {
-                return RidesService.list(0, 10).then(function (response) {
-                    $scope.rides = response.rides;
+                return RidesService.list($scope.page * $scope.fetchSize, $scope.fetchSize).then(function (response) {
+                    $scope.rides = $scope.rides.concat(response.rides);
+                    if (response.rides.length === $scope.fetchSize) {
+                        $scope.page++;
+                    } else {
+                        $scope.fetchNoMore = true;
+                    }
                 }, function (error) {
                     console.error(error);
                     $rootScope.showError("Failed to fetch rides", 5000);
@@ -72,7 +71,7 @@
                 console.log("Reserving ride: " + ride);
                 RidesService.reserve(ride.id).then(function (reservation) {
                     ride.reservationCount++;
-                    $scope.myReservations.push(reservation);
+                    ride.reservationDevices = [ride.reservationDevices, reservation.device].join(",");
                 }, function (error) {
                     console.error(error);
                     $rootScope.showError("Failed to create ride", 5000);
@@ -80,9 +79,7 @@
             }
 
             function isReserved(ride) {
-                return $scope.myReservations.find(function(reservation) {
-                    return reservation.rideId === ride.id;
-                });
+                return ride.reservationDevices && ride.reservationDevices.includes($rootScope.account.device);
             }
 
             function isBoarding(ride) {
@@ -102,13 +99,10 @@
                 $cookies.put("preferences.hideCreateRideForm", $scope.hideCreateRideForm);
             }
 
-            if ($rootScope.isLoggedIn()) {
-                fetchMyReservations().then(fetchRides);
-            } else {
-                fetchRides();
-            }
+            fetchRides();
 
             $scope.createRide = createRide;
+            $scope.fetchRides = fetchRides;
             $scope.reserve = reserve;
             $scope.isReserved = isReserved;
             $scope.isMyRide = isMyRide;

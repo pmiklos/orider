@@ -89,6 +89,12 @@
         };
     });
 
+    app.filter("MBYTE", function() {
+        return function(amount) {
+            return amount / MBYTE;
+        };
+    });
+
     app.filter("paymentUrl", ["byteball", function(byteball) {
         return function(payment) {
             if (typeof payment === 'object') {

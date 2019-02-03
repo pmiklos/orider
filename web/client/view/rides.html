@@ -71,7 +71,8 @@
                     <h5 class="card-title">
                         {{ ride.departure | date:'MMM dd, yyyy HH:mm a'}} <br>
                         {{ ride.driver.name }}
-                        <small ng-if="ride.averageScore >= 0 && ride.totalRides >= 0"><star-rating rating="ride.averageScore * 5"/>, {{ ride.totalRides }} rides</small>
+                        <small ng-if="ride.averageScore >= 0 && ride.totalRides >= 0"><star-rating rating="ride.averageScore * 5"/>, {{ ride.totalRides }} rides</small><br>
+                        <small>{{ ride.pricePerSeat | MBYTE | number }} MBYTE</small>
                     </h5>
                     <p>
                         Pick-up: {{ ride.pickupAddress }} <br>
@@ -88,6 +89,11 @@
                     <a class="card-link" ng-href="#!/my/reservations/{{ ride.id }}" ng-if="isLoggedIn() && isReserved(ride)">Reserved</a>
                     <a class="card-link" ng-href="#!/my/ride/{{ ride.id }}" ng-if="isLoggedIn() && isMyRide(ride)">Start</a>
                 </div>
+            </div>
+        </div>
+        <div class="row p-2">
+            <div class="col">
+                <button class="btn btn-primary" ng-click="fetchRides()" ng-disabled="fetchNoMore">More</button>
             </div>
         </div>
     </div>

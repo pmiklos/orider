@@ -5,7 +5,8 @@
         <div class="card-body">
             <h3 class="card-title">
                 {{ ride.departure | date:'MMM dd, yyyy HH:mm a'}} <br>
-                <small ng-if="ride.averageScore >= 0 && ride.totalRides >= 0"><star-rating rating="ride.averageScore * 5"/>, {{ ride.totalRides }} rides</small>
+                <small ng-if="ride.averageScore >= 0 && ride.totalRides >= 0"><star-rating rating="ride.averageScore * 5"/>, {{ ride.totalRides }} rides</small><br>
+                <small>{{ ride.pricePerSeat | MBYTE | number}} MBYTE</small>
             </h3>
             <p>
                 Driver: {{ ride.driver }}
