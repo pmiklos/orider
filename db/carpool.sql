@@ -52,3 +52,33 @@ CREATE TABLE cp_reservations (
 );
 
 CREATE INDEX cp_reservations_device ON cp_reservations(device);
+
+CREATE VIEW cp_driver_stats AS
+SELECT driver_stats.device,
+    driver_stats.avg_completion_score avg_driver_score,
+    passenger_stats.avg_completion_score avg_passenger_score,
+    (driver_stats.total_completion_score + passenger_stats.total_completion_score) / (driver_stats.count_rides + passenger_stats.count_passengers) avg_score,
+    driver_stats.count_rides,
+    passenger_stats.count_passengers
+FROM
+    (
+        SELECT device,
+            AVG(completion_score) avg_completion_score,
+            SUM(completion_score) total_completion_score,
+            COUNT(1) count_rides
+        FROM cp_rides
+        WHERE status='completed'
+        GROUP BY 1
+    ) driver_stats,
+    (
+        SELECT ride.device,
+            AVG(reservation.completion_score) avg_completion_score,
+            SUM(reservation.completion_score) total_completion_score,
+            COUNT(1) count_passengers
+        FROM cp_rides ride
+        JOIN cp_reservations reservation USING (ride_id)
+        WHERE ride.status='completed'
+            AND reservation.status='completed'
+        GROUP BY 1
+    ) passenger_stats
+WHERE driver_stats.device = passenger_stats.device;

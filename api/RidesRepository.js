@@ -64,8 +64,11 @@ function select(id, callback) {
             rides.status,
             rides.completion_score completionScore,
             rides.oracle_value oracleValue,
-            rides.oracle_unit oracleUnit
+            rides.oracle_unit oracleUnit,
+            COALESCE(stats.avg_score, 0) averageScore,
+            COALESCE(stats.count_rides, 0) totalRides
         FROM cp_rides rides
+        LEFT JOIN cp_driver_stats stats USING (device)
         LEFT JOIN cp_reservations reservations USING (ride_id)
         WHERE ride_id = ?`, [id], (rows) => {
         if (Array.isArray(rows) && rows.length === 1) {
@@ -111,9 +114,12 @@ function selectAll(from, size, callback) {
             rides.seats,
             rides.price_per_seat pricePerSeat,
             rides.status,
+            COALESCE(stats.avg_score, 0) averageScore,
+            COALESCE(stats.count_rides, 0) totalRides,
             count(reservations.device) reservationCount,
             group_concat(reservations.device, ',') reservationDevices
         FROM cp_rides rides
+        LEFT JOIN cp_driver_stats stats USING (device)
         LEFT JOIN cp_reservations reservations USING (ride_id)
         WHERE departure > ${aDayBefore}
         GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
