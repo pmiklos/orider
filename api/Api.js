@@ -8,11 +8,6 @@ const authEvents = new events.EventEmitter();
 
 const tokenService = require("../common/TokenService");
 
-const accountRepository = require("./AccountRepository");
-const authRepository = require("./AuthRepository");
-const ridesRepository = require("./RidesRepository");
-const reservationsRepository = require("./ReservationsRepository");
-
 const AccountResource = require("./AccountResource");
 const authResource = require("./AuthResource");
 const CompletionScoring = require("./CompletionScoring");
@@ -55,16 +50,16 @@ function accessTokenResolver(req, res, next) {
     }
 }
 
-module.exports = function (webapp, mapService) {
+module.exports = function (webapp, mapService, db) {
 
     const completionScoring = CompletionScoring(mapService);
-    const accountResource = AccountResource(accountRepository);
-    const ridesResource = RidesResource(ridesRepository, reservationsRepository, authRepository, mapService, completionScoring);
-    const reservationsResource = ReservationsResource(reservationsRepository, ridesRepository, completionScoring);
+    const accountResource = AccountResource(db.accountRepository);
+    const ridesResource = RidesResource(db.ridesRepository, db.reservationsRepository, db.authRepository, mapService, completionScoring);
+    const reservationsResource = ReservationsResource(db.reservationsRepository, db.ridesRepository, completionScoring);
 
     webapp.use("/api", express.json());
     webapp.use("/api", requestLogger);
-    webapp.use("/api", authResource(authRepository, authEvents, tokenService));
+    webapp.use("/api", authResource(db.authRepository, authEvents, tokenService));
     webapp.use("/api", configResource());
     webapp.post("/api/*", cookieParser());
     webapp.post("/api/*", accessTokenResolver);
@@ -72,6 +67,7 @@ module.exports = function (webapp, mapService) {
     webapp.get("/api/my/*", accessTokenResolver);
     webapp.get("/api/my/account", accountResource.get);
     webapp.post("/api/my/account", accountResource.createOrUpdate);
+    webapp.post("/api/my/account/kyc", accountResource.requestKyc);
     webapp.get("/api/my/reservations", reservationsResource.listByDevice);
     webapp.get("/api/my/reservations/:id", reservationsResource.get);
     webapp.post("/api/my/reservations/:id/complete", reservationsResource.complete);
@@ -95,9 +91,6 @@ module.exports = function (webapp, mapService) {
     return {
         onAuthenticated(event) {
             authEvents.emit(event.id, event.data);
-        },
-        accountRepository,
-        reservationsRepository,
-        ridesRepository
+        }
     }
 };
