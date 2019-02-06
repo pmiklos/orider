@@ -6,6 +6,7 @@
         function ($rootScope, $scope, $route, $location, byteball, socket, AccountService) {
 
             $scope.payoutAddress = $rootScope.account.payoutAddress;
+            $scope.realName = $rootScope.account.realName;
 
             function updateAccount() {
                 AccountService.update({
@@ -20,7 +21,17 @@
                 });
             }
 
+            function requestKyc() {
+                AccountService.requestKyc().then(function() {
+                    $rootScope.showInfo("Real name request sent. Please check your messages in your Obyte wallet!", 5000);
+                }, function (error) {
+                    console.error(error);
+                    $rootScope.showError("Failed to request real name", 5000);
+                });
+            }
+
             $scope.updateAccount = updateAccount;
+            $scope.requestKyc = requestKyc;
         }]);
 
 })();

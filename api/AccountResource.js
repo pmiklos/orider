@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function (accountRepository) {
+module.exports = function (accountRepository, chatProcessor) {
 
     function accountReady(req, res, next) {
         if (req.account && req.account.payoutAddress) {
@@ -40,11 +40,20 @@ module.exports = function (accountRepository) {
         });
     }
 
+    function requestKyc(req, res, next) {
+        chatProcessor.requestProfile(req.accessToken.dev, err => {
+            if (err) return next(err);
+
+            res.sendStatus(200);
+        });
+    }
+
     return {
         accountReady,
         fetch,
         get,
-        createOrUpdate
+        createOrUpdate,
+        requestKyc
     };
 
 };

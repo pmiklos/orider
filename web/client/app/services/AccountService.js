@@ -19,6 +19,13 @@
                 }, function (errorResponse) {
                     return $q.reject({status: "error"});
                 });
+            },
+            requestKyc: function () {
+                return $http.post("/api/my/account/kyc").then(function(response) {
+                    return response.data;
+                }, function (errorResponse) {
+                    return $q.reject({status: "error"});
+                });
             }
         };
     }]);

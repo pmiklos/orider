@@ -22,11 +22,12 @@ const db = require("./db").Sqlite;
 const httpPort = process.env.PORT || 8080;
 const httpHost = process.env.IP || "127.0.0.1";
 
+const chatProcessor = ChatProcessor(db.accountRepository, db.ridesRepository, db.reservationsRepository);
 const webapp = express();
 const httpServer = http.Server(webapp);
 const ws = socketio(httpServer);
 const web = Web(webapp, ws);
-const api = Api(webapp, mapService, db);
+const api = Api(webapp, mapService, db, chatProcessor);
 
 eventBus.once("headless_wallet_ready", () => {
 
@@ -49,8 +50,6 @@ eventBus.once("headless_wallet_ready", () => {
 });
 
 function start(rideFeeContract) {
-
-    const chatProcessor = ChatProcessor(db.accountRepository, db.ridesRepository, db.reservationsRepository);
 
     httpServer.listen(httpPort, httpHost, () => {
         console.error("WEB started");

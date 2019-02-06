@@ -50,10 +50,10 @@ function accessTokenResolver(req, res, next) {
     }
 }
 
-module.exports = function (webapp, mapService, db) {
+module.exports = function (webapp, mapService, db, chatProcessor) {
 
     const completionScoring = CompletionScoring(mapService);
-    const accountResource = AccountResource(db.accountRepository);
+    const accountResource = AccountResource(db.accountRepository, chatProcessor);
     const ridesResource = RidesResource(db.ridesRepository, db.reservationsRepository, db.authRepository, mapService, completionScoring);
     const reservationsResource = ReservationsResource(db.reservationsRepository, db.ridesRepository, completionScoring);
 
