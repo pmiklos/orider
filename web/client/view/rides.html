@@ -96,17 +96,19 @@
                         </div>
                     </div>
 
-                    <a class="card-link" ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}" target="carpool-map">Directions</a>
-                    <button class="btn btn-link card-link" type="button" ng-click="reserve(ride)"
-                            ng-if="isAccountReady() && ride.id && ride.seats > ride.reservationCount && !isReserved(ride) && !isCompleted(ride) && !isMyRide(ride)">Reserve</button>
-                    <a class="card-link" ng-href="#!/my/reservations/{{ ride.id }}" ng-if="isLoggedIn() && isReserved(ride)">Reserved</a>
-                    <a class="card-link" ng-href="#!/my/ride/{{ ride.id }}" ng-if="isLoggedIn() && isMyRide(ride)">Start</a>
+                    <div class="mt-2">
+                        <a class="card-link" ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}" target="carpool-map">Directions</a>
+                        <button class="btn btn-link card-link" type="button" ng-click="reserve(ride)"
+                                ng-if="isAccountReady() && ride.id && ride.seats > ride.reservationCount && !isReserved(ride) && !isCompleted(ride) && !isMyRide(ride)">Reserve</button>
+                        <a class="card-link" ng-href="#!/my/reservations/{{ ride.id }}" ng-if="isLoggedIn() && isReserved(ride)">Reserved</a>
+                        <button class="btn btn-primary card-link" type="button" ng-click="startRide(ride)" ng-if="isLoggedIn() && isMyRide(ride)">Start</button>
+                    </div>
                 </div>
             </div>
         </div>
         <div class="row p-2">
             <div class="col">
-                <button class="btn btn-primary" ng-click="fetchRides()" ng-if="rides && rides.length" ng-disabled="fetchNoMore">More</button>
+                <button class="btn btn-link" ng-click="fetchRides()" ng-if="rides && rides.length" ng-disabled="fetchNoMore">More</button>
             </div>
         </div>
     </div>

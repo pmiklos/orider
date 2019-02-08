@@ -2,8 +2,8 @@
 
     var app = angular.module("carpool");
 
-    app.controller("MyRideController", ["$rootScope", "$scope", "$routeParams", "$timeout", "byteball", "socket", "LocationService", "MyRidesService",
-        function ($rootScope, $scope, $routeParams, $timeout, byteball, socket, LocationService, MyRidesService) {
+    app.controller("MyRideController", ["$rootScope", "$scope", "$routeParams", "$timeout", "byteball", "socket", "LocationService", "MyRidesService", "WakeLockService",
+        function ($rootScope, $scope, $routeParams, $timeout, byteball, socket, LocationService, MyRidesService, WakeLockService) {
 
             const AUTO_COMPLETION_TIMEOUT = 10 * 1000; // 10 sec
             const AUTO_COMPLETION_COUNTDOWN = 50;
@@ -47,10 +47,6 @@
 
                     startAutoCompletion(ride, AUTO_COMPLETION_COUNTDOWN);
                 });
-
-                $scope.$on('$routeChangeStart', function() {
-                    LocationService.clear(locationWatchId);
-                });
             }
 
             function fetchRide() {
@@ -69,6 +65,7 @@
             }
 
             function startBoarding() {
+                WakeLockService.acquire();
                 return MyRidesService.board($routeParams.id).then(function (response) {
                     updateCheckInUrl(response.checkInCode);
                     $scope.ride.status = response.status;
@@ -92,6 +89,7 @@
                     });
                 }
 
+                WakeLockService.release();
                 LocationService.clear(locationWatchId);
 
                 if ("geolocation" in navigator) {
@@ -172,6 +170,11 @@
                     $scope.reservations = [];
                 });
             }
+
+            $scope.$on('$routeChangeStart', function() {
+                WakeLockService.release();
+                LocationService.clear(locationWatchId);
+            });
 
             socket.on("checkin", function(data) {
                 console.log(data.device + " checked in");
