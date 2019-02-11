@@ -2,8 +2,8 @@
 
     var app = angular.module("carpool");
 
-    app.controller("RidesController", ["$rootScope", "$scope", "$cookies", "RidesService", "MyReservationsService",
-        function ($rootScope, $scope, $cookies, RidesService, MyReservationsService) {
+    app.controller("RidesController", ["$rootScope", "$scope", "$cookies", "$location", "RidesService", "MyReservationsService", "WakeLockService",
+        function ($rootScope, $scope, $cookies, $location, RidesService, MyReservationsService, WakeLockService) {
 
             const byte = 1;
             const KB = byte * 1000;
@@ -78,6 +78,13 @@
                 });
             }
 
+            function startRide(ride) {
+                if (isBoarding(ride)) {
+                    WakeLockService.acquire();
+                }
+                $location.url(`/my/ride/${ride.id}`);
+            }
+
             function isReserved(ride) {
                 return ride.reservationDevices && ride.reservationDevices.includes($rootScope.account.device);
             }
@@ -103,6 +110,7 @@
 
             $scope.createRide = createRide;
             $scope.fetchRides = fetchRides;
+            $scope.startRide = startRide;
             $scope.reserve = reserve;
             $scope.isReserved = isReserved;
             $scope.isMyRide = isMyRide;
