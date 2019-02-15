@@ -22,7 +22,7 @@ const db = require("./db").Sqlite;
 const httpPort = process.env.PORT || 8080;
 const httpHost = process.env.IP || "127.0.0.1";
 
-const chatProcessor = ChatProcessor(db.accountRepository, db.ridesRepository, db.reservationsRepository);
+const chatProcessor = ChatProcessor(db.accountRepository, db.profileRepository, db.ridesRepository, db.reservationsRepository);
 const webapp = express();
 const httpServer = http.Server(webapp);
 const ws = socketio(httpServer);

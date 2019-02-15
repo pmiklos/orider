@@ -1,6 +1,7 @@
 "use strict";
 
 const constants = require("ocore/constants");
+const config = require("ocore/conf");
 const device = require("ocore/device");
 
 // TODO make it reusable
@@ -24,7 +25,22 @@ To set your payout/refund address, simply insert your address.
 
 const REQUEST_PROFILE = 'REQ_PROFILE';
 
-module.exports = function (accountRepository, ridesReporsitory, reservationsRepository) {
+const ATTESTORS = new Map();
+
+ATTESTORS.set(config.realnameAttestor, {
+    name: "Real Name Attestor",
+    privateProfileRequest: "Please share your first and last name [Profile request](profile-request:first_name,last_name)",
+
+    validate(profile) {
+        return typeof profile.first_name === "string" && typeof profile.last_name === "string"
+    },
+
+    extractName(profile) {
+        return toRealNameCase(profile.first_name + ' ' + profile.last_name);
+    }
+});
+
+module.exports = function (accountRepository, profileRepository, ridesReporsitory, reservationsRepository) {
 
     const contextMemory = new Map();
 
@@ -115,6 +131,33 @@ module.exports = function (accountRepository, ridesReporsitory, reservationsRepo
     function setProfileAddress(context, profileAddress) {
         console.error("Received profile " + profileAddress);
         contextMemory.delete(context.deviceAddress);
+
+        profileRepository.selectAttestations(profileAddress, (err, attestations) => {
+            if (err) context.somethingWentWrong(err);
+
+            console.error(JSON.stringify(attestations));
+
+            let choices = "Select a method to prove your identity:\n";
+
+            attestations.forEach(attestation => {
+                const attestor = ATTESTORS.get(attestation.attestor_address);
+
+                choices += `*  ${attestor.name}. `;
+
+                if (attestation.profile && attestation.profile.profile_hash) {
+                    choices += attestor.privateProfileRequest + "\n";
+                } else {
+                    let challenge = chash.getChash288(attestation.attestor_address + profileAddress);
+                    choices += `Please sign your profile [Signature request](sign-message-request:${challenge})\n`;
+                }
+            });
+
+            if (attestations.length > 0) {
+                return context.reply(choices);
+            }
+
+            context.reply("Your profile is not attested.");
+        });
     }
 
     function handleAddress(context, address) {
