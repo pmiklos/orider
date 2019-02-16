@@ -4,6 +4,8 @@ const constants = require("ocore/constants");
 const config = require("ocore/conf");
 const device = require("ocore/device");
 
+const ProfileHandler = require("./ProfileHandler");
+
 // TODO make it reusable
 function isTestnet() {
     const byteballVersion = constants.version;
@@ -25,24 +27,10 @@ To set your payout/refund address, simply insert your address.
 
 const REQUEST_PROFILE = 'REQ_PROFILE';
 
-const ATTESTORS = new Map();
-
-ATTESTORS.set(config.realnameAttestor, {
-    name: "Real Name Attestor",
-    privateProfileRequest: "Please share your first and last name [Profile request](profile-request:first_name,last_name)",
-
-    validate(profile) {
-        return typeof profile.first_name === "string" && typeof profile.last_name === "string"
-    },
-
-    extractName(profile) {
-        return toRealNameCase(profile.first_name + ' ' + profile.last_name);
-    }
-});
-
 module.exports = function (accountRepository, profileRepository, ridesReporsitory, reservationsRepository) {
 
     const contextMemory = new Map();
+    const profileHandler = ProfileHandler(accountRepository, profileRepository);
 
     function listRides(context, from) {
         const fetchFrom = Number.parseInt(from) || 0;
@@ -128,41 +116,9 @@ module.exports = function (accountRepository, profileRepository, ridesReporsitor
         });
     }
 
-    function setProfileAddress(context, profileAddress) {
-        console.error("Received profile " + profileAddress);
-        contextMemory.delete(context.deviceAddress);
-
-        profileRepository.selectAttestations(profileAddress, (err, attestations) => {
-            if (err) context.somethingWentWrong(err);
-
-            console.error(JSON.stringify(attestations));
-
-            let choices = "Select a method to prove your identity:\n";
-
-            attestations.forEach(attestation => {
-                const attestor = ATTESTORS.get(attestation.attestor_address);
-
-                choices += `*  ${attestor.name}. `;
-
-                if (attestation.profile && attestation.profile.profile_hash) {
-                    choices += attestor.privateProfileRequest + "\n";
-                } else {
-                    let challenge = chash.getChash288(attestation.attestor_address + profileAddress);
-                    choices += `Please sign your profile [Signature request](sign-message-request:${challenge})\n`;
-                }
-            });
-
-            if (attestations.length > 0) {
-                return context.reply(choices);
-            }
-
-            context.reply("Your profile is not attested.");
-        });
-    }
-
     function handleAddress(context, address) {
         if (context.request && context.request === REQUEST_PROFILE) {
-            setProfileAddress(context, address);
+            profileHandler.setProfileAddress(context, address);
         } else {
             setPayoutAddress(context, address);
         }
@@ -186,6 +142,9 @@ module.exports = function (accountRepository, profileRepository, ridesReporsitor
         }, {
             pattern: /([A-Z2-7]{32})/,
             handler: handleAddress
+        }, {
+            pattern: /\[.+?\]\(profile:(.+?)\)/,
+            handler: profileHandler.handlePrivateProfile
         }];
 
     function answer(deviceAddress, answer) {
@@ -207,7 +166,16 @@ module.exports = function (accountRepository, profileRepository, ridesReporsitor
             const newContext = {
                 deviceAddress,
                 reply,
-                somethingWentWrong
+                somethingWentWrong,
+                resetMemory() {
+                    contextMemory.delete(deviceAddress);
+                },
+                log(msg) {
+                    console.warn(`[${deviceAddress}]: ` + msg);
+                },
+                warn(msg) {
+                    console.warn(`[${deviceAddress}] "${answer}": ` + msg);
+                }
             };
             args.unshift({ ...oldContext, ...newContext });
             command.handler.apply(this, args);

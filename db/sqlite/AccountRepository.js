@@ -33,7 +33,18 @@ function upsert(device, account, callback) {
     });
 }
 
+function updateName(device, firstName, lastName, callback) {
+    db.query(`UPDATE cp_accounts SET first_name = ?, last_name = ? WHERE device = ?`, [firstName, lastName, device], (updateResult) => {
+        if (updateResult.affectedRows === 1) {
+            return callback(null);
+        }
+
+        callback(`Failed to update account for ${device}`);
+    });
+}
+
 module.exports = {
     select,
-    upsert
+    upsert,
+    updateName
 };

@@ -1,5 +1,7 @@
 CREATE TABLE cp_accounts (
     device CHAR(33) NOT NULL PRIMARY KEY,
+    first_name VARCHAR,
+    last_name VARCHAR,
     payout_address CHAR(32) NULL
 --    FOREIGN KEY (device) REFERENCES correspondent_addresses(device_address)
 );

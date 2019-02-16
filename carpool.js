@@ -15,7 +15,7 @@ const CarpoolOracle = require("./job/CarpoolOracle");
 const OverdueReservationProcessor = require("./job/OverdueReservationProcessor");
 const PayoutProcessor = require("./job/PayoutProcessor");
 const PaymentProcessor = require("./job/PaymentProcessor");
-const ChatProcessor = require("./job/ChatProcessor");
+const ChatProcessor = require("./chat/ChatProcessor");
 const mapService = require("./common/MapService");
 const db = require("./db").Sqlite;
 
