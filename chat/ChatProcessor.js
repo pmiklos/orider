@@ -27,10 +27,10 @@ To set your payout/refund address, simply insert your address.
 
 const REQUEST_PROFILE = 'REQ_PROFILE';
 
-module.exports = function (accountRepository, profileRepository, ridesReporsitory, reservationsRepository) {
+module.exports = function (web, accountRepository, profileRepository, ridesReporsitory, reservationsRepository) {
 
     const contextMemory = new Map();
-    const profileHandler = ProfileHandler(accountRepository, profileRepository);
+    const profileHandler = ProfileHandler(web, accountRepository, profileRepository);
 
     function listRides(context, from) {
         const fetchFrom = Number.parseInt(from) || 0;

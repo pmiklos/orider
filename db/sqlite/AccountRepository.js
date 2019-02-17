@@ -6,7 +6,10 @@ function select(device, callback) {
     db.query(`SELECT
             correspondent.device_address device,
             correspondent.name deviceName,
-            account.payout_address payoutAddress
+            account.payout_address payoutAddress,
+            account.first_name firstName,
+            account.last_name lastName,
+            COALESCE(account.first_name || ' ' || account.last_name, account.first_name, account.last_name) fullName
         FROM correspondent_devices correspondent
         LEFT JOIN cp_accounts account ON device_address = device
         WHERE device_address = ?`, [device], (rows) => {

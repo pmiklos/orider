@@ -28,7 +28,15 @@ ATTESTORS.set(config.realnameAttestor, {
 });
 
 
-module.exports = function (accountRepository, profileRepository) {
+module.exports = function (web, accountRepository, profileRepository) {
+
+    function notifyAccountUpdated(account) {
+        web.send({
+            id: account.device,
+            event: "accountUpdated",
+            data: account
+        });
+    }
 
     return {
 
@@ -70,6 +78,11 @@ module.exports = function (accountRepository, profileRepository) {
                     }
                     context.log(`Attested ${address} by ${attestor.name}`);
                     context.reply(`Thank you. Attested profile found for address ${address} Your real name is saved as ${firstName} ${lastName}`);
+
+                    accountRepository.select(device, (err, account) => {
+                        if (err) return context.warn("Failed to send accountUpdated to web");
+                        notifyAccountUpdated(account);
+                    });
                 });
 
             });

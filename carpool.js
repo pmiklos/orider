@@ -15,19 +15,19 @@ const CarpoolOracle = require("./job/CarpoolOracle");
 const OverdueReservationProcessor = require("./job/OverdueReservationProcessor");
 const PayoutProcessor = require("./job/PayoutProcessor");
 const PaymentProcessor = require("./job/PaymentProcessor");
-const ChatProcessor = require("./chat/ChatProcessor");
+const Chat = require("./chat/ChatProcessor");
 const mapService = require("./common/MapService");
 const db = require("./db").Sqlite;
 
 const httpPort = process.env.PORT || 8080;
 const httpHost = process.env.IP || "127.0.0.1";
 
-const chatProcessor = ChatProcessor(db.accountRepository, db.profileRepository, db.ridesRepository, db.reservationsRepository);
 const webapp = express();
 const httpServer = http.Server(webapp);
 const ws = socketio(httpServer);
 const web = Web(webapp, ws);
-const api = Api(webapp, mapService, db, chatProcessor);
+const chat = Chat(web, db.accountRepository, db.profileRepository, db.ridesRepository, db.reservationsRepository);
+const api = Api(webapp, mapService, db, chat);
 
 eventBus.once("headless_wallet_ready", () => {
 
@@ -57,7 +57,7 @@ function start(rideFeeContract) {
 
     eventBus.on("paired", (from_address, pairing_secret) => {
         if (pairing_secret === config.permanent_pairing_secret) {
-            return chatProcessor.welcome(from_address);
+            return chat.welcome(from_address);
         }
     });
 
@@ -144,7 +144,7 @@ function start(rideFeeContract) {
         }
     });
 
-    eventBus.on("text", chatProcessor.answer);
+    eventBus.on("text", chat.answer);
 
     const paymentProcessor = PaymentProcessor(web, db.ridesRepository, db.reservationsRepository);
     const payoutProcessor = PayoutProcessor(headlessWallet, db.ridesRepository, db.reservationsRepository);

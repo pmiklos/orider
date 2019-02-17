@@ -6,7 +6,6 @@
         function ($rootScope, $scope, $route, $location, byteball, socket, AccountService) {
 
             $scope.payoutAddress = $rootScope.account.payoutAddress;
-            $scope.realName = $rootScope.account.realName;
 
             function updateAccount() {
                 AccountService.update({
@@ -29,6 +28,11 @@
                     $rootScope.showError("Failed to request real name", 5000);
                 });
             }
+
+            socket.on("accountUpdated", function(account) {
+                $rootScope.setAccount(account);
+                $rootScope.showInfo("Account updated", 3000);
+            });
 
             $scope.updateAccount = updateAccount;
             $scope.requestKyc = requestKyc;
