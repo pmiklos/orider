@@ -191,7 +191,9 @@ module.exports = function (web, accountRepository, profileRepository, ridesRepor
         contextMemory.set(deviceAddress, {
            request: REQUEST_PROFILE
         });
-        device.sendMessageToDevice(deviceAddress, "text", "Please insert your profile address attested by the real name attestor.");
+        device.sendMessageToDevice(deviceAddress, "text",
+            "Please insert your profile address attested by the real name attestor. " +
+            "Tip: use your drivers license to become a verified driver.");
 
         callback();
     }

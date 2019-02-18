@@ -12,10 +12,10 @@ String.prototype.toCamelCase = function() {
 
 ATTESTORS.set(config.realnameAttestor, {
     name: "Real Name Attestor",
-    privateProfileRequest: "Please share your first and last name [Profile request](profile-request:first_name,last_name)",
+    privateProfileRequest: "Please share your first and last name [Profile request](profile-request:first_name,last_name,id_type)",
 
     validate(profile) {
-        return typeof profile.first_name === "string" && typeof profile.last_name === "string"
+        return typeof profile.first_name === "string" && typeof profile.last_name === "string" && typeof profile.id_type === "string"
     },
 
     firstName(profile) {
@@ -24,7 +24,12 @@ ATTESTORS.set(config.realnameAttestor, {
 
     lastName(profile) {
         return profile.last_name.toCamelCase();
+    },
+
+    isDriversLicense(profile) {
+        return profile.id_type === "DRIVING_LICENSE";
     }
+
 });
 
 
@@ -47,7 +52,7 @@ module.exports = function (web, accountRepository, profileRepository) {
 
             if (!profileUnit) {
                 context.warn('Invalid profile: failed to decode');
-                return context.reply('Invalid profile. Issuer creation is not possible.');
+                return context.reply('Invalid profile. Real name cannot be saved.');
             }
 
             privateProfile.parseAndValidatePrivateProfile(profileUnit, function (err, address, attestor_address) {
@@ -68,20 +73,22 @@ module.exports = function (web, accountRepository, profileRepository) {
                     return context.reply('Profile not accepted. Please try again and share all requested fields!');
                 }
 
-                const firstName = attestor.firstName(profile);
-                const lastName = attestor.lastName(profile);
-
-                accountRepository.updateName(device, firstName, lastName, function (err) {
+                accountRepository.updateProfile(device, {
+                    unit: profileUnit.unit,
+                    firstName: attestor.firstName(profile),
+                    lastName: attestor.lastName(profile),
+                    isDriversLicense: attestor.isDriversLicense(profile)
+                }, function (err) {
                     if (err) {
                         context.warn('Failed to save: ' + err);
                         return context.reply(`Failed to save your real name.`);
                     }
                     context.log(`Attested ${address} by ${attestor.name}`);
-                    context.reply(`Thank you. Attested profile found for address ${address} Your real name is saved as ${firstName} ${lastName}`);
 
                     accountRepository.select(device, (err, account) => {
                         if (err) return context.warn("Failed to send accountUpdated to web");
                         notifyAccountUpdated(account);
+                        context.reply(`Thank you. Attested profile found for address ${address} Your real name is saved as ${account.fullName}`);
                     });
                 });
 
