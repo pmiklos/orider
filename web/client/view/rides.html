@@ -80,7 +80,11 @@
                             </h5>
                             <div class="col-8 text-truncate">
                                 <span ng-if="ride.averageScore >= 0 && ride.totalRides >= 0"><star-rating rating="ride.averageScore * 5"/>, {{ ride.totalRides }} rides</span><br>
-                                {{ ride.pricePerSeat | MBYTE | number }} MBYTE
+                                {{ ride.pricePerSeat | MBYTE | number }} MBYTE<br>
+                                {{ ride.driver }}
+                                <sup class="badge badge-success" ng-if="ride.hasDriversLicense" title="Verified drivers license">
+                                    <i class="fa fa-id-card" aria-hidden="true"></i>
+                                </sup>
                             </div>
                         </div>
                         <div class="row col-12 col-md-6 mt-2 mt-md-0">
