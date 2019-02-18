@@ -20,4 +20,6 @@ exports.authTimeout = 300000; // the user has 5 minutes to confirm logon with pa
 
 exports.googleMapsApiKey = "GOOGLE MAPS API KEY";
 
+exports.realnameAttestor = "RJV3YUZ3FG3MPBWXX4RSD7PCPOIGGQZB";
+
 console.log('finished carpool conf');

@@ -49,7 +49,6 @@ function select(id, callback) {
     db.query(`SELECT
             rides.ride_id id,
             rides.device,
-            rides.device driver,
             rides.pickup_address pickupAddress,
             rides.pickup_lat pickupLat,
             rides.pickup_lng pickupLng,
@@ -65,9 +64,12 @@ function select(id, callback) {
             rides.completion_score completionScore,
             rides.oracle_value oracleValue,
             rides.oracle_unit oracleUnit,
+            account.has_drivers_license hasDriversLicense,
+            COALESCE(account.first_name, rides.device) driver,
             COALESCE(stats.avg_score, 0) averageScore,
             COALESCE(stats.count_rides, 0) totalRides
         FROM cp_rides rides
+        JOIN cp_accounts account USING (device)
         LEFT JOIN cp_driver_stats stats USING (device)
         LEFT JOIN cp_reservations reservations USING (ride_id)
         WHERE ride_id = ?`, [id], (rows) => {
@@ -107,22 +109,24 @@ function selectAll(from, size, callback) {
     db.query(`SELECT
             rides.ride_id id,
             rides.device,
-            rides.device driver,
             rides.pickup_address pickupAddress,
             rides.dropoff_address dropoffAddress,
             strftime('%s', rides.departure) * 1000 departure,
             rides.seats,
             rides.price_per_seat pricePerSeat,
             rides.status,
+            account.first_name driver,
+            account.has_drivers_license hasDriversLicense,
             COALESCE(stats.avg_score, 0) averageScore,
             COALESCE(stats.count_rides, 0) totalRides,
             count(reservations.device) reservationCount,
             group_concat(reservations.device, ',') reservationDevices
         FROM cp_rides rides
+        JOIN cp_accounts account USING (device)
         LEFT JOIN cp_driver_stats stats USING (device)
         LEFT JOIN cp_reservations reservations USING (ride_id)
         WHERE departure > ${aDayBefore}
-        GROUP BY 1, 2, 3, 4, 5, 6, 7, 8, 9
+        GROUP BY 1
         ORDER BY departure ASC
         LIMIT ${size} OFFSET ${from}`, [], (rows) => {
         if (Array.isArray(rows)) {

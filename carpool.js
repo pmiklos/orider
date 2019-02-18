@@ -15,8 +15,9 @@ const CarpoolOracle = require("./job/CarpoolOracle");
 const OverdueReservationProcessor = require("./job/OverdueReservationProcessor");
 const PayoutProcessor = require("./job/PayoutProcessor");
 const PaymentProcessor = require("./job/PaymentProcessor");
-const ChatProcessor = require("./job/ChatProcessor");
+const Chat = require("./chat/ChatProcessor");
 const mapService = require("./common/MapService");
+const db = require("./db").Sqlite;
 
 const httpPort = process.env.PORT || 8080;
 const httpHost = process.env.IP || "127.0.0.1";
@@ -25,7 +26,8 @@ const webapp = express();
 const httpServer = http.Server(webapp);
 const ws = socketio(httpServer);
 const web = Web(webapp, ws);
-const api = Api(webapp, mapService);
+const chat = Chat(web, db.accountRepository, db.profileRepository, db.ridesRepository, db.reservationsRepository);
+const api = Api(webapp, mapService, db, chat);
 
 eventBus.once("headless_wallet_ready", () => {
 
@@ -34,8 +36,8 @@ eventBus.once("headless_wallet_ready", () => {
         const payoutProcessorAddress = address;
         const carpoolOracleAddress = address;
         const rideFeeContract = RideFeeContract(payoutProcessorDevice, payoutProcessorAddress, carpoolOracleAddress);
-        const carpoolOracle = CarpoolOracle(carpoolOracleAddress, headlessWallet, web, api.ridesRepository);
-        const overdueReservationProcessor = OverdueReservationProcessor(api.reservationsRepository);
+        const carpoolOracle = CarpoolOracle(carpoolOracleAddress, headlessWallet, web, db.ridesRepository);
+        const overdueReservationProcessor = OverdueReservationProcessor(db.reservationsRepository);
 
         console.error("Carpool oracle address: " + carpoolOracleAddress);
 
@@ -49,15 +51,13 @@ eventBus.once("headless_wallet_ready", () => {
 
 function start(rideFeeContract) {
 
-    const chatProcessor = ChatProcessor(api.accountRepository, api.ridesRepository, api.reservationsRepository);
-
     httpServer.listen(httpPort, httpHost, () => {
         console.error("WEB started");
     });
 
     eventBus.on("paired", (from_address, pairing_secret) => {
         if (pairing_secret === config.permanent_pairing_secret) {
-            return chatProcessor.welcome(from_address);
+            return chat.welcome(from_address);
         }
     });
 
@@ -81,13 +81,13 @@ function start(rideFeeContract) {
 
             const checkInCode = pairing_secret.substring(8);
 
-            api.ridesRepository.selectByCheckInCode(checkInCode, (err, ride) => {
+            db.ridesRepository.selectByCheckInCode(checkInCode, (err, ride) => {
                 if (err) {
                     console.error(`[${from_address}] Failed to check in with ${checkInCode}: ${err}`);
                     return device.sendMessageToDevice(from_address, "text", "Something went wrong, try to check in again.");
                 }
 
-                api.reservationsRepository.select(ride.id, from_address, (err, reservation) => {
+                db.reservationsRepository.select(ride.id, from_address, (err, reservation) => {
                     if (err) {
                         console.error(`[${from_address}] Failed to check in with ${checkInCode}: ${err}`);
                         return device.sendMessageToDevice(from_address, "text", "Something went wrong, try to check in again.");
@@ -106,7 +106,7 @@ function start(rideFeeContract) {
                             return device.sendMessageToDevice(from_address, "text", "Something went wrong, try to check in again.");
                         }
 
-                        api.reservationsRepository.checkin(ride.id, from_address, contractAddress, (err) => {
+                        db.reservationsRepository.checkin(ride.id, from_address, contractAddress, (err) => {
                             if (err) {
                                 console.error(`[${from_address}] Failed to check in for ride ${ride.id}: ${err}`);
                                 return device.sendMessageToDevice(from_address, "text", "Something went wrong, try to check in again.");
@@ -144,10 +144,10 @@ function start(rideFeeContract) {
         }
     });
 
-    eventBus.on("text", chatProcessor.answer);
+    eventBus.on("text", chat.answer);
 
-    const paymentProcessor = PaymentProcessor(web, api.ridesRepository, api.reservationsRepository);
-    const payoutProcessor = PayoutProcessor(headlessWallet, api.ridesRepository, api.reservationsRepository);
+    const paymentProcessor = PaymentProcessor(web, db.ridesRepository, db.reservationsRepository);
+    const payoutProcessor = PayoutProcessor(headlessWallet, db.ridesRepository, db.reservationsRepository);
 
     eventBus.on("new_my_transactions", paymentProcessor.reservationsReceived);
     eventBus.on("my_transactions_became_stable", payoutProcessor.payoutRides);

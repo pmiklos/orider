@@ -6,7 +6,11 @@ function select(device, callback) {
     db.query(`SELECT
             correspondent.device_address device,
             correspondent.name deviceName,
-            account.payout_address payoutAddress
+            account.payout_address payoutAddress,
+            account.first_name firstName,
+            account.last_name lastName,
+            COALESCE(account.first_name || ' ' || account.last_name, account.first_name, account.last_name) fullName,
+            account.has_drivers_license hasDriversLicense
         FROM correspondent_devices correspondent
         LEFT JOIN cp_accounts account ON device_address = device
         WHERE device_address = ?`, [device], (rows) => {
@@ -33,7 +37,29 @@ function upsert(device, account, callback) {
     });
 }
 
+/**
+ *
+ * @param {string} device
+ * @param {Object} profile
+ * @param {string} profile.unit
+ * @param {string} profile.firstName
+ * @param {string} profile.lastName
+ * @param {boolean} profile.isDriversLicense
+ * @param callback
+ */
+function updateProfile(device, profile, callback) {
+    db.query(`UPDATE cp_accounts SET profile_unit = ?, first_name = ?, last_name = ?, has_drivers_license = ? WHERE device = ?`,
+        [profile.unit, profile.firstName, profile.lastName, profile.isDriversLicense, device], (updateResult) => {
+        if (updateResult.affectedRows === 1) {
+            return callback(null);
+        }
+
+        callback(`Failed to update account for ${device}`);
+    });
+}
+
 module.exports = {
     select,
-    upsert
+    upsert,
+    updateProfile
 };

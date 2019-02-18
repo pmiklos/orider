@@ -1,7 +1,10 @@
 "use strict";
 
 const constants = require("ocore/constants");
+const config = require("ocore/conf");
 const device = require("ocore/device");
+
+const ProfileHandler = require("./ProfileHandler");
 
 // TODO make it reusable
 function isTestnet() {
@@ -18,11 +21,17 @@ This chat interface lets you search for rides and make reservations:
 
 * [rides](command:rides) - list of rides
 * [reservations](command:reservations) - list of your reservations
+* [kyc](command:kyc) - set real name and validate drivers license
 
 To set your payout/refund address, simply insert your address.
 `;
 
-module.exports = function (accountRepository, ridesReporsitory, reservationsRepository) {
+const REQUEST_PROFILE = 'REQ_PROFILE';
+
+module.exports = function (web, accountRepository, profileRepository, ridesReporsitory, reservationsRepository) {
+
+    const contextMemory = new Map();
+    const profileHandler = ProfileHandler(web, accountRepository, profileRepository);
 
     function listRides(context, from) {
         const fetchFrom = Number.parseInt(from) || 0;
@@ -108,6 +117,14 @@ module.exports = function (accountRepository, ridesReporsitory, reservationsRepo
         });
     }
 
+    function handleAddress(context, address) {
+        if (context.request && context.request === REQUEST_PROFILE) {
+            profileHandler.setProfileAddress(context, address);
+        } else {
+            setPayoutAddress(context, address);
+        }
+    }
+
     const commands = [
         {
             pattern: /hi|hello|yo/i,
@@ -125,7 +142,18 @@ module.exports = function (accountRepository, ridesReporsitory, reservationsRepo
             handler: listReservations
         }, {
             pattern: /([A-Z2-7]{32})/,
-            handler: setPayoutAddress
+            handler: handleAddress
+        }, {
+            pattern: /\[.+?\]\(profile:(.+?)\)/,
+            handler: profileHandler.handlePrivateProfile
+        }, {
+            pattern: /\[.+?\]\(signed-message:(.+?)\)/,
+            handler: profileHandler.handlePublicProfile
+        }, {
+            pattern: /^kyc/i,
+            handler: (context) => {
+                requestProfile(context.deviceAddress, () => {});
+            }
         }];
 
     function answer(deviceAddress, answer) {
@@ -143,16 +171,40 @@ module.exports = function (accountRepository, ridesReporsitory, reservationsRepo
         if (command) {
             const matches = answer.match(command.pattern);
             const args = matches.slice(1, matches.length);
-            const context = {
+            const oldContext = contextMemory.get(deviceAddress) || {};
+            const newContext = {
                 deviceAddress,
                 reply,
-                somethingWentWrong
+                somethingWentWrong,
+                resetMemory() {
+                    contextMemory.delete(deviceAddress);
+                },
+                log(msg) {
+                    console.warn(`[${deviceAddress}]: ` + msg);
+                },
+                warn(msg) {
+                    console.warn(`[${deviceAddress}] "${answer}": ` + msg);
+                }
             };
-            args.unshift(context);
+            args.unshift({ ...oldContext, ...newContext });
             command.handler.apply(this, args);
         } else {
             reply(USAGE);
         }
+    }
+
+    /**
+     * @param {string} deviceAddress - the user device from which the profile is requested
+     */
+    function requestProfile(deviceAddress, callback) {
+        contextMemory.set(deviceAddress, {
+           request: REQUEST_PROFILE
+        });
+        device.sendMessageToDevice(deviceAddress, "text",
+            "Please insert your profile address attested by the real name attestor. " +
+            "Tip: use your drivers license to become a verified driver.");
+
+        callback();
     }
 
     function welcome(deviceAddress) {
@@ -161,6 +213,7 @@ module.exports = function (accountRepository, ridesReporsitory, reservationsRepo
 
     return {
         answer,
+        requestProfile,
         welcome
     };
 };

@@ -88,7 +88,7 @@ function select(rideId, device, callback) {
     db.query(`SELECT
         ride_id rideId,
         device,
-        device name, -- until we have attestation
+        account.first_name name,
         status,
         reservation_date reservationDate,
         completion_score completionScore,
@@ -107,7 +107,7 @@ function selectAllByRide(rideId, callback) {
     db.query(`SELECT
         ride_id rideId,
         device,
-        device name, -- until we have attestation
+        COALESCE(account.first_name, device) name,
         status,
         reservation_date reservationDate,
         contract_address contractAddress,

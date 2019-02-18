@@ -20,7 +20,22 @@
                 });
             }
 
+            function requestKyc() {
+                AccountService.requestKyc().then(function() {
+                    $rootScope.showInfo("Real name request sent. Please check your messages in your Obyte wallet!", 5000);
+                }, function (error) {
+                    console.error(error);
+                    $rootScope.showError("Failed to request real name", 5000);
+                });
+            }
+
+            socket.on("accountUpdated", function(account) {
+                $rootScope.setAccount(account);
+                $rootScope.showInfo("Account updated", 3000);
+            });
+
             $scope.updateAccount = updateAccount;
+            $scope.requestKyc = requestKyc;
         }]);
 
 })();

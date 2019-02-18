@@ -10,6 +10,9 @@
             </h3>
             <p>
                 Driver: {{ ride.driver }}
+                <sup class="badge badge-success" ng-if="ride.hasDriversLicense" title="Verified drivers license">
+                    <i class="fa fa-id-card" aria-hidden="true"></i>
+                </sup>
             </p>
             <p>
                 Pick-up: {{ ride.pickupAddress }} <br>

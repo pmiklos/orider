@@ -1,5 +1,9 @@
 CREATE TABLE cp_accounts (
     device CHAR(33) NOT NULL PRIMARY KEY,
+    profile_unit CHAR(44) NULL,
+    first_name VARCHAR NULL,
+    last_name VARCHAR NULL,
+    has_drivers_license INTEGER NOT NULL DEFAULT 0,
     payout_address CHAR(32) NULL
 --    FOREIGN KEY (device) REFERENCES correspondent_addresses(device_address)
 );
