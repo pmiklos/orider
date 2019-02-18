@@ -21,6 +21,7 @@ This chat interface lets you search for rides and make reservations:
 
 * [rides](command:rides) - list of rides
 * [reservations](command:reservations) - list of your reservations
+* [kyc](command:kyc) - set real name and validate drivers license
 
 To set your payout/refund address, simply insert your address.
 `;
@@ -148,6 +149,11 @@ module.exports = function (web, accountRepository, profileRepository, ridesRepor
         }, {
             pattern: /\[.+?\]\(signed-message:(.+?)\)/,
             handler: profileHandler.handlePublicProfile
+        }, {
+            pattern: /^kyc/i,
+            handler: (context) => {
+                requestProfile(context.deviceAddress, () => {});
+            }
         }];
 
     function answer(deviceAddress, answer) {
