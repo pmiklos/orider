@@ -145,6 +145,9 @@ module.exports = function (web, accountRepository, profileRepository, ridesRepor
         }, {
             pattern: /\[.+?\]\(profile:(.+?)\)/,
             handler: profileHandler.handlePrivateProfile
+        }, {
+            pattern: /\[.+?\]\(signed-message:(.+?)\)/,
+            handler: profileHandler.handlePublicProfile
         }];
 
     function answer(deviceAddress, answer) {

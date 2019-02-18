@@ -3,11 +3,14 @@
 const chash = require('ocore/chash.js');
 const config = require("ocore/conf");
 const privateProfile = require('ocore/private_profile.js');
+const validation = require('ocore/validation.js');
 
 const ATTESTORS = new Map();
 
-String.prototype.toCamelCase = function() {
-    return this.toLowerCase().replace(/^(.)/, function($1) { return $1.toUpperCase(); });
+String.prototype.toCamelCase = function () {
+    return this.toLowerCase().replace(/^(.)/, function ($1) {
+        return $1.toUpperCase();
+    });
 };
 
 ATTESTORS.set(config.realnameAttestor, {
@@ -45,36 +48,102 @@ module.exports = function (web, accountRepository, profileRepository) {
 
     return {
 
+        handlePublicProfile(context, signedMessageBase64) {
+            let device = context.deviceAddress;
+
+            context.warn("signedMessageBase64: %s", signedMessageBase64);
+
+            let signedMessageJson = Buffer(signedMessageBase64, 'base64').toString('utf8');
+            try {
+                context.warn("signedMessageJson: %s", signedMessageJson);
+                let objSignedMessage = JSON.parse(signedMessageJson);
+
+                validation.validateSignedMessage(objSignedMessage, err => {
+                    if (err) {
+                        context.warn("Failed to validate attestation by signature: %s", err);
+                        return context.reply("Invalid signature. Cannot save real name.");
+                    }
+
+                    let challenge = objSignedMessage.signed_message;
+
+                    if (!chash.isChashValid(challenge)) {
+                        context.warn("Invalid signature: %s" + hash);
+                        return context.reply("Invalid signature. Cannot save real name.");
+                    }
+
+                    let profileAddress = objSignedMessage.authors[0].address;
+
+                    profileRepository.selectAttestations(profileAddress, (err, attestations) => {
+
+                        let attestation = attestations.find(attestation => {
+                            return challenge === chash.getChash288(attestation.attestor_address + profileAddress);
+                        });
+
+                        if (attestation) {
+                            let attestor = ATTESTORS.get(attestation.attestor_address);
+                            let profile = attestation.profile;
+
+                            accountRepository.updateProfile(device, {
+                                unit: attestation.unit,
+                                firstName: attestor.firstName(profile),
+                                lastName: attestor.lastName(profile),
+                                isDriversLicense: attestor.isDriversLicense(profile)
+                            }, function (err) {
+                                if (err) {
+                                    context.warn('Failed to save: ' + err);
+                                    return context.reply(`Failed to save your real name.`);
+                                }
+                                context.log(`Attested ${profileAddress} by ${attestor.name}`);
+
+                                accountRepository.select(device, (err, account) => {
+                                    if (err) return context.warn("Failed to send accountUpdated to web");
+                                    notifyAccountUpdated(account);
+                                    context.reply(`Thank you. Attested profile found for address ${profileAddress} Your real name is saved as ${account.fullName}`);
+                                });
+                            });
+                        } else {
+                            context.warn("Invalid signature: No valid attestation found for profile %s", profileAddress);
+                            context.reply("Invalid signature. Cannot save real name.");
+                        }
+                    });
+                });
+            }
+            catch (e) {
+                console.error(e);
+                context.reply("Invalid signature. Cannot save real name.");
+            }
+        },
+
         handlePrivateProfile(context, privateProfileJsonBase64) {
             let device = context.deviceAddress;
 
-            let profileUnit = privateProfile.getPrivateProfileFromJsonBase64(privateProfileJsonBase64);
+            let attestation = privateProfile.getPrivateProfileFromJsonBase64(privateProfileJsonBase64);
 
-            if (!profileUnit) {
+            if (!attestation) {
                 context.warn('Invalid profile: failed to decode');
                 return context.reply('Invalid profile. Real name cannot be saved.');
             }
 
-            privateProfile.parseAndValidatePrivateProfile(profileUnit, function (err, address, attestor_address) {
+            privateProfile.parseAndValidatePrivateProfile(attestation, function (err, profileAddress, attestorAddress) {
                 if (err) {
                     context.warn('Invalid profile: ' + err);
                     return context.reply('Invalid profile. Real name cannot be saved.');
                 }
 
-                if (!ATTESTORS.has(attestor_address)) {
+                if (!ATTESTORS.has(attestorAddress)) {
                     context.warn('Profile not accepted: untrusted attestor');
                     return context.reply('Profile not accepted: your profile is attested by an untrusted attestor.');
                 }
 
-                let profile = privateProfile.parseSrcProfile(profileUnit.src_profile);
-                let attestor = ATTESTORS.get(attestor_address);
+                let profile = privateProfile.parseSrcProfile(attestation.src_profile);
+                let attestor = ATTESTORS.get(attestorAddress);
 
                 if (!attestor.validate(profile)) {
                     return context.reply('Profile not accepted. Please try again and share all requested fields!');
                 }
 
                 accountRepository.updateProfile(device, {
-                    unit: profileUnit.unit,
+                    unit: attestation.unit,
                     firstName: attestor.firstName(profile),
                     lastName: attestor.lastName(profile),
                     isDriversLicense: attestor.isDriversLicense(profile)
@@ -83,12 +152,12 @@ module.exports = function (web, accountRepository, profileRepository) {
                         context.warn('Failed to save: ' + err);
                         return context.reply(`Failed to save your real name.`);
                     }
-                    context.log(`Attested ${address} by ${attestor.name}`);
+                    context.log(`Attested ${profileAddress} by ${attestor.name}`);
 
                     accountRepository.select(device, (err, account) => {
                         if (err) return context.warn("Failed to send accountUpdated to web");
                         notifyAccountUpdated(account);
-                        context.reply(`Thank you. Attested profile found for address ${address} Your real name is saved as ${account.fullName}`);
+                        context.reply(`Thank you. Attested profile found for address ${profileAddress} Your real name is saved as ${account.fullName}`);
                     });
                 });
 
