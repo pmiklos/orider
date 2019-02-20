@@ -187,13 +187,17 @@ module.exports = function (web, accountRepository, profileRepository) {
                 attestations.forEach(attestation => {
                     const attestor = ATTESTORS.get(attestation.attestor_address);
 
-                    choices += `*  ${attestor.name}. `;
+                    if (attestor) {
+                        choices += `*  ${attestor.name}. `;
 
-                    if (attestation.profile && attestation.profile.profile_hash) {
-                        choices += attestor.privateProfileRequest + "\n";
+                        if (attestation.profile && attestation.profile.profile_hash) {
+                            choices += attestor.privateProfileRequest + "\n";
+                        } else {
+                            let challenge = chash.getChash288(attestation.attestor_address + profileAddress);
+                            choices += `Please sign your profile [Signature request](sign-message-request:${challenge})\n`;
+                        }
                     } else {
-                        let challenge = chash.getChash288(attestation.attestor_address + profileAddress);
-                        choices += `Please sign your profile [Signature request](sign-message-request:${challenge})\n`;
+                        choices += `* attestor ${attestation.attestor_address} is not supported\n`
                     }
                 });
 
