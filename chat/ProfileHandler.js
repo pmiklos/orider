@@ -142,22 +142,29 @@ module.exports = function (web, accountRepository, profileRepository) {
                     return context.reply('Profile not accepted. Please try again and share all requested fields!');
                 }
 
-                accountRepository.updateProfile(device, {
-                    unit: attestation.unit,
-                    firstName: attestor.firstName(profile),
-                    lastName: attestor.lastName(profile),
-                    isDriversLicense: attestor.isDriversLicense(profile)
-                }, function (err) {
+                privateProfile.savePrivateProfile(attestation, profileAddress, attestorAddress, (err) =>{
                     if (err) {
-                        context.warn('Failed to save: ' + err);
-                        return context.reply(`Failed to save your real name.`);
+                        context.warn("Failed to save private profile: " + err);
+                        return context.reply("Failed to save your real name.");
                     }
-                    context.log(`Attested ${profileAddress} by ${attestor.name}`);
 
-                    accountRepository.select(device, (err, account) => {
-                        if (err) return context.warn("Failed to send accountUpdated to web");
-                        notifyAccountUpdated(account);
-                        context.reply(`Thank you. Attested profile found for address ${profileAddress} Your real name is saved as ${account.fullName}`);
+                    accountRepository.updateProfile(device, {
+                        unit: attestation.unit,
+                        firstName: attestor.firstName(profile),
+                        lastName: attestor.lastName(profile),
+                        isDriversLicense: attestor.isDriversLicense(profile)
+                    }, function (err) {
+                        if (err) {
+                            context.warn('Failed to save: ' + err);
+                            return context.reply(`Failed to save your real name.`);
+                        }
+                        context.log(`Attested ${profileAddress} by ${attestor.name}`);
+
+                        accountRepository.select(device, (err, account) => {
+                            if (err) return context.warn("Failed to send accountUpdated to web");
+                            notifyAccountUpdated(account);
+                            context.reply(`Thank you. Attested profile found for address ${profileAddress} Your real name is saved as ${account.fullName}`);
+                        });
                     });
                 });
 
