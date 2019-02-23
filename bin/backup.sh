@@ -16,7 +16,7 @@ BACKUP_FILE="$BACKUP_DIR/$DATE.sql.gpg"
 
 echo "Backing up to $BACKUP_FILE"
 
-cat << EOF | sqlite3 $DATABASE | gpg --output "${BACKUP_FILE}" --encrypt --recipient orider@obyte.app
+cat << EOF | sqlite3 $DATABASE | gpg --batch --output "${BACKUP_FILE}" --encrypt --recipient orider@obyte.app
 .dump cp_accounts
 .dump cp_rides
 .dump cp_reservations
