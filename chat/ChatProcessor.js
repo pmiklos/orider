@@ -127,7 +127,7 @@ module.exports = function (web, accountRepository, profileRepository, ridesRepor
 
     const commands = [
         {
-            pattern: /hi|hello|yo/i,
+            pattern: /^hi|^hello|^yo$/i,
             handler(context) {
                 context.reply("Hi, try [rides](command:rides) or [help](command:help) for detailed help");
             }
@@ -135,13 +135,13 @@ module.exports = function (web, accountRepository, profileRepository, ridesRepor
             pattern: /^rides|^more rides ([0-9]{1,2})/i,
             handler: listRides
         }, {
-            pattern: /reserve ([0-9]+)/i,
+            pattern: /^reserve ([0-9]+)/i,
             handler: makeReservation
         }, {
-            pattern: /reservations/i,
+            pattern: /^reservations/i,
             handler: listReservations
         }, {
-            pattern: /([A-Z2-7]{32})/,
+            pattern: /^([A-Z2-7]{32})/,
             handler: handleAddress
         }, {
             pattern: /\[.+?\]\(profile:(.+?)\)/,

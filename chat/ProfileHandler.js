@@ -1,6 +1,5 @@
 "use strict";
 
-const chash = require('ocore/chash.js');
 const config = require("ocore/conf");
 const privateProfile = require('ocore/private_profile.js');
 const validation = require('ocore/validation.js');
@@ -35,6 +34,18 @@ ATTESTORS.set(config.realnameAttestor, {
 
 });
 
+function publicProfileChallenge(profileAddress, attestation) {
+    const fields = [];
+    if (attestation && attestation.profile) {
+        for (let key in attestation.profile) {
+            if (attestation.profile.hasOwnProperty(key)) {
+                fields.push(key + ": " + attestation.profile[key]);
+            }
+        }
+    }
+    const challenge = fields.join(", ");
+    return `I sign that profile address ${profileAddress} with the following public profile belongs to me: ${challenge}`;
+}
 
 module.exports = function (web, accountRepository, profileRepository) {
 
@@ -66,17 +77,12 @@ module.exports = function (web, accountRepository, profileRepository) {
 
                     let challenge = objSignedMessage.signed_message;
 
-                    if (!chash.isChashValid(challenge)) {
-                        context.warn("Invalid signature: %s" + hash);
-                        return context.reply("Invalid signature. Cannot save real name.");
-                    }
-
                     let profileAddress = objSignedMessage.authors[0].address;
 
                     profileRepository.selectAttestations(profileAddress, (err, attestations) => {
 
                         let attestation = attestations.find(attestation => {
-                            return challenge === chash.getChash288(attestation.attestor_address + profileAddress);
+                            return challenge === publicProfileChallenge(profileAddress, attestation);
                         });
 
                         if (attestation) {
@@ -187,13 +193,13 @@ module.exports = function (web, accountRepository, profileRepository) {
                 attestations.forEach(attestation => {
                     const attestor = ATTESTORS.get(attestation.attestor_address);
 
-                    if (attestor) {
+                    if (attestor && attestation.profile) {
                         choices += `*  ${attestor.name}. `;
 
-                        if (attestation.profile && attestation.profile.profile_hash) {
+                        if (attestation.profile.profile_hash) {
                             choices += attestor.privateProfileRequest + "\n";
                         } else {
-                            let challenge = chash.getChash288(attestation.attestor_address + profileAddress);
+                            let challenge = publicProfileChallenge(profileAddress, attestation);
                             choices += `Please sign your profile [Signature request](sign-message-request:${challenge})\n`;
                         }
                     } else {
