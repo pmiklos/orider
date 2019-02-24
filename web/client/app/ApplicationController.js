@@ -18,7 +18,14 @@
 
             function showMessage(severity, msg, timeout) {
                 $scope.messages = [];
-                $scope.messages[severity] = msg;
+
+                if (typeof msg === "object") {
+                    $scope.messages[severity] = msg;
+                } else {
+                    $scope.messages[severity] = {
+                        text: msg
+                    };
+                }
 
                 if (!angular.isUndefined(timeout)) {
                     $timeout(function () {

@@ -22,7 +22,11 @@
 
             function requestKyc() {
                 AccountService.requestKyc().then(function() {
-                    $rootScope.showInfo("Real name request sent. Please check your messages in your Obyte wallet!", 5000);
+                    $rootScope.showInfo({
+                        text: "Real name request sent. Please check your messages in your Obyte wallet!",
+                        href: byteball.redirectUrl,
+                        link: "Open wallet"
+                    }, 7000);
                 }, function (error) {
                     console.error(error);
                     $rootScope.showError("Failed to request real name", 5000);

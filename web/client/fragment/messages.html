@@ -1,18 +1,19 @@
 <div id="messages">
     <div class="alert alert-danger alert-dismissible fade show col-lg-12" role="alert" ng-show="messages.error">
-        {{ messages.error }}
+        {{ messages.error.text }}
         <button type="button" class="close" ng-click="clearMessages()" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
     <div class="alert alert-warning alert-dismissible fade show col-lg-12" role="alert" ng-show="messages.warn">
-        {{ messages.warn }}
+        {{ messages.warn.text }}
         <button type="button" class="close" ng-click="clearMessages()" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>
     </div>
     <div class="alert alert-success alert-dismissible fade show col-lg-12" role="alert" ng-show="messages.info">
-        {{ messages.info }}
+        {{ messages.info.text }}
+        <a href="{{ messages.info.href }}" ng-if="messages.info.href">{{ messages.info.link }}</a>
         <button type="button" class="close" ng-click="clearMessages()" aria-label="Close">
             <span aria-hidden="true">&times;</span>
         </button>

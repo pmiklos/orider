@@ -1,11 +1,11 @@
 (function() {
 
     var byteball = function(config) {
-        
+
         var explorerUrl = function(hash) {
             return config.byteball.explorerUrl + "#" + hash;
         };
-        
+
         var requestPaymentUrl = function(address, amount, asset = "base") {
             return config.byteball.protocol + ":" + address + "?amount=" + amount + "&asset=" + asset;
         };
@@ -18,11 +18,14 @@
             return config.byteball.protocol + ":" + pairingCode;
         };
 
+        var redirectUrl = pairingUrl(pairingCode(config.byteball.redirectCode));
+
         return {
-            explorerUrl: explorerUrl,
-            requestPaymentUrl: requestPaymentUrl,
-            pairingCode: pairingCode,
-            pairingUrl: pairingUrl
+            explorerUrl,
+            requestPaymentUrl,
+            pairingCode,
+            pairingUrl,
+            redirectUrl
         };
     };
 

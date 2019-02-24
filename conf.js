@@ -9,6 +9,7 @@ exports.storage = 'sqlite';
 exports.hub = 'obyte.org/bb-test';
 exports.deviceName = 'Carpooling';
 exports.permanent_pairing_secret = '0000';
+exports.redirect_pairing_secret = '0001';
 exports.KEYS_FILENAME = 'keys.json';
 
 //exports.control_addresses = [""];

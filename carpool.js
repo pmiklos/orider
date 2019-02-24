@@ -29,6 +29,10 @@ const web = Web(webapp, ws);
 const chat = Chat(web, db.accountRepository, db.profileRepository, db.ridesRepository, db.reservationsRepository);
 const api = Api(webapp, mapService, db, chat);
 
+db.authRepository.insertPermanentPairingSecret(config.redirect_pairing_secret, "20 YEARS", (err) => {
+    if (err) return console.error("Failed to upsert redirect_pairing_secret");
+});
+
 eventBus.once("headless_wallet_ready", () => {
 
     headlessWallet.issueOrSelectStaticChangeAddress((address) => {

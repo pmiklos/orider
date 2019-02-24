@@ -20,7 +20,8 @@ module.exports = function () {
                 hub: config.hub,
                 devicePubKey: device.getMyDevicePubKey(),
                 protocol: isTestnet() ? "byteball-tn" : "byteball",
-                explorerUrl: isTestnet() ? "https://testnetexplorer.obyte.org/" : "https://explorer.obyte.org/"
+                explorerUrl: isTestnet() ? "https://testnetexplorer.obyte.org/" : "https://explorer.obyte.org/",
+                redirectCode: config.redirect_pairing_secret
             }
         });
     });
