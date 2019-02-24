@@ -17,7 +17,7 @@ ATTESTORS.set(config.realnameAttestor, {
     privateProfileRequest: "Please share your first and last name [Profile request](profile-request:first_name,last_name,id_type)",
 
     validate(profile) {
-        return typeof profile.first_name === "string" && typeof profile.last_name === "string" && typeof profile.id_type === "string"
+        return profile && typeof profile === "object" && typeof profile.first_name === "string" && typeof profile.last_name === "string" && typeof profile.id_type === "string"
     },
 
     firstName(profile) {
@@ -35,15 +35,11 @@ ATTESTORS.set(config.realnameAttestor, {
 });
 
 function publicProfileChallenge(profileAddress, attestation) {
-    const fields = [];
-    if (attestation && attestation.profile) {
-        for (let key in attestation.profile) {
-            if (attestation.profile.hasOwnProperty(key)) {
-                fields.push(key + ": " + attestation.profile[key]);
-            }
-        }
-    }
-    const challenge = fields.join(", ");
+    const profile = attestation.profile;
+    const challenge = Object.getOwnPropertyNames(profile)
+        .filter(k => typeof profile[k] !== "object")
+        .map(k => k + ": " + profile[k])
+        .join(", ");
     return `I sign that profile address ${profileAddress} with the following public profile belongs to me: ${challenge}`;
 }
 
@@ -76,41 +72,49 @@ module.exports = function (web, accountRepository, profileRepository) {
                     }
 
                     let challenge = objSignedMessage.signed_message;
-
                     let profileAddress = objSignedMessage.authors[0].address;
 
                     profileRepository.selectAttestations(profileAddress, (err, attestations) => {
 
                         let attestation = attestations.find(attestation => {
-                            return challenge === publicProfileChallenge(profileAddress, attestation);
+                            return attestation.profile && challenge === publicProfileChallenge(profileAddress, attestation);
                         });
 
-                        if (attestation) {
-                            let attestor = ATTESTORS.get(attestation.attestor_address);
-                            let profile = attestation.profile;
-
-                            accountRepository.updateProfile(device, {
-                                unit: attestation.unit,
-                                firstName: attestor.firstName(profile),
-                                lastName: attestor.lastName(profile),
-                                isDriversLicense: attestor.isDriversLicense(profile)
-                            }, function (err) {
-                                if (err) {
-                                    context.warn('Failed to save: ' + err);
-                                    return context.reply(`Failed to save your real name.`);
-                                }
-                                context.log(`Attested ${profileAddress} by ${attestor.name}`);
-
-                                accountRepository.select(device, (err, account) => {
-                                    if (err) return context.warn("Failed to send accountUpdated to web");
-                                    notifyAccountUpdated(account);
-                                    context.reply(`Thank you. Attested profile found for address ${profileAddress} Your real name is saved as ${account.fullName}`);
-                                });
-                            });
-                        } else {
-                            context.warn("Invalid signature: No valid attestation found for profile %s", profileAddress);
-                            context.reply("Invalid signature. Cannot save real name.");
+                        if (!attestation) {
+                            context.warn(`Invalid signature: No valid attestation found for profile ${profileAddress}`);
+                            return context.reply("Invalid signature. Cannot save real name.");
                         }
+
+                        if (!ATTESTORS.has(attestation.attestor_address)) {
+                            context.warn(`Profile not accepted: unsupported attestor ${attestation.attestor_address}`);
+                            return context.reply('Profile not accepted: your profile is attested by an unsupported attestor.');
+                        }
+
+                        let attestor = ATTESTORS.get(attestation.attestor_address);
+                        let profile = attestation.profile;
+
+                        if (!attestor.validate(profile)) {
+                            return context.reply('Profile not accepted. Please try again and share all requested fields!');
+                        }
+
+                        accountRepository.updateProfile(device, {
+                            unit: attestation.unit,
+                            firstName: attestor.firstName(profile),
+                            lastName: attestor.lastName(profile),
+                            isDriversLicense: attestor.isDriversLicense(profile)
+                        }, function (err) {
+                            if (err) {
+                                context.warn('Failed to save: ' + err);
+                                return context.reply(`Failed to save your real name.`);
+                            }
+                            context.log(`Attested ${profileAddress} by ${attestor.name}`);
+
+                            accountRepository.select(device, (err, account) => {
+                                if (err) return context.warn("Failed to send accountUpdated to web");
+                                notifyAccountUpdated(account);
+                                context.reply(`Thank you. Attested profile found for address ${profileAddress} Your real name is saved as ${account.fullName}`);
+                            });
+                        });
                     });
                 });
             }
@@ -137,8 +141,8 @@ module.exports = function (web, accountRepository, profileRepository) {
                 }
 
                 if (!ATTESTORS.has(attestorAddress)) {
-                    context.warn('Profile not accepted: untrusted attestor');
-                    return context.reply('Profile not accepted: your profile is attested by an untrusted attestor.');
+                    context.warn(`Profile not accepted: unsupported attestor ${attestorAddress}`);
+                    return context.reply('Profile not accepted: your profile is attested by an unsupported attestor.');
                 }
 
                 let profile = privateProfile.parseSrcProfile(attestation.src_profile);
