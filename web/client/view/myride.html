@@ -1,6 +1,6 @@
 <div ng-include="'/fragment/messages.html'"></div>
 
-<div class="modal fade" id="rideAutoCompletion" tabindex="-1" role="dialog" aria-hidden="true">
+<div class="modal fade" id="rideAutoCompletion" data-backdrop="static" data-keyboard="false" tabindex="-1" role="dialog" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-body">
@@ -11,7 +11,7 @@
                     </div>
                 </p>
                 <p class="d-flex justify-content-center">
-                    <button class="btn btn-primary px-5" type="button" ng-click="cancelCompletion()">Cancel</button>
+                    <button id="cancelCompletion" class="btn btn-primary px-5" type="button" ng-click="cancelCompletion()">Cancel</button>
                 </p>
             </div>
         </div>
@@ -43,11 +43,11 @@
                 <a ng-href="{{ride.oracleUnitUrl}}" target="explorer">{{ ride.oracleValue}}</a>
             </p>
             <p>
-                Pick-up: {{ ride.pickupAddress }} <br>
-                Drop-off: {{ ride.dropoffAddress }} <br>
-                <a class="card-link"
-                   ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}"
-                   target="carpool-map">Directions</a>
+                <i class="fa fa-car"></i> {{ ride.pickupAddress }} <br>
+                <i class="fa fa-dot-circle-o"></i>
+                <a ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}"
+                    target="carpool-map"> {{ ride.dropoffAddress }} <br>
+                </a>
             </p>
             <div>
                 <button class="btn btn-primary card-link" type="button" ng-click="startBoarding()" ng-if="!isBoarding() && !isCompleted()">Start boarding</button>

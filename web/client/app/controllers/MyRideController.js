@@ -41,8 +41,9 @@
                 locationWatchId = LocationService.watch(ride.dropoffLat, ride.dropoffLng, function(err) {
                     if (err) return console.error(err);
 
-                    angular.element("#rideAutoCompletion").modal({
-                        backdrop: "static"
+                    angular.element("#rideAutoCompletion").modal();
+                    angular.element("#rideAutoCompletion").on("shown.bs.modal", function () {
+                        $("#cancelCompletion").trigger("focus")
                     });
 
                     startAutoCompletion(ride, AUTO_COMPLETION_COUNTDOWN);
