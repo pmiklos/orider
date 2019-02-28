@@ -20,6 +20,7 @@ exports.authSecret = "secret";
 exports.authTimeout = 300000; // the user has 5 minutes to confirm logon with pairing code
 
 exports.googleMapsApiKey = "GOOGLE MAPS API KEY";
+exports.googleMapsEmbedKey = "GOOGLE MAPS EMBED API KEY"; // used on front end
 
 exports.realnameAttestor = "RJV3YUZ3FG3MPBWXX4RSD7PCPOIGGQZB";
 

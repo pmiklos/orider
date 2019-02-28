@@ -22,6 +22,9 @@ module.exports = function () {
                 protocol: isTestnet() ? "byteball-tn" : "byteball",
                 explorerUrl: isTestnet() ? "https://testnetexplorer.obyte.org/" : "https://explorer.obyte.org/",
                 redirectCode: config.redirect_pairing_secret
+            },
+            google: {
+                mapsEmbedKey: config.googleMapsEmbedKey
             }
         });
     });

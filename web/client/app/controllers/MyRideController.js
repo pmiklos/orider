@@ -2,8 +2,8 @@
 
     var app = angular.module("carpool");
 
-    app.controller("MyRideController", ["$rootScope", "$scope", "$routeParams", "$timeout", "byteball", "socket", "LocationService", "MyRidesService", "WakeLockService",
-        function ($rootScope, $scope, $routeParams, $timeout, byteball, socket, LocationService, MyRidesService, WakeLockService) {
+    app.controller("MyRideController", ["$rootScope", "$scope", "$routeParams", "$timeout", "byteball", "google", "socket", "LocationService", "MyRidesService", "WakeLockService",
+        function ($rootScope, $scope, $routeParams, $timeout, byteball, google, socket, LocationService, MyRidesService, WakeLockService) {
 
             const AUTO_COMPLETION_TIMEOUT = 10 * 1000; // 10 sec
             const AUTO_COMPLETION_COUNTDOWN = 50;
@@ -14,6 +14,7 @@
             $scope.totalCheckIns = 0;
             $scope.completedReservations = [];
             $scope.autoCompletionProgress = 0;
+            $scope.googleMapUrl = null;
 
             let locationWatchId = 0;
             let autoCompletionTimer;
@@ -58,6 +59,7 @@
                         trackRide(ride);
                     }
                     $scope.ride.oracleUnitUrl = byteball.explorerUrl(ride.oracleUnit);
+                    $scope.googleMapUrl = google.mapsEmbedDirections(`${ride.pickupLat},${ride.pickupLng}`, `${ride.dropoffLat},${ride.dropoffLng}`);
                 }, function (error) {
                     console.error(error);
                     $rootScope.showError("Failed to fetch ride", 5000);
@@ -152,6 +154,7 @@
             }
 
             function fetchReservations() {
+                const initialFetch = $scope.reservations.length === 0;
                 return MyRidesService.listReservations($routeParams.id).then(function (response) {
                     $scope.reservations = response.reservations;
 
@@ -164,6 +167,16 @@
                         $scope.paidCheckIns = paidCheckIns / totalReservations;
                         $scope.unpaidCheckIns = (totalCheckIns - paidCheckIns) / totalReservations;
                         $scope.completedReservations = response.reservations.filter(completed);
+
+                        if (paidCheckIns === totalReservations) {
+                            if (initialFetch) {
+                                $scope.ridePaid = true;
+                            } else {
+                                $timeout(function () {
+                                    $scope.ridePaid = true;
+                                }, 3000);
+                            }
+                        }
                     }
                 }, function (error) {
                     console.error(error);
@@ -196,7 +209,9 @@
                 }
             });
 
-            fetchRide().then(fetchReservations);
+            fetchRide().then(fetchReservations).then(function () {
+                $scope.initialized = true;
+            });
 
             $scope.startBoarding = startBoarding;
             $scope.cancelCompletion = cancelCompletion;
