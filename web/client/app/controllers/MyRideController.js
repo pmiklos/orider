@@ -167,6 +167,9 @@
                         $scope.paidCheckIns = paidCheckIns / totalReservations;
                         $scope.unpaidCheckIns = (totalCheckIns - paidCheckIns) / totalReservations;
                         $scope.completedReservations = response.reservations.filter(completed);
+                        $scope.totalPayments = response.reservations.filter(paid).reduce(function(sum) {
+                            return sum + $scope.ride.pricePerSeat;
+                        }, 0);
 
                         if (paidCheckIns === totalReservations) {
                             if (initialFetch) {

@@ -3,11 +3,11 @@
 <div class="row justify-content-center">
     <div class="col-12 col-md-8 card border-light">
         <div class="card-body">
-            <h3 class="card-title">
+            <h5 class="card-title">
                 {{ ride.departure | date:'MMM dd, yyyy HH:mm a'}} <br>
                 <small ng-if="ride.averageScore >= 0 && ride.totalRides >= 0"><star-rating rating="ride.averageScore * 5"/>, {{ ride.totalRides }} rides</small><br>
                 <small>{{ ride.pricePerSeat | MBYTE | number}} MBYTE</small>
-            </h3>
+            </h5>
             <p>
                 Driver: {{ ride.driver }}
                 <sup class="badge badge-success" ng-if="ride.hasDriversLicense" title="Verified drivers license">
@@ -15,11 +15,11 @@
                 </sup>
             </p>
             <p>
-                Pick-up: {{ ride.pickupAddress }} <br>
-                Drop-off: {{ ride.dropoffAddress }} <br>
-                <a class="card-link"
-                   ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}"
-                   target="carpool-map">Directions</a>
+                <i class="fa fa-car"></i> {{ ride.pickupAddress }} <br>
+                <i class="fa fa-dot-circle-o"></i>
+                <a ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}"
+                   target="carpool-map"> {{ ride.dropoffAddress }} <br>
+                </a>
             </p>
             <p>
                 <span class="text-info" ng-if="isRideBoarding()"><b>Boarding now</b></span>

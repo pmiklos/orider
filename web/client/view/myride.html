@@ -38,14 +38,53 @@
         <iframe ng-src="{{ googleMapUrl }}" frameborder="0" width="100%" height="350" style="border:0" allowfullscreen></iframe>
     </div>
 
+    <div class="col-12 col-md-4" ng-if="isCompleted()">
+        <div class="card" style="min-height: 350px">
+            <div class="card-header clearfix">
+                <span class="float-left">Ride result</span>
+                <a class="float-right" ng-href="{{ride.oracleUnitUrl}}" target="explorer" ng-if="ride.oracleValue">{{ ride.oracleValue}}</a>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Score</th>
+                            <th>Payment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>You</div>
+                            <td>{{ ride.completionScore * 100 | number :0}}%</td>
+                            <td>-</td>
+                        </tr>
+                        <tr ng-repeat="reservation in reservations">
+                            <td>{{ reservation.name }}</div>
+                            <td ng-if="reservation.status === 'completed'">{{ reservation.completionScore * 100 | number:0 }}%</td>
+                            <td ng-if="reservation.status !== 'completed'">pending</td>
+                            <td ng-if="reservation.paymentStatus === 'received'">{{ ride.pricePerSeat | MBYTE }} MB</td>
+                            <td ng-if="reservation.paymentStatus === 'paid'">{{ ride.pricePerSeat | MBYTE }} MB</td>
+                            <td ng-if="reservation.paymentStatus === 'failed'">FAILED</td>
+                            <td ng-if="reservation.paymentStatus === 'unpaid'">UNPAID</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="2">Total</th>
+                            <th ng-if="totalPayments">{{ totalPayments | MBYTE }} MB</th>
+                            <th ng-if="!totalPayments">-</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
     <div class="col-12 col-md-8 card border-light">
         <div class="card-body">
             <h5 class="card-title">
                 {{ ride.departure | date:'MMM dd, yyyy HH:mm a'}} <br>
             </h5>
-            <p ng-if="ride.oracleValue">
-                <a ng-href="{{ride.oracleUnitUrl}}" target="explorer">{{ ride.oracleValue}}</a>
-            </p>
             <p>
                 <i class="fa fa-car"></i> {{ ride.pickupAddress }} <br>
                 <i class="fa fa-dot-circle-o"></i>
@@ -57,13 +96,6 @@
                 <button class="btn btn-primary card-link" type="button" ng-click="startBoarding()" ng-if="!isBoarding() && !isCompleted()">Start boarding</button>
                 <span class="card-link text-muted" ng-if="isBoarding()">Boarding now</span>
                 <button class="btn btn-primary card-link" type="button" ng-click="completeRide()" ng-if="!isCompleted()" ng-disabled="isCreated()">Complete Ride</button>
-                <span class="card-link text-muted" ng-if="isCompleted()">Completed ({{ ride.completionScore * 100 | number :0}}%)</span>
-            </div>
-            <div ng-if="completedReservations.length > 0">
-                Passenger completion results:
-                <ul class="list-unstyled payment">
-                    <li ng-class="reservation.paymentStatus" ng-repeat="reservation in completedReservations">{{ reservation.name }} ({{ reservation.completionScore * 100 | number:0 }}%)</li>
-                </ul>
             </div>
         </div>
     </div>
