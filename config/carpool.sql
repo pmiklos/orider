@@ -44,6 +44,7 @@ CREATE TABLE cp_reservations (
     reservation_date DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     contract_address CHAR(32) NULL,
     payment_status VARCHAR NOT NULL DEFAULT 'unpaid', -- unpaid, received, paid, failed
+    payment_unit CHAR(44) NULL,
     checkin_date DATETIME NULL,
     arrival_date DATETIME NULL,
     arrival_lat FLOAT NULL,

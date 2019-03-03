@@ -75,6 +75,11 @@
                             <th ng-if="totalPayments">{{ totalPayments | MBYTE }} MB</th>
                             <th ng-if="!totalPayments">-</th>
                         </tr>
+                        <tr ng-if="ride.oracleValue === 'INCOMPLETE'">
+                            <th colspan="2">Refunded</th>
+                            <th ng-if="totalPayments">{{ totalPayments | MBYTE }} MB</th>
+                            <th ng-if="!totalPayments">-</th>
+                        </tr>
                     </tfoot>
                 </table>
             </div>

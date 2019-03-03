@@ -92,7 +92,9 @@ function select(rideId, device, callback) {
         status,
         reservation_date reservationDate,
         completion_score completionScore,
-        account.payout_address payoutAddress
+        account.payout_address payoutAddress,
+        payment_status paymentStatus,
+        payment_unit paymentUnit
         FROM cp_reservations reservation
         JOIN cp_accounts account USING (device)
         WHERE ride_id = ? AND device = ?`, [rideId, device], (rows) => {
@@ -113,6 +115,7 @@ function selectAllByRide(rideId, callback) {
         contract_address contractAddress,
         completion_score completionScore,
         payment_status paymentStatus,
+        payment_unit paymentUnit,
         account.payout_address payoutAddress
         FROM cp_reservations
         LEFT JOIN cp_accounts account USING (device)
@@ -133,7 +136,8 @@ function selectAllByDevice(device, callback) {
         strftime('%s', ride.departure) * 1000 departure,
         reservation.status,
         reservation.reservation_date reservationDate,
-        reservation.payment_status paymentStatus
+        reservation.payment_status paymentStatus,
+        reservation.payment_unit paymentUnit
         FROM cp_reservations reservation
         JOIN cp_rides ride USING (ride_id)
         WHERE reservation.device = ?
@@ -152,7 +156,8 @@ function selectByContractPaymentUnits(units, callback) {
         reservation.device name, -- until we have attestation
         reservation.status,
         reservation.reservation_date reservationDate,
-        reservation.contract_address contractAddress
+        reservation.contract_address contractAddress,
+        outputs.unit paymentUnit
         FROM cp_reservations reservation
         JOIN cp_rides ride USING (ride_id)
         JOIN outputs ON contract_address = outputs.address
@@ -188,10 +193,27 @@ function checkin(rideId, device, contractAddress, callback) {
     });
 }
 
-function paymentReceived(rideId, device, callback) {
-    db.query(`UPDATE cp_reservations SET payment_status = 'received'
+function paymentConfirmed(rideId, device, paymentUnit, callback) {
+    db.query(`UPDATE cp_reservations
+        SET payment_unit = ?,
+            payment_status = (
+                SELECT CASE sequence WHEN 'good' THEN 'paid' ELSE 'failed' END AS status
+                FROM units
+                WHERE unit = ?
+            )
+        WHERE ride_id = ? AND device = ? AND payment_status IN ('unpaid', 'received', 'paid', 'failed')`,
+        [paymentUnit, paymentUnit, rideId, device], (result) => {
+            if (result.affectedRows === 1) {
+                return callback();
+            }
+            callback(`Failed to update payment status to received: ${rideId} ${device}, ${JSON.stringify(result)}`);
+        });
+}
+
+function paymentReceived(rideId, device, paymentUnit, callback) {
+    db.query(`UPDATE cp_reservations SET payment_status = 'received', payment_unit = ?
         WHERE ride_id = ? AND device = ? AND payment_status IN ('unpaid', 'received')`,
-        [rideId, device], (result) => {
+        [paymentUnit, rideId, device], (result) => {
             if (result.affectedRows === 1) {
                 return callback();
             }
@@ -208,5 +230,6 @@ module.exports = {
     selectAllByDevice,
     selectByContractPaymentUnits,
     checkin,
+    paymentConfirmed,
     paymentReceived
 };

@@ -205,6 +205,13 @@
                 }
             });
 
+            socket.on("paymentConfirmed", function(data) {
+                console.log("Payment confirmed for ride " + data.rideId);
+                if (data.rideId === $scope.ride.id) {
+                    fetchReservations();
+                }
+            });
+
             socket.on("rideCompleted", function(data) {
                 console.log("Ride completed " + data.rideId);
                 if (data.rideId === $scope.ride.id) {
