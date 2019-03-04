@@ -63,9 +63,9 @@
                             <td>{{ reservation.name }}</div>
                             <td ng-if="reservation.status === 'completed'">{{ reservation.completionScore * 100 | number:0 }}%</td>
                             <td ng-if="reservation.status !== 'completed'">pending</td>
-                            <td ng-if="reservation.paymentStatus === 'received'">{{ ride.pricePerSeat | MBYTE }} MB</td>
-                            <td ng-if="reservation.paymentStatus === 'paid'">{{ ride.pricePerSeat | MBYTE }} MB</td>
-                            <td ng-if="reservation.paymentStatus === 'failed'">FAILED</td>
+                            <td ng-if="reservation.paymentStatus === 'received'"><a ng-href="{{ reservation.paymentUnit | explorerUrl }}" target="explorer">{{ ride.pricePerSeat | MBYTE }} MB</a></td>
+                            <td ng-if="reservation.paymentStatus === 'paid'"><a ng-href="{{ reservation.paymentUnit | explorerUrl }}" target="explorer">{{ ride.pricePerSeat | MBYTE }} MB</a></td>
+                            <td ng-if="reservation.paymentStatus === 'failed'"><a ng-href="{{ reservation.paymentUnit | explorerUrl }}" target="explorer">FAILED</a></td>
                             <td ng-if="reservation.paymentStatus === 'unpaid'">UNPAID</td>
                         </tr>
                     </tbody>

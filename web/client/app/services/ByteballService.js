@@ -1,6 +1,12 @@
 (function() {
 
-    var byteball = function(config) {
+    var app = angular.module("carpool");
+
+    const KBYTE = 1000;
+    const MBYTE = 1000 * KBYTE;
+    const GBYTE = 1000 * MBYTE;
+
+    app.factory('byteball', ["CONFIG", function(config) {
 
         var explorerUrl = function(hash) {
             return config.byteball.explorerUrl + "#" + hash;
@@ -27,9 +33,36 @@
             pairingUrl,
             redirectUrl
         };
-    };
+    }]);
 
-    var app = angular.module("carpool");
-    app.factory('byteball', ["CONFIG", byteball]);
+    app.filter("GBYTE", function() {
+        return function(amount) {
+            return amount / GBYTE;
+        };
+    });
+
+    app.filter("MBYTE", function() {
+        return function(amount) {
+            return amount / MBYTE;
+        };
+    });
+
+    app.filter("paymentUrl", ["byteball", function(byteball) {
+        return function(payment) {
+            if (typeof payment === 'object') {
+                return byteball.requestPaymentUrl(payment.address, payment.amount, payment.asset);
+            }
+            return "";
+        };
+    }]);
+
+    app.filter("explorerUrl", ["byteball", function(byteball) {
+        return function(unitOrAddress) {
+            if (typeof unitOrAddress === 'string') {
+                return byteball.explorerUrl(unitOrAddress);
+            }
+            return "";
+        };
+    }]);
 
 }());

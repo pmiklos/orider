@@ -79,31 +79,6 @@
             });
     });
 
-    const KBYTE = 1000;
-    const MBYTE = 1000 * KBYTE;
-    const GBYTE = 1000 * MBYTE;
-
-    app.filter("GBYTE", function() {
-        return function(amount) {
-            return amount / GBYTE;
-        };
-    });
-
-    app.filter("MBYTE", function() {
-        return function(amount) {
-            return amount / MBYTE;
-        };
-    });
-
-    app.filter("paymentUrl", ["byteball", function(byteball) {
-        return function(payment) {
-            if (typeof payment === 'object') {
-                return byteball.requestPaymentUrl(payment.address, payment.amount, payment.asset);
-            }
-            return "";
-        };
-    }]);
-
     fetchConfig().then(bootstrapApplication);
 
 })();
