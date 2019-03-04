@@ -51,6 +51,8 @@ CREATE TABLE cp_reservations (
     arrival_lng FLOAT NULL,
     arrival_accuracy FLOAT NULL,
     completion_score FLOAT NULL,
+    payout_unit CHAR(44) NULL,
+    refund_unit CHAR(44) NULL,
     PRIMARY KEY (ride_id, device),
     FOREIGN KEY (ride_id) REFERENCES cp_rides(ride_id),
     FOREIGN KEY (device) REFERENCES cp_accounts(device)

@@ -94,7 +94,9 @@ function select(rideId, device, callback) {
         completion_score completionScore,
         account.payout_address payoutAddress,
         payment_status paymentStatus,
-        payment_unit paymentUnit
+        payment_unit paymentUnit,
+        payout_unit payoutUnit,
+        refund_unit refundUnit
         FROM cp_reservations reservation
         JOIN cp_accounts account USING (device)
         WHERE ride_id = ? AND device = ?`, [rideId, device], (rows) => {
@@ -116,6 +118,8 @@ function selectAllByRide(rideId, callback) {
         completion_score completionScore,
         payment_status paymentStatus,
         payment_unit paymentUnit,
+        payout_unit payoutUnit,
+        refund_unit refundUnit,
         account.payout_address payoutAddress
         FROM cp_reservations
         LEFT JOIN cp_accounts account USING (device)
@@ -137,7 +141,9 @@ function selectAllByDevice(device, callback) {
         reservation.status,
         reservation.reservation_date reservationDate,
         reservation.payment_status paymentStatus,
-        reservation.payment_unit paymentUnit
+        reservation.payment_unit paymentUnit,
+        reservation.payout_unit payoutUnit,
+        reservation.refund_unit refundUnit
         FROM cp_reservations reservation
         JOIN cp_rides ride USING (ride_id)
         WHERE reservation.device = ?
@@ -221,6 +227,26 @@ function paymentReceived(rideId, device, paymentUnit, callback) {
         });
 }
 
+function refunded(rideId, device, refundUnit, callback) {
+    db.query(`UPDATE cp_reservations SET refund_unit = ? WHERE ride_id = ? AND device = ?`,
+        [refundUnit, rideId, device], (result) => {
+            if (result.affectedRows === 1) {
+                return callback();
+            }
+            callback(`Failed to update refund unit: ${rideId} ${device} ${refundUnit}, ${JSON.stringify(result)}`);
+        });
+}
+
+function paidOut(rideId, device, payoutUnit, callback) {
+    db.query(`UPDATE cp_reservations SET payout_unit = ? WHERE ride_id = ? AND device = ?`,
+        [payoutUnit, rideId, device], (result) => {
+            if (result.affectedRows === 1) {
+                return callback();
+            }
+            callback(`Failed to update payout unit: ${rideId} ${device} ${payoutUnit}, ${JSON.stringify(result)}`);
+        });
+}
+
 module.exports = {
     complete,
     completeAllOverdue,
@@ -231,5 +257,7 @@ module.exports = {
     selectByContractPaymentUnits,
     checkin,
     paymentConfirmed,
-    paymentReceived
+    paymentReceived,
+    paidOut,
+    refunded
 };

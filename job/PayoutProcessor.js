@@ -3,18 +3,29 @@
 module.exports = function (headlessWallet, ridesRepository, reservationsRepository) {
 
     // TODO transaction fee has to be calculated when creating the contract to be able to transfer the money.
-    function makePayment(fromAddress, toAddress, toDevice) {
+    function makePayment(fromAddress, toAddress, toDevice, callback) {
         headlessWallet.sendAllBytesFromAddress(fromAddress, toAddress, toDevice, (err, unit) => {
-            if (err) return console.error(`[PAYOUT] Failed to make payment from ${fromAddress} to ${toAddress}: ${err}`);
+            if (err) return callback(`[PAYOUT] Failed to make payment from ${fromAddress} to ${toAddress}: ${err}`);
             console.error(`[PAYOUT] Payment made from ${fromAddress} to ${toAddress} in unit ${unit}`);
+            callback(null, unit);
         });
     }
 
-    function payoutReservation(rideStatus, contract, driver, passenger) {
+    function payoutReservation(rideId, rideStatus, contract, driver, passenger) {
         if (rideStatus === 'COMPLETED') {
-            makePayment(contract, driver.payoutAddress, driver.device);
+            makePayment(contract, driver.payoutAddress, driver.device, (err, unit) => {
+                if (err) return console.error(err);
+                reservationsRepository.paidOut(rideId, passenger.device, unit, (err) => {
+                    if (err) return console.error(err);
+                });
+            });
         } else if (rideStatus === 'INCOMPLETE') {
-            makePayment(contract, passenger.payoutAddress, passenger.device);
+            makePayment(contract, passenger.payoutAddress, passenger.device, (err, unit) => {
+                if (err) return console.error(err);
+                reservationsRepository.refunded(rideId, passenger.device, unit, (err) => {
+                    if (err) return console.error(err);
+                });
+            });
         } else {
             console.error(`[PAYOUT] Failed to payout contract ${contract}: invalid ride status ${rideStatus}`);
         }
@@ -24,7 +35,7 @@ module.exports = function (headlessWallet, ridesRepository, reservationsReposito
         reservationsRepository.selectAllByRide(ride.rideId, (err, reservations) => {
             if (err) return console.error("[PAYOUT] Failed to fetch reservations to payout. Ride id: " + ride.rideId);
             reservations.forEach(reservation => {
-                payoutReservation(ride.oracleValue, reservation.contractAddress, ride, reservation);
+                payoutReservation(ride.rideId, ride.oracleValue, reservation.contractAddress, ride, reservation);
             });
         });
     }
