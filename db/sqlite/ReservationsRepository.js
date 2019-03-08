@@ -109,20 +109,26 @@ function select(rideId, device, callback) {
 
 function selectAllByRide(rideId, callback) {
     db.query(`SELECT
-        ride_id rideId,
-        device,
-        COALESCE(account.first_name, device) name,
-        status,
-        reservation_date reservationDate,
-        contract_address contractAddress,
-        completion_score completionScore,
-        payment_status paymentStatus,
-        payment_unit paymentUnit,
-        payout_unit payoutUnit,
-        refund_unit refundUnit,
-        account.payout_address payoutAddress
-        FROM cp_reservations
-        LEFT JOIN cp_accounts account USING (device)
+        reservation.ride_id rideId,
+        reservation.device,
+        COALESCE(passenger.first_name, passenger.device) name,
+        reservation.status,
+        reservation.reservation_date reservationDate,
+        reservation.contract_address contractAddress,
+        reservation.completion_score completionScore,
+        reservation.payment_status paymentStatus,
+        reservation.payment_unit paymentUnit,
+        reservation.payout_unit payoutUnit,
+        payout.amount payoutAmount,
+        reservation.refund_unit refundUnit,
+        refund.amount refundAmount,
+        passenger.payout_address payoutAddress
+        FROM cp_reservations reservation
+        JOIN cp_rides ride USING (ride_id)
+        LEFT JOIN cp_accounts driver ON driver.device = ride.device
+        LEFT JOIN cp_accounts passenger ON passenger.device = reservation.device
+        LEFT JOIN outputs payout ON payout.unit = reservation.payout_unit AND payout.address = driver.payout_address
+        LEFT JOIN outputs refund ON refund.unit = reservation.refund_unit AND refund.address = passenger.payout_address
         WHERE ride_id = ?
         ORDER BY reservation_date`, [rideId], (rows) => {
         if (Array.isArray(rows)) {

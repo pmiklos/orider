@@ -170,6 +170,12 @@
                         $scope.totalPayments = response.reservations.filter(paid).reduce(function(sum) {
                             return sum + $scope.ride.pricePerSeat;
                         }, 0);
+                        $scope.totalPayouts = response.reservations.filter(paid).reduce(function(sum, reservation) {
+                            return sum + reservation.payoutAmount;
+                        }, 0);
+                        $scope.totalRefunds = response.reservations.filter(paid).reduce(function(sum, reservation) {
+                            return sum + reservation.refundAmount;
+                        }, 0);
 
                         if (paidCheckIns === totalReservations) {
                             if (initialFetch) {
