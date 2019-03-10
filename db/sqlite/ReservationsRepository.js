@@ -92,7 +92,11 @@ function select(rideId, device, callback) {
         status,
         reservation_date reservationDate,
         completion_score completionScore,
-        account.payout_address payoutAddress
+        account.payout_address payoutAddress,
+        payment_status paymentStatus,
+        payment_unit paymentUnit,
+        payout_unit payoutUnit,
+        refund_unit refundUnit
         FROM cp_reservations reservation
         JOIN cp_accounts account USING (device)
         WHERE ride_id = ? AND device = ?`, [rideId, device], (rows) => {
@@ -105,17 +109,26 @@ function select(rideId, device, callback) {
 
 function selectAllByRide(rideId, callback) {
     db.query(`SELECT
-        ride_id rideId,
-        device,
-        COALESCE(account.first_name, device) name,
-        status,
-        reservation_date reservationDate,
-        contract_address contractAddress,
-        completion_score completionScore,
-        payment_status paymentStatus,
-        account.payout_address payoutAddress
-        FROM cp_reservations
-        LEFT JOIN cp_accounts account USING (device)
+        reservation.ride_id rideId,
+        reservation.device,
+        COALESCE(passenger.first_name, passenger.device) name,
+        reservation.status,
+        reservation.reservation_date reservationDate,
+        reservation.contract_address contractAddress,
+        reservation.completion_score completionScore,
+        reservation.payment_status paymentStatus,
+        reservation.payment_unit paymentUnit,
+        reservation.payout_unit payoutUnit,
+        payout.amount payoutAmount,
+        reservation.refund_unit refundUnit,
+        refund.amount refundAmount,
+        passenger.payout_address payoutAddress
+        FROM cp_reservations reservation
+        JOIN cp_rides ride USING (ride_id)
+        LEFT JOIN cp_accounts driver ON driver.device = ride.device
+        LEFT JOIN cp_accounts passenger ON passenger.device = reservation.device
+        LEFT JOIN outputs payout ON payout.unit = reservation.payout_unit AND payout.address = driver.payout_address
+        LEFT JOIN outputs refund ON refund.unit = reservation.refund_unit AND refund.address = passenger.payout_address
         WHERE ride_id = ?
         ORDER BY reservation_date`, [rideId], (rows) => {
         if (Array.isArray(rows)) {
@@ -133,7 +146,10 @@ function selectAllByDevice(device, callback) {
         strftime('%s', ride.departure) * 1000 departure,
         reservation.status,
         reservation.reservation_date reservationDate,
-        reservation.payment_status paymentStatus
+        reservation.payment_status paymentStatus,
+        reservation.payment_unit paymentUnit,
+        reservation.payout_unit payoutUnit,
+        reservation.refund_unit refundUnit
         FROM cp_reservations reservation
         JOIN cp_rides ride USING (ride_id)
         WHERE reservation.device = ?
@@ -152,7 +168,8 @@ function selectByContractPaymentUnits(units, callback) {
         reservation.device name, -- until we have attestation
         reservation.status,
         reservation.reservation_date reservationDate,
-        reservation.contract_address contractAddress
+        reservation.contract_address contractAddress,
+        outputs.unit paymentUnit
         FROM cp_reservations reservation
         JOIN cp_rides ride USING (ride_id)
         JOIN outputs ON contract_address = outputs.address
@@ -188,14 +205,51 @@ function checkin(rideId, device, contractAddress, callback) {
     });
 }
 
-function paymentReceived(rideId, device, callback) {
-    db.query(`UPDATE cp_reservations SET payment_status = 'received'
-        WHERE ride_id = ? AND device = ? AND payment_status IN ('unpaid', 'received')`,
-        [rideId, device], (result) => {
+function paymentConfirmed(rideId, device, paymentUnit, callback) {
+    db.query(`UPDATE cp_reservations
+        SET payment_unit = ?,
+            payment_status = (
+                SELECT CASE sequence WHEN 'good' THEN 'paid' ELSE 'failed' END AS status
+                FROM units
+                WHERE unit = ?
+            )
+        WHERE ride_id = ? AND device = ? AND payment_status IN ('unpaid', 'received', 'paid', 'failed')`,
+        [paymentUnit, paymentUnit, rideId, device], (result) => {
             if (result.affectedRows === 1) {
                 return callback();
             }
             callback(`Failed to update payment status to received: ${rideId} ${device}, ${JSON.stringify(result)}`);
+        });
+}
+
+function paymentReceived(rideId, device, paymentUnit, callback) {
+    db.query(`UPDATE cp_reservations SET payment_status = 'received', payment_unit = ?
+        WHERE ride_id = ? AND device = ? AND payment_status IN ('unpaid', 'received')`,
+        [paymentUnit, rideId, device], (result) => {
+            if (result.affectedRows === 1) {
+                return callback();
+            }
+            callback(`Failed to update payment status to received: ${rideId} ${device}, ${JSON.stringify(result)}`);
+        });
+}
+
+function refunded(rideId, device, refundUnit, callback) {
+    db.query(`UPDATE cp_reservations SET refund_unit = ? WHERE ride_id = ? AND device = ?`,
+        [refundUnit, rideId, device], (result) => {
+            if (result.affectedRows === 1) {
+                return callback();
+            }
+            callback(`Failed to update refund unit: ${rideId} ${device} ${refundUnit}, ${JSON.stringify(result)}`);
+        });
+}
+
+function paidOut(rideId, device, payoutUnit, callback) {
+    db.query(`UPDATE cp_reservations SET payout_unit = ? WHERE ride_id = ? AND device = ?`,
+        [payoutUnit, rideId, device], (result) => {
+            if (result.affectedRows === 1) {
+                return callback();
+            }
+            callback(`Failed to update payout unit: ${rideId} ${device} ${payoutUnit}, ${JSON.stringify(result)}`);
         });
 }
 
@@ -208,5 +262,8 @@ module.exports = {
     selectAllByDevice,
     selectByContractPaymentUnits,
     checkin,
-    paymentReceived
+    paymentConfirmed,
+    paymentReceived,
+    paidOut,
+    refunded
 };

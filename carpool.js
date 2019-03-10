@@ -151,8 +151,9 @@ function start(rideFeeContract) {
     eventBus.on("text", chat.answer);
 
     const paymentProcessor = PaymentProcessor(web, db.ridesRepository, db.reservationsRepository);
-    const payoutProcessor = PayoutProcessor(headlessWallet, db.ridesRepository, db.reservationsRepository);
+    const payoutProcessor = PayoutProcessor(headlessWallet, web, db.ridesRepository, db.reservationsRepository);
 
     eventBus.on("new_my_transactions", paymentProcessor.reservationsReceived);
+    eventBus.on("my_transactions_became_stable", paymentProcessor.reservationsConfirmed);
     eventBus.on("my_transactions_became_stable", payoutProcessor.payoutRides);
 }

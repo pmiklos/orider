@@ -170,6 +170,12 @@
                         $scope.totalPayments = response.reservations.filter(paid).reduce(function(sum) {
                             return sum + $scope.ride.pricePerSeat;
                         }, 0);
+                        $scope.totalPayouts = response.reservations.filter(paid).reduce(function(sum, reservation) {
+                            return sum + reservation.payoutAmount;
+                        }, 0);
+                        $scope.totalRefunds = response.reservations.filter(paid).reduce(function(sum, reservation) {
+                            return sum + reservation.refundAmount;
+                        }, 0);
 
                         if (paidCheckIns === totalReservations) {
                             if (initialFetch) {
@@ -205,10 +211,24 @@
                 }
             });
 
+            socket.on("paymentConfirmed", function(data) {
+                console.log("Payment confirmed for ride " + data.rideId);
+                if (data.rideId === $scope.ride.id) {
+                    fetchReservations();
+                }
+            });
+
             socket.on("rideCompleted", function(data) {
                 console.log("Ride completed " + data.rideId);
                 if (data.rideId === $scope.ride.id) {
                     fetchRide().then(fetchReservations());
+                }
+            });
+
+            socket.on("paidOut", function(data) {
+                console.log("Reservation paid out " + data.rideId);
+                if (data.rideId === $scope.ride.id) {
+                    fetchReservations();
                 }
             });
 

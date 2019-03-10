@@ -50,6 +50,7 @@
                         <tr>
                             <th></th>
                             <th>Score</th>
+                            <th></th>
                             <th>Payment</th>
                         </tr>
                     </thead>
@@ -57,23 +58,43 @@
                         <tr>
                             <td>You</div>
                             <td>{{ ride.completionScore * 100 | number :0}}%</td>
+                            <td></td>
                             <td>-</td>
                         </tr>
-                        <tr ng-repeat="reservation in reservations">
-                            <td>{{ reservation.name }}</div>
-                            <td ng-if="reservation.status === 'completed'">{{ reservation.completionScore * 100 | number:0 }}%</td>
-                            <td ng-if="reservation.status !== 'completed'">pending</td>
-                            <td ng-if="reservation.paymentStatus === 'received'">{{ ride.pricePerSeat | MBYTE }} MB</td>
-                            <td ng-if="reservation.paymentStatus === 'paid'">{{ ride.pricePerSeat | MBYTE }} MB</td>
-                            <td ng-if="reservation.paymentStatus === 'failed'">FAILED</td>
+                        <tr ng-repeat-start="reservation in reservations">
+                            <td rowspan="2">{{ reservation.name }}</div>
+                            <td rowspan="2" ng-if="reservation.status === 'completed'">{{ reservation.completionScore * 100 | number:0 }}%</td>
+                            <td rowspan="2" ng-if="reservation.status !== 'completed'">pending</td>
+                            <td><i class="fa fa-sign-in"></i></td>
+                            <td ng-if="reservation.paymentStatus === 'received'"><a ng-href="{{ reservation.paymentUnit | explorerUrl }}" target="explorer">{{ ride.pricePerSeat | MBYTE }} MB</a></td>
+                            <td ng-if="reservation.paymentStatus === 'paid'"><a ng-href="{{ reservation.paymentUnit | explorerUrl }}" target="explorer">{{ ride.pricePerSeat | MBYTE }} MB</a></td>
+                            <td ng-if="reservation.paymentStatus === 'failed'"><a ng-href="{{ reservation.paymentUnit | explorerUrl }}" target="explorer">FAILED</a></td>
                             <td ng-if="reservation.paymentStatus === 'unpaid'">UNPAID</td>
+                        </tr>
+                        <tr ng-if="reservation.payoutUnit">
+                            <td><i class="fa fa-sign-out"></i></td>
+                            <td><a ng-href="{{ reservation.payoutUnit | explorerUrl }}" target="explorer">{{ reservation.payoutAmount | MBYTE }} MB</a></td>
+                        </tr>
+                        <tr ng-repeat-end ng-if="reservation.refundUnit">
+                            <td><i class="fa fa-sign-out"></i></td>
+                            <td><a ng-href="{{ reservation.refundUnit | explorerUrl }}" target="explorer">{{ reservation.refundAmount | MBYTE }} MB</a></td>
                         </tr>
                     </tbody>
                     <tfoot>
                         <tr>
-                            <th colspan="2">Total</th>
+                            <th colspan="3">Received</th>
                             <th ng-if="totalPayments">{{ totalPayments | MBYTE }} MB</th>
                             <th ng-if="!totalPayments">-</th>
+                        </tr>
+                        <tr ng-if="totalPayouts">
+                            <th colspan="2">Paid out</th>
+                            <th>=</th>
+                            <th class="text-success">{{ totalPayouts | MBYTE }} MB</th>
+                        </tr>
+                        <tr ng-if="totalRefunds">
+                            <th colspan="2">Refunded</th>
+                            <th>=</th>
+                            <th class="text-danger">{{ totalRefunds | MBYTE }} MB</th>
                         </tr>
                     </tfoot>
                 </table>
