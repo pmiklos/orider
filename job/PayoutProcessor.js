@@ -1,6 +1,25 @@
 "use strict";
 
-module.exports = function (headlessWallet, ridesRepository, reservationsRepository) {
+module.exports = function (headlessWallet, web, ridesRepository, reservationsRepository) {
+
+    function notify(rideId, driver, passenger) {
+        web.send({
+            id: driver,
+            event: "paidOut",
+            data: {
+                rideId: rideId,
+                device: passenger
+            }
+        });
+        web.send({
+            id: passenger,
+            event: "paidOut",
+            data: {
+                rideId: rideId,
+                device: passenger
+            }
+        });
+    }
 
     // TODO transaction fee has to be calculated when creating the contract to be able to transfer the money.
     function makePayment(fromAddress, toAddress, toDevice, callback) {
@@ -17,6 +36,7 @@ module.exports = function (headlessWallet, ridesRepository, reservationsReposito
                 if (err) return console.error(err);
                 reservationsRepository.paidOut(rideId, passenger.device, unit, (err) => {
                     if (err) return console.error(err);
+                    notify(rideId, driver.device, passenger.device);
                 });
             });
         } else if (rideStatus === 'INCOMPLETE') {
@@ -24,6 +44,7 @@ module.exports = function (headlessWallet, ridesRepository, reservationsReposito
                 if (err) return console.error(err);
                 reservationsRepository.refunded(rideId, passenger.device, unit, (err) => {
                     if (err) return console.error(err);
+                    notify(rideId, driver.device, passenger.device);
                 });
             });
         } else {

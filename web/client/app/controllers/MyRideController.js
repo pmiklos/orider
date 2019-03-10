@@ -225,6 +225,13 @@
                 }
             });
 
+            socket.on("paidOut", function(data) {
+                console.log("Reservation paid out " + data.rideId);
+                if (data.rideId === $scope.ride.id) {
+                    fetchReservations();
+                }
+            });
+
             fetchRide().then(fetchReservations).then(function () {
                 $scope.initialized = true;
             });
