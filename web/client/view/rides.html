@@ -1,7 +1,7 @@
 <div ng-include="'/fragment/messages.html'"></div>
 
 <div class="row" ng-if="isLoggedIn()">
-    <div class="col-12 bg-light pt-3" ng-hide="hideCreateRideForm">
+    <div class="col-12 jumbotron pt-3" ng-hide="hideCreateRideForm">
         <form name="createRideForm" ng-submit="createRide()">
             <div class="form-row align-items-center">
                 <div class="form-group col-12 col-lg-6">
@@ -68,8 +68,8 @@
         <div class="row p-2" ng-repeat="ride in rides">
             <div class="col-12 p-0 card">
                 <h5 class="card-header" ng-if="isBoarding(ride) || isCompleted(ride)">
-                    <span class="text-info" ng-if="isBoarding(ride)"><b>Boarding now</b></span>
-                    <span class="text-info" ng-if="isCompleted(ride)"><b>Completed</b></span>
+                    <span ng-if="isBoarding(ride)"><b>Boarding now</b></span>
+                    <span ng-if="isCompleted(ride)"><b>Completed</b></span>
                 </h5>
                 <div class="card-body">
                     <div class="row">
