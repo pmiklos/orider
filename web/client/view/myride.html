@@ -20,25 +20,28 @@
 
 
 <div class="row justify-content-center">
-    <div class="col-auto pt-3 card border-dark" ng-if="initialized && !ridePaid && checkInUrl">
-        <div class="mx-auto">
-            <qrcode data="{{ checkInUrl }}" size="270" version="7"></qrcode>
-        </div>
-        <div class="card-body">
-            <h4 class="car-title text-monospace text-center">Check-in ({{ totalCheckIns }}/{{ reservations.length }})</h4>
-            <div class="progress">
-                <div class="progress-bar bg-success" role="progressbar" style="width: {{ paidCheckIns * 100 | number:0 }}%" aria-valuenow="{{ paidCheckIns * 100 | number:0 }}" aria-valuemin="0" aria-valuemax="100"></div>
-                <div class="progress-bar" role="progressbar" style="width: {{ unpaidCheckIns * 100 | number:0 }}%" aria-valuenow="{{ unpaidCheckIns * 100 | number:0 }}" aria-valuemin="0" aria-valuemax="100"></div>
+
+    <div class="col-auto pb-3" ng-if="initialized && !ridePaid && checkInUrl">
+        <div class="card">
+            <div class="mx-auto pt-3">
+                <qrcode data="{{ checkInUrl }}" size="270" version="7"></qrcode>
             </div>
-            <p class="card-text"><small class="text-muted">Passengers have to scan to check in for the ride</small></p>
+            <div class="card-body">
+                <h4 class="car-title text-monospace text-center">Check-in ({{ totalCheckIns }}/{{ reservations.length }})</h4>
+                <div class="progress">
+                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ paidCheckIns * 100 | number:0 }}%" aria-valuenow="{{ paidCheckIns * 100 | number:0 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    <div class="progress-bar bg-info" role="progressbar" style="width: {{ unpaidCheckIns * 100 | number:0 }}%" aria-valuenow="{{ unpaidCheckIns * 100 | number:0 }}" aria-valuemin="0" aria-valuemax="100"></div>
+                </div>
+                <p class="card-text"><small class="text-muted">Passengers have to scan to check in for the ride</small></p>
+            </div>
         </div>
     </div>
 
-    <div class="col-12 col-md-4" ng-if="initialized && ridePaid && googleMapUrl && !isCompleted()">
+    <div class="col-12 col-md-4 pb-3" ng-if="initialized && ridePaid && googleMapUrl && !isCompleted()">
         <iframe ng-src="{{ googleMapUrl }}" frameborder="0" width="100%" height="350" style="border:0" allowfullscreen></iframe>
     </div>
 
-    <div class="col-12 col-md-4" ng-if="isCompleted()">
+    <div class="col-12 col-md-4 pb-3" ng-if="isCompleted()">
         <div class="card" style="min-height: 350px">
             <div class="card-header clearfix">
                 <span class="float-left">Ride result</span>
@@ -101,22 +104,25 @@
             </div>
         </div>
     </div>
-    <div class="col-12 col-md-8 card border-light">
-        <div class="card-body">
-            <h5 class="card-title">
-                {{ ride.departure | date:'MMM dd, yyyy HH:mm a'}} <br>
-            </h5>
-            <p>
-                <i class="fa fa-car"></i> {{ ride.pickupAddress }} <br>
-                <i class="fa fa-dot-circle-o"></i>
-                <a ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}"
-                    target="carpool-map"> {{ ride.dropoffAddress }} <br>
-                </a>
-            </p>
-            <div>
-                <button class="btn btn-primary card-link" type="button" ng-click="startBoarding()" ng-if="!isBoarding() && !isCompleted()">Start boarding</button>
-                <span class="card-link text-muted" ng-if="isBoarding()">Boarding now</span>
-                <button class="btn btn-primary card-link" type="button" ng-click="completeRide()" ng-if="!isCompleted()" ng-disabled="isCreated()">Complete Ride</button>
+
+    <div class="col-12 col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">
+                    {{ ride.departure | date:'MMM dd, yyyy HH:mm a'}} <br>
+                </h5>
+                <p>
+                    <i class="fa fa-car"></i> {{ ride.pickupAddress }} <br>
+                    <i class="fa fa-dot-circle-o"></i>
+                    <a ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}"
+                        target="carpool-map"> {{ ride.dropoffAddress }} <br>
+                    </a>
+                </p>
+                <div>
+                    <button class="btn btn-primary card-link" type="button" ng-click="startBoarding()" ng-if="!isBoarding() && !isCompleted()">Start boarding</button>
+                    <span class="card-link text-muted" ng-if="isBoarding()">Boarding now</span>
+                    <button class="btn btn-primary card-link" type="button" ng-click="completeRide()" ng-if="!isCompleted()" ng-disabled="isCreated()">Complete Ride</button>
+                </div>
             </div>
         </div>
     </div>
