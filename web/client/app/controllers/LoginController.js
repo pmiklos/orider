@@ -11,7 +11,8 @@
                 socket.reconnect();
                 document.getSelection().removeAllRanges();
                 console.log("Logged in.");
-                $location.url("/");
+                $location.url($rootScope.referrerUrl || "/");
+                $rootScope.referrerUrl = null;
             }, function (error) {
                 console.error("Authentication failed");
                 $timeout(function () {

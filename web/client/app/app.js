@@ -73,7 +73,9 @@
                 controller: "RidesController",
                 resolve: {
                     account: function(AccountService) {
-                        return AccountService.resolve();
+                        return AccountService.resolve().catch(function (reason) {
+                            console.error(reason);
+                        });
                     }
                 }
             });

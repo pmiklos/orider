@@ -9,8 +9,7 @@
                     $rootScope.setAccount(response.data);
                 }, function(errorResponse) {
                     $rootScope.setAccount(null);
-                    console.error("Failed to load account: " + errorResponse);
-                    return null; // do not block downstream
+                    return $q.reject(errorResponse);
                 });
             },
             update: function (account) {
