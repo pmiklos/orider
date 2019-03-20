@@ -99,9 +99,14 @@ module.exports = function (ridesRepository, reservationsRepository, authReposito
     function fetchMine(req, res, next) {
         ridesRepository.select(req.params.id, (err, ride) => {
             if (err) return next(err);
-            if (!ride || ride.device !== req.accessToken.dev) return next({
+            if (!ride) return next({
                 status: 404,
-                message: "No such ride"
+                message: "Not found"
+            });
+
+            if (ride.device !== req.accessToken.dev) return next({
+                status: 403,
+                message: "No allowed"
             });
             req.ride = ride;
             next();

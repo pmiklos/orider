@@ -30,18 +30,36 @@
 </head>
 <body ng-controller="ApplicationController">
 
+<div class="modal fade" id="unauthorizedError" tabindex="-1" role="dialog" aria-labelledby="unauthorizedErrorLabel"
+     aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="unauthorizedErrorLabel">Unauthorized</h5>
+            </div>
+            <div class="modal-body">
+                Please log in to use this page!
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" ng-href="#!/login" onclick="angular.element('#unauthorizedError').modal('hide')">LOGIN</a>
+                <a class="btn btn-secondary" ng-href="#!/" onclick="angular.element('#unauthorizedError').modal('hide')">Cancel</a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div class="modal fade" id="forbiddenWarning" tabindex="-1" role="dialog" aria-labelledby="forbiddenWarningLabel"
-     aria-hidden="true">
+     aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="forbiddenWarningLabel">Forbidden</h5>
             </div>
             <div class="modal-body">
-                Unfortunately you are not allowed to see this page, please log in!
-                <p>
-                    <a ng-href="#!/login" onclick="angular.element('#forbiddenWarning').modal('hide')">LOGIN</a>
-                </p>
+                This page is not available to you.
+            </div>
+            <div class="modal-footer">
+                <a class="btn btn-primary" ng-href="#!/" onclick="angular.element('#forbiddenWarning').modal('hide')">Close</a>
             </div>
         </div>
     </div>
