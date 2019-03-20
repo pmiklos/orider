@@ -1,4 +1,4 @@
-# byteball-carpool
+# ORider
 Carpooling for Obyte
 
 This project is submitted to [The Great Byteball Bot War Use-a-thon](https://wiki.byteball.org/Use-a-thon/botwar).
@@ -14,7 +14,7 @@ scan the QR code displayed on the driver's mobile screen with their Obyte wallet
 soon as they are ready to leave, the driver closes the check-in period and the smart contract is sent out to the riders who
 make the payment. The driver gets notified about the incoming payments and when all have paid, the trip starts. When they
 reach the destination and the driver completes the trip, the GPS coordinates are read and transmitted to the
-`byteball-carpool` bot which checks if the people taking the ride are all at the destination. If so, it posts a 
+`orider` bot which checks if the people taking the ride are all at the destination. If so, it posts a 
 completed notification to its oracle data feed which unlocks the smart contract and the funds are released to the
 driver. In case the trip is completed without reaching the destination, a notification indicating the incomplete trip is
 posted and the smart contract releases the funds back to the passengers.
@@ -40,8 +40,8 @@ Setting up the basic infrastructure on a bare Ubuntu 18 VPS (eg. [DigitalOcean](
 Install the Carpooling application:
 
     # Clone the repo and install and run the app
-    git clone https://github.com/pmiklos/byteball-carpool.git
-    cd byteball-carpool
+    git clone https://github.com/pmiklos/orider.git
+    cd orider
     npm install
     npm dedupe # to remove duplicate ocore module
     node carpool.js
@@ -58,11 +58,12 @@ Install the SSL certificates:
 
 ## Configuration
 
-The app uses [Google Geocoding API](https://developers.google.com/maps/documentation/geocoding/start) to translate addresses to geo locations.
+The app uses [Google Geocoding API](https://developers.google.com/maps/documentation/geocoding/start) to translate addresses to geo locations and [Google Maps Embed API](https://developers.google.com/maps/documentation/embed/start) to render the maps for the rides.
 The API requires an API KEY you can set in the `~/.config/byteball-carpool/conf.json`:
 
     {
-        "googleMapsApiKey": "YOUR GOOGLE MAP API KEY"
+        "googleMapsApiKey": "YOUR GOOGLE MAP API KEY",
+        "googleMapsEmbedKey": "YOUR GOOGLE MAPS EMBED API KEY"
     }
 
 By default the `access_token` that carries the data for the authenticated wallet is set as a secure cookie. On localhost development you might not have HTTPS set up. To turn secure cookie off set the `supportsHttps` to `false`:
