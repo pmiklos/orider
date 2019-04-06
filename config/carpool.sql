@@ -4,7 +4,8 @@ CREATE TABLE cp_accounts (
     first_name VARCHAR NULL,
     last_name VARCHAR NULL,
     has_drivers_license INTEGER NOT NULL DEFAULT 0,
-    payout_address CHAR(32) NULL
+    payout_address CHAR(32) NULL,
+    vehicle VARCHAR(255) NULL,
 --    FOREIGN KEY (device) REFERENCES correspondent_addresses(device_address)
 );
 

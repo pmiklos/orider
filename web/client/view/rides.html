@@ -104,7 +104,7 @@
 
                     <div class="mt-2">
                         <a class="card-link" ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}" target="carpool-map">Directions</a>
-                        <button class="btn btn-link card-link" type="button" ng-click="reserve(ride)"
+                        <button class="btn btn-primary card-link" type="button" ng-click="reserve(ride)"
                                 ng-if="isAccountReady() && ride.id && ride.seats > ride.reservationCount && !isReserved(ride) && !isCompleted(ride) && !isMyRide(ride)">Reserve</button>
                         <a class="card-link" ng-href="#!/my/reservations/{{ ride.id }}" ng-if="isLoggedIn() && isReserved(ride)">Reserved</a>
                         <button class="btn btn-primary card-link" type="button" ng-click="startRide(ride)" ng-if="isLoggedIn() && isMyRide(ride)">Start</button>

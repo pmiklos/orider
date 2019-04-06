@@ -1,0 +1,1 @@
+ALTER TABLE cp_accounts ADD vehicle VARCHAR(255) NULL;

@@ -6,12 +6,15 @@
         function ($rootScope, $scope, $route, $location, byteball, socket, AccountService) {
 
             $scope.payoutAddress = $rootScope.account.payoutAddress;
+            $scope.vehicle = $rootScope.account.vehicle;
 
             function updateAccount() {
                 AccountService.update({
-                    payoutAddress: $scope.payoutAddress
+                    payoutAddress: $scope.payoutAddress,
+                    vehicle: $scope.vehicle
                 }).then(function (account) {
                     $scope.payoutAddress = account.payoutAddress;
+                    $scope.vehicle = account.vehicle;
                     $rootScope.setAccount(account);
                     $rootScope.showInfo("Account updated", 3000);
                 }, function (error) {
