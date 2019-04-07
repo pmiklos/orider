@@ -10,7 +10,8 @@ function select(device, callback) {
             account.first_name firstName,
             account.last_name lastName,
             COALESCE(account.first_name || ' ' || account.last_name, account.first_name, account.last_name) fullName,
-            account.has_drivers_license hasDriversLicense
+            account.has_drivers_license hasDriversLicense,
+            account.vehicle vehicle
         FROM correspondent_devices correspondent
         LEFT JOIN cp_accounts account ON device_address = device
         WHERE device_address = ?`, [device], (rows) => {
@@ -22,12 +23,12 @@ function select(device, callback) {
 }
 
 function upsert(device, account, callback) {
-    db.query(`INSERT ${db.getIgnore()} INTO cp_accounts(device, payout_address) VALUES (?, ?)`, [device, account.payoutAddress], (insertResult) => {
+    db.query(`INSERT ${db.getIgnore()} INTO cp_accounts(device, payout_address, vehicle) VALUES (?, ?, ?)`, [device, account.payoutAddress, account.vehicle], (insertResult) => {
         if (insertResult.affectedRows === 1) {
             return callback(null);
         }
 
-        db.query(`UPDATE cp_accounts SET payout_address = ? WHERE device = ?`, [account.payoutAddress, device], (updateResult) => {
+        db.query(`UPDATE cp_accounts SET payout_address = ?, vehicle = ? WHERE device = ?`, [account.payoutAddress, account.vehicle, device], (updateResult) => {
             if (updateResult.affectedRows === 1) {
                 return callback(null);
             }

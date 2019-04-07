@@ -30,7 +30,8 @@ module.exports = function (accountRepository, chatProcessor) {
 
     function createOrUpdate(req, res, next) {
         const updatedAccount = {
-            payoutAddress: req.body.payoutAddress
+            payoutAddress: req.body.payoutAddress,
+            vehicle: req.body.vehicle
         };
 
         accountRepository.upsert(req.accessToken.dev, updatedAccount, (err) => {

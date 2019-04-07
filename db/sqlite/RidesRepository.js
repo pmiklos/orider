@@ -64,6 +64,7 @@ function select(id, callback) {
             rides.completion_score completionScore,
             rides.oracle_value oracleValue,
             rides.oracle_unit oracleUnit,
+            account.vehicle vehicle,
             account.has_drivers_license hasDriversLicense,
             COALESCE(account.first_name, rides.device) driver,
             COALESCE(stats.avg_score, 0) averageScore,
