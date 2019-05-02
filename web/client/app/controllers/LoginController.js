@@ -2,10 +2,19 @@
 
     var app = angular.module("carpool");
 
-    app.controller("LoginController", ["$rootScope", "$scope", "$route", "$location", "$timeout", "byteball", "socket", "AuthService", "AccountService",
-        function ($rootScope, $scope, $route, $location, $timeout, byteball, socket, AuthService, AccountService) {
+    app.controller("LoginController", ["$rootScope", "$scope", "$route", "$location", "$timeout", "byteball", "socket", "AuthService", "AccountService", "DetectMobileBrowserService",
+        function ($rootScope, $scope, $route, $location, $timeout, byteball, socket, AuthService, AccountService, DetectMobileBrowserService) {
 
             var pariringCode = byteball.pairingCode(AuthService.getAuthCode());
+
+            function copyToClipboard(elementId) {
+                var input = document.getElementById(elementId);
+                input.select();
+                var copied = document.execCommand("copy");
+                if (copied) {
+                    $rootScope.showInfo("Pairing code copied to clipboard", 2000);
+                }
+            }
 
             AuthService.getAuthToken().then(function (response) {
                 socket.reconnect();
@@ -23,6 +32,8 @@
 
             $scope.pairingCode = pariringCode;
             $scope.pairingUrl = byteball.pairingUrl(pariringCode);
+            $scope.mobile = DetectMobileBrowserService.isMobile();
+            $scope.copyToClipboard = copyToClipboard;
         }]);
 
 })();
