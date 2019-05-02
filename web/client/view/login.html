@@ -1,17 +1,38 @@
-<div class="row">
+<div ng-include="'/fragment/messages.html'"></div>
+
+<div class="row justify-content-center">
     <div class="col-lg-6">
-        <div class="card">
+        <div class="card" ng-if="mobile">
             <div class="card-body text-center">
                 <p>
-                    Scan the QR code or pair your wallet using
-                    the pairing code below.
+                    Clicking the button below will open the O<sub>byte</sub> wallet with the ORider chat screen.
+                    Once you receive the notification about successful login, come back to the browser,
+                    you will be logged in.
                 </p>
                 <p>
-                    <a ng-href="{{pairingUrl}}">LOGIN</a>
+                    <a class="btn btn-primary" ng-href="{{pairingUrl}}">LOGIN</a>
                 </p>
-                <qrcode data="{{pairingUrl}}" size="180" version="7"></qrcode>
-                <br>
-                <input class="form-control" type="text" value="{{pairingCode}}"/>
+            </div>
+        </div>
+        <div class="card" ng-if="!mobile">
+            <div class="card-body text-center">
+                <p>
+                    Scan the QR code with your mobile O<sub>byte</sub> wallet to log in.
+                </p>
+                <div class="p-3">
+                    <qrcode data="{{pairingUrl}}" size="180" version="7"></qrcode>
+                </div>
+                OR
+                <p class="pt-3">
+                    Copy the pairing code below and paste it in the "Accept invitation from the other device"
+                    screen of your desktop wallet.
+                </p>
+                <div class="input-group mb-3">
+                    <input id="pairingCode" class="form-control" type="text" value="{{pairingCode}}"/>
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="button" id="button-addon2" ng-click="copyToClipboard('pairingCode')">Copy</button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
