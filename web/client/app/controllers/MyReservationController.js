@@ -2,11 +2,13 @@
 
     var app = angular.module("carpool");
 
-    app.controller("MyReservationController", ["$rootScope", "$scope", "$routeParams", "byteball", "socket", "MyReservationsService", "RidesService",
-        function ($rootScope, $scope, $routeParams, byteball, socket, MyReservationsService, RidesService) {
+    app.controller("MyReservationController", ["$rootScope", "$scope", "$routeParams", "byteball", "socket", "MyReservationsService", "RidesService", "DetectMobileBrowserService",
+        function ($rootScope, $scope, $routeParams, byteball, socket, MyReservationsService, RidesService, DetectMobileBrowserService) {
 
             $scope.reservation = {};
             $scope.ride = {};
+            $scope.mobile = DetectMobileBrowserService.isMobile();
+            $scope.contactDriverUrl = byteball.pairingUrl(byteball.pairingCode(`CONTACT-${$routeParams.id}`));
 
             function fetchMyReservation() {
                 return MyReservationsService.get($routeParams.id).then(function (reservation) {
@@ -83,6 +85,15 @@
                 return $scope.reservation.status === 'completed';
             }
 
+            function contactDriver() {
+                MyReservationsService.contact($routeParams.id).then(function (response) {
+                    $rootScope.showInfo("Contact details were sent to your wallet.", 3000);
+                }, function (error) {
+                    console.error(error);
+                    $rootScope.showError("Cannot contact to driver.", 3000);
+                });
+            }
+
             fetchMyReservation().then(fetchRide());
 
             $scope.isReserved = isReserved;
@@ -90,6 +101,7 @@
             $scope.isCompleted = isCompleted;
             $scope.isRideBoarding = isRideBoarding;
             $scope.completeRide = completeRide;
+            $scope.contactDriver = contactDriver;
         }]);
 
 })();

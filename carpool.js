@@ -80,6 +80,17 @@ function start(rideFeeContract) {
     });
 
     eventBus.on("paired", (from_address, pairing_secret) => {
+        if (pairing_secret.startsWith("CONTACT-")) {
+            const rideId = pairing_secret.substring(8);
+            console.error(`[${from_address}] CONTACT @${rideId}`);
+
+            chat.contactDriver(rideId, from_address, (err) => {
+                if (err) return console.error(err);
+            });
+        }
+    });
+
+    eventBus.on("paired", (from_address, pairing_secret) => {
         if (pairing_secret.startsWith("CHECKIN-")) {
             console.log(`[${from_address}] Checking in using ${pairing_secret}`);
 

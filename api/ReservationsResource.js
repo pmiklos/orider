@@ -1,6 +1,6 @@
 "use strict";
 
-module.exports = function (reservationRepository, ridesRepository, completionScoring) {
+module.exports = function (reservationRepository, ridesRepository, completionScoring, chatProcessor) {
 
     function complete(req, res, next) {
         const rideId = req.params.id;
@@ -68,11 +68,25 @@ module.exports = function (reservationRepository, ridesRepository, completionSco
         });
     }
 
+    function contactDriver(req, res, next) {
+        const rideId = req.params.id;
+        const device = req.accessToken.dev;
+
+        reservationRepository.select(rideId, device, (err) => {
+            if (err) return next(err);
+            chatProcessor.contactDriver(rideId, device, (err) => {
+                if (err) return next(err);
+                res.json({});
+            });
+        });
+    }
+
     return {
         get,
         complete,
         create,
         listByRide,
-        listByDevice
+        listByDevice,
+        contactDriver
     };
 };

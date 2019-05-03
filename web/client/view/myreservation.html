@@ -1,36 +1,42 @@
 <div ng-include="'/fragment/messages.html'"></div>
 
 <div class="row justify-content-center">
-    <div class="col-12 col-md-8 card border-light">
-        <div class="card-body">
-            <h5 class="card-title">
-                {{ ride.departure | date:'MMM dd, yyyy HH:mm a'}} <br>
-                <small ng-if="ride.averageScore >= 0 && ride.totalRides >= 0"><star-rating rating="ride.averageScore * 5"/>, {{ ride.totalRides }} rides</small><br>
-                <small>{{ ride.pricePerSeat | MBYTE | number}} MBYTE</small>
-            </h5>
-            <p>
-                Driver: {{ ride.driver }}
-                <sup class="badge badge-success" ng-if="ride.hasDriversLicense" title="Verified drivers license">
-                    <i class="fa fa-id-card" aria-hidden="true"></i>
-                </sup>
+    <div class="col-12 col-md-8">
+        <div class="card border-light">
+            <div class="card-header clearfix">
+                <span class="float-left" ng-if="isReserved()">Reserved</span>
+                <span class="float-left" ng-if="isCheckedIn()">Checked-in</span>
+                <span class="float-right" ng-if="isRideBoarding()"><b>Boarding now</b></span>
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">
+                    {{ ride.departure | date:'MMM dd, yyyy HH:mm a'}} <br>
+                    <small ng-if="ride.averageScore >= 0 && ride.totalRides >= 0"><star-rating rating="ride.averageScore * 5"/>, {{ ride.totalRides }} rides</small><br>
+                    <small>{{ ride.pricePerSeat | MBYTE | number}} MBYTE</small>
+                </h5>
+                <p>
+                    Driver: {{ ride.driver }}
+                    <sup class="badge badge-success" ng-if="ride.hasDriversLicense" title="Verified drivers license">
+                        <i class="fa fa-id-card" aria-hidden="true"></i>
+                    </sup>
+                    <br>
+                    Vehicle: {{ ride.vehicle }}
+                </p>
+                <p>
+                    <i class="fa fa-car"></i> {{ ride.pickupAddress }} <br>
+                    <i class="fa fa-dot-circle-o"></i>
+                    <a ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}"
+                       target="carpool-map"> {{ ride.dropoffAddress }} <br>
+                    </a>
+                </p>
                 <br>
-                Vehicle: {{ ride.vehicle }}
-            </p>
-            <p>
-                <i class="fa fa-car"></i> {{ ride.pickupAddress }} <br>
-                <i class="fa fa-dot-circle-o"></i>
-                <a ng-href="https://google.com/maps/dir/{{ ride.pickupAddress }}/{{ ride.dropoffAddress }}"
-                   target="carpool-map"> {{ ride.dropoffAddress }} <br>
-                </a>
-            </p>
-            <p>
-                <span class="text-info" ng-if="isRideBoarding()"><b>Boarding now</b></span>
-            </p>
-            <div>
-                <span class="card-link text-muted" ng-if="isReserved()">Reserved</span>
-                <span class="card-link text-muted" ng-if="isCheckedIn()">Checked-in</span>
-                <button class="btn btn-primary card-link" type="button" ng-click="completeRide()" ng-if="!isCompleted()" ng-disabled="!isCheckedIn()">Complete Ride</button>
-                <span class="card-link text-muted" ng-if="isCompleted()">Completed ({{ reservation.completionScore * 100 | number : 0}}%)</span>
+                <div>
+                    <button class="btn btn-primary card-link" type="button" ng-click="completeRide()" ng-if="!isCompleted()" ng-disabled="!isCheckedIn()">Complete Ride</button>
+                    <span class="card-link text-muted" ng-if="isCompleted()">Completed ({{ reservation.completionScore * 100 | number : 0}}%)</span>
+
+                    <a class="card-link btn btn-outline-primary" ng-href="{{ contactDriverUrl }}" ng-if="mobile">Contact Driver</a>
+                    <button class="card-link btn btn-outline-primary" ng-if="!mobile" ng-click="contactDriver()">Contact Driver</button>
+                </div>
             </div>
         </div>
     </div>

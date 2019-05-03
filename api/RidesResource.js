@@ -83,6 +83,10 @@ module.exports = function (ridesRepository, reservationsRepository, authReposito
                 ridesRepository.create(req.accessToken.dev, ride, (err, ride) => {
                     if (err) return next(err);
                     res.json(deleteCoordinates(ride));
+
+                    authRepository.insertPermanentPairingSecret(`CONTACT-${ride.id}`, "3 MONTH", (err) => {
+                        if (err) console.error(err);
+                    });
                 });
             });
         });
