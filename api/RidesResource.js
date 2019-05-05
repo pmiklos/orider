@@ -92,7 +92,7 @@ module.exports = function (ridesRepository, reservationsRepository, authReposito
                     res.json(deleteCoordinates(ride));
 
                     const daysToDeparture = Math.floor((req.body.departure - Date.now()) / (24 * 60 * 60 * 1000));
-                    authRepository.insertPermanentPairingSecret(`CONTACT-${ride.id}`, `${daysToDeparture + 1} DAYS`, (err) => {
+                    authRepository.insertPermanentPairingSecret(`CONTACT-${ride.id}`, `${daysToDeparture + 3} DAYS`, (err) => {
                         if (err) console.error(err);
                     });
                 });
