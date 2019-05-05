@@ -9,6 +9,10 @@ function insertPairingSecret(pairingSecret, isPermanent, timeout, callback) {
         "INSERT " + db.getIgnore() + " INTO pairing_secrets (pairing_secret, is_permanent, expiry_date) VALUES (?, ?, " + expiryDate + ")", [pairingSecret, isPermanent],
         function(result) {
             db.query("UPDATE pairing_secrets SET expiry_date = " + expiryDate + " WHERE pairing_secret = ?", [pairingSecret], function(result) {
+                if (result.affectedRows !== 1) {
+                    console.error(`Failed to insert pairing secret ${pairingSecret} with expiry ${expiryDate}`);
+                    // fall through
+                }
                 callback();
             });
         }
