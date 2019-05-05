@@ -90,7 +90,7 @@
                     $rootScope.showInfo("Contact details were sent to your wallet.", 3000);
                 }, function (error) {
                     console.error(error);
-                    $rootScope.showError("Cannot contact to driver.", 3000);
+                    $rootScope.showError("Cannot contact driver.", 3000);
                 });
             }
 

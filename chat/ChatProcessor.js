@@ -124,16 +124,35 @@ module.exports = function (web, accountRepository, profileRepository, ridesRepos
         }
     }
 
-    function sendMessageToDriver(context, rideId, message) {
-        reservationsRepository.select(rideId, context.deviceAddress, (err, reservation) => {
+    function sendMessageToDriverOrAllPassengers(context, rideId, message) {
+        ridesRepository.select(rideId, (err, ride) => {
+            if (err) return context.reply("No such ride, cannot send message");
+
+            if (ride.device === context.deviceAddress) {
+                sendMessageToAllPassengers(context, ride, message);
+            } else {
+                sendMessageToDriver(context, ride, message);
+            }
+        });
+    }
+
+    function sendMessageToDriver(context, ride, message) {
+        reservationsRepository.select(ride.id, context.deviceAddress, (err, reservation) => {
             if (err) return context.reply("Cannot message to the driver of this ride.");
 
-            ridesRepository.select(rideId, (err, ride) => {
-                if (err) return context("Cannot message to the driver, no such ride. Try listing your [reservations](command:reservations).");
+            const replyTo = `${ride.id}.${reservation.device.substring(1, 9)}`;
+            device.sendMessageToDevice(ride.device, "text", `[${replyTo}] ${reservation.name}> ${message}\n[Reply](suggest-command:@${replyTo} )`);
+        });
+    }
 
-                const replyTo = `${rideId}.${reservation.device.substring(1, 9)}`;
+    function sendMessageToAllPassengers(context, ride, message) {
+        reservationsRepository.selectAllByRide(ride.id, (err, reservations) => {
+            if (err) return context.reply(`Cannot message to passengers to this ride.`);
+            if (reservations.length === 0) return context.reply(`No passengers made reservations yet.`);
 
-                device.sendMessageToDevice(ride.device, "text", `[${replyTo}] ${reservation.name}> ${message}\n[Reply](suggest-command:@${replyTo} )`);
+            const replyTo = `${ride.id}`;
+            reservations.forEach(reservation => {
+                device.sendMessageToDevice(reservation.device, "text", `[${replyTo}] ${ride.driver}> ${message}\n[Reply](suggest-command:@${replyTo} )`);
             });
         });
     }
@@ -182,7 +201,7 @@ module.exports = function (web, accountRepository, profileRepository, ridesRepos
             handler: profileHandler.handlePublicProfile
         }, {
             pattern: /^@([0-9]+) (.*)/,
-            handler: sendMessageToDriver
+            handler: sendMessageToDriverOrAllPassengers
         }, {
             pattern: /^@([0-9]+)\.([A-Z2-7]+) (.*)/,
             handler: sendMessageToPassenger
@@ -244,15 +263,26 @@ module.exports = function (web, accountRepository, profileRepository, ridesRepos
         callback();
     }
 
-    function contactDriver(rideId, passengerAddress, callback) {
+    function contact(rideId, deviceAddress, callback) {
         ridesRepository.select(rideId, (err, ride) => {
-            if (err) return callback("Cannot send message, no such driver.");
-            device.sendMessageToDevice(passengerAddress, "text",
-                `Contact details for ride ${rideId}:` +
-                `\nDriver: ${ride.driver}` +
-                `\nPick-up: ${ride.pickupAddress}` +
-                `\nDrop-off: ${ride.dropoffAddress}` +
-                `\n\n[Send message](suggest-command:@${rideId} )`);
+            if (err) return callback(`Cannot send message, no such ride ${rideId}`);
+
+            if (ride.device === deviceAddress) {
+                device.sendMessageToDevice(deviceAddress, "text",
+                    `Send a message to all your passengers for ride ${rideId}:` +
+                    `\nPick-up: ${ride.pickupAddress}` +
+                    `\nDrop-off: ${ride.dropoffAddress}` +
+                    `\n\nExample: [@${rideId} Hi, how are you?](suggest-command:@${rideId} Hi, how are you?)` +
+                    `\n\n[Send message](suggest-command:@${rideId} )`);
+            } else {
+                device.sendMessageToDevice(deviceAddress, "text",
+                    `Contact details for ride ${rideId}:` +
+                    `\nDriver: ${ride.driver}` +
+                    `\nPick-up: ${ride.pickupAddress}` +
+                    `\nDrop-off: ${ride.dropoffAddress}` +
+                    `\n\nExample: [@${rideId} Hi, how are you?](suggest-command:@${rideId} Hi, how are you?)` +
+                    `\n\n[Send message](suggest-command:@${rideId} )`);
+            }
             callback();
         });
     }
@@ -263,7 +293,7 @@ module.exports = function (web, accountRepository, profileRepository, ridesRepos
 
     return {
         answer,
-        contactDriver,
+        contact,
         requestProfile,
         welcome
     };

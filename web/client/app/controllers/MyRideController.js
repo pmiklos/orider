@@ -2,8 +2,8 @@
 
     var app = angular.module("carpool");
 
-    app.controller("MyRideController", ["$rootScope", "$scope", "$routeParams", "$timeout", "byteball", "google", "socket", "LocationService", "MyRidesService", "WakeLockService",
-        function ($rootScope, $scope, $routeParams, $timeout, byteball, google, socket, LocationService, MyRidesService, WakeLockService) {
+    app.controller("MyRideController", ["$rootScope", "$scope", "$routeParams", "$timeout", "byteball", "google", "socket", "LocationService", "MyRidesService", "WakeLockService", "DetectMobileBrowserService",
+        function ($rootScope, $scope, $routeParams, $timeout, byteball, google, socket, LocationService, MyRidesService, WakeLockService, DetectMobileBrowserService) {
 
             const AUTO_COMPLETION_TIMEOUT = 10 * 1000; // 10 sec
             const AUTO_COMPLETION_COUNTDOWN = 50;
@@ -15,6 +15,8 @@
             $scope.completedReservations = [];
             $scope.autoCompletionProgress = 0;
             $scope.googleMapUrl = null;
+            $scope.mobile = DetectMobileBrowserService.isMobile();
+            $scope.contactPassengersUrl = byteball.pairingUrl(byteball.pairingCode(`CONTACT-${$routeParams.id}`));
 
             let locationWatchId = 0;
             let autoCompletionTimer;
@@ -194,6 +196,15 @@
                 });
             }
 
+            function contactPassengers() {
+                MyRidesService.contact($routeParams.id).then(function (response) {
+                    $rootScope.showInfo("Contact details were sent to your wallet.", 3000);
+                }, function (error) {
+                    console.error(error);
+                    $rootScope.showError("Cannot contact passengers.", 3000);
+                });
+            }
+
             $scope.$on('$routeChangeStart', function() {
                 WakeLockService.release();
                 LocationService.clear(locationWatchId);
@@ -239,6 +250,7 @@
             $scope.startBoarding = startBoarding;
             $scope.cancelCompletion = cancelCompletion;
             $scope.completeRide = completeRide;
+            $scope.contactPassengers = contactPassengers;
             $scope.isCreated = isCreated;
             $scope.isBoarding = isBoarding;
             $scope.isCompleted = isCompleted;

@@ -74,7 +74,7 @@ module.exports = function (reservationRepository, ridesRepository, completionSco
 
         reservationRepository.select(rideId, device, (err) => {
             if (err) return next(err);
-            chatProcessor.contactDriver(rideId, device, (err) => {
+            chatProcessor.contact(rideId, device, (err) => {
                 if (err) return next(err);
                 res.json({});
             });

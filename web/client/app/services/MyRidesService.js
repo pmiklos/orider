@@ -20,6 +20,14 @@
                     return $q.reject({status: "error"});
                 });
             },
+            contact: function (id) {
+                return $http.post(`/api/my/rides/${id}/contact`, {}).then(function (response) {
+                    return response.data;
+                }, function (errorResponse) {
+                    console.error(errorResponse);
+                    return $q.reject({status: "error"});
+                });
+            },
             get: function (id) {
                 return $http.get(`/api/my/rides/${id}`).then(function (response) {
                     return response.data;

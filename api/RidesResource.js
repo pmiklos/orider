@@ -22,7 +22,7 @@ function deleteCoordinates(ride) {
     return ride;
 }
 
-module.exports = function (ridesRepository, reservationsRepository, authRepository, mapService, completionScoring) {
+module.exports = function (ridesRepository, reservationsRepository, authRepository, mapService, completionScoring, chatProcessor) {
 
     function board(req, res, next) {
         const checkInCode = "CHECKIN-" + req.ride.checkInCode;
@@ -61,6 +61,13 @@ module.exports = function (ridesRepository, reservationsRepository, authReposito
                 status,
                 completionScore
             });
+        });
+    }
+
+    function contactPassengers(req, res, next) {
+        chatProcessor.contact(req.ride.id, req.accessToken.dev, (err) => {
+            if (err) return next(err);
+            res.json({});
         });
     }
 
@@ -150,6 +157,7 @@ module.exports = function (ridesRepository, reservationsRepository, authReposito
     return {
         board,
         complete,
+        contactPassengers,
         create,
         get,
         getMine,
