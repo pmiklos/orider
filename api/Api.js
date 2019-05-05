@@ -54,8 +54,8 @@ module.exports = function (webapp, mapService, db, chatProcessor) {
 
     const completionScoring = CompletionScoring(mapService);
     const accountResource = AccountResource(db.accountRepository, chatProcessor);
-    const ridesResource = RidesResource(db.ridesRepository, db.reservationsRepository, db.authRepository, mapService, completionScoring);
-    const reservationsResource = ReservationsResource(db.reservationsRepository, db.ridesRepository, completionScoring);
+    const ridesResource = RidesResource(db.ridesRepository, db.reservationsRepository, db.authRepository, mapService, completionScoring, chatProcessor);
+    const reservationsResource = ReservationsResource(db.reservationsRepository, db.ridesRepository, completionScoring, chatProcessor);
 
     webapp.use("/api", express.json());
     webapp.use("/api", requestLogger);
@@ -71,12 +71,14 @@ module.exports = function (webapp, mapService, db, chatProcessor) {
     webapp.get("/api/my/reservations", reservationsResource.listByDevice);
     webapp.get("/api/my/reservations/:id", reservationsResource.get);
     webapp.post("/api/my/reservations/:id/complete", reservationsResource.complete);
+    webapp.post("/api/my/reservations/:id/contact", reservationsResource.contactDriver);
     webapp.get("/api/my/rides", ridesResource.listByDevice);
     webapp.use("/api/my/rides/:id", ridesResource.fetchMine);
     webapp.get("/api/my/rides/:id", ridesResource.getMine);
     webapp.get("/api/my/rides/:id/reservations", reservationsResource.listByRide);
     webapp.post("/api/my/rides/:id/board", ridesResource.board);
     webapp.post("/api/my/rides/:id/complete", ridesResource.complete);
+    webapp.post("/api/my/rides/:id/contact", ridesResource.contactPassengers);
     webapp.get("/api/rides", ridesResource.list);
     webapp.post("/api/rides", accountResource.fetch);
     webapp.post("/api/rides", accountResource.accountReady);

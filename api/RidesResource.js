@@ -22,7 +22,7 @@ function deleteCoordinates(ride) {
     return ride;
 }
 
-module.exports = function (ridesRepository, reservationsRepository, authRepository, mapService, completionScoring) {
+module.exports = function (ridesRepository, reservationsRepository, authRepository, mapService, completionScoring, chatProcessor) {
 
     function board(req, res, next) {
         const checkInCode = "CHECKIN-" + req.ride.checkInCode;
@@ -64,6 +64,13 @@ module.exports = function (ridesRepository, reservationsRepository, authReposito
         });
     }
 
+    function contactPassengers(req, res, next) {
+        chatProcessor.contact(req.ride.id, req.accessToken.dev, (err) => {
+            if (err) return next(err);
+            res.json({});
+        });
+    }
+
     function create(req, res, next) {
         mapService.geocode(req.body.pickupAddress, (err, pickupLocation) => {
             if (err) return next(err);
@@ -83,6 +90,11 @@ module.exports = function (ridesRepository, reservationsRepository, authReposito
                 ridesRepository.create(req.accessToken.dev, ride, (err, ride) => {
                     if (err) return next(err);
                     res.json(deleteCoordinates(ride));
+
+                    const daysToDeparture = Math.floor((req.body.departure - Date.now()) / (24 * 60 * 60 * 1000));
+                    authRepository.insertPermanentPairingSecret(`CONTACT-${ride.id}`, `${daysToDeparture + 3} DAYS`, (err) => {
+                        if (err) console.error(err);
+                    });
                 });
             });
         });
@@ -145,6 +157,7 @@ module.exports = function (ridesRepository, reservationsRepository, authReposito
     return {
         board,
         complete,
+        contactPassengers,
         create,
         get,
         getMine,

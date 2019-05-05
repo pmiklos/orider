@@ -120,8 +120,9 @@
                 </p>
                 <div>
                     <button class="btn btn-primary card-link" type="button" ng-click="startBoarding()" ng-if="!isBoarding() && !isCompleted()">Start boarding</button>
-                    <span class="card-link text-muted" ng-if="isBoarding()">Boarding now</span>
-                    <button class="btn btn-primary card-link" type="button" ng-click="completeRide()" ng-if="!isCompleted()" ng-disabled="isCreated()">Complete Ride</button>
+                    <button class="btn btn-primary card-link" type="button" ng-click="completeRide()" ng-if="isBoarding()" ng-disabled="isCreated()">Complete Ride</button>
+                    <button class="btn btn-outline-primary card-link" type="button" ng-click="contactPassengers()" ng-if="!mobile">Contact Passengers</button>
+                    <a class="btn btn-outline-primary card-link" ng-if="mobile" ng-href="{{ contactPassengersUrl }}">Contact Passengers</a>
                 </div>
             </div>
         </div>

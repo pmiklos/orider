@@ -12,6 +12,14 @@
                     return $q.reject({status: "error"});
                 });
             },
+            contact: function (rideId) {
+                return $http.post(`/api/my/reservations/${rideId}/contact`, {}).then(function (response) {
+                    return response.data;
+                }, function (errorResponse) {
+                    console.error(errorResponse);
+                    return $q.reject({status: "error"});
+                });
+            },
             get: function (rideId) {
                 return $http.get(`/api/my/reservations/${rideId}`).then(function (response) {
                     return response.data;
