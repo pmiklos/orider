@@ -141,7 +141,7 @@ module.exports = function (web, accountRepository, profileRepository, ridesRepos
             if (err) return context.reply("Cannot message to the driver of this ride.");
 
             const replyTo = `${ride.id}.${reservation.device.substring(1, 9)}`;
-            device.sendMessageToDevice(ride.device, "text", `[${replyTo}] ${reservation.name}> ${message}\n[Reply](suggest-command:@${replyTo} )`);
+            device.sendMessageToDevice(ride.device, "text", `[${replyTo}] ${reservation.name || ""}> ${message}\n[Reply](suggest-command:@${replyTo} )`);
         });
     }
 
@@ -152,7 +152,7 @@ module.exports = function (web, accountRepository, profileRepository, ridesRepos
 
             const replyTo = `${ride.id}`;
             reservations.forEach(reservation => {
-                device.sendMessageToDevice(reservation.device, "text", `[${replyTo}] ${ride.driver}> ${message}\n[Reply](suggest-command:@${replyTo} )`);
+                device.sendMessageToDevice(reservation.device, "text", `[${replyTo}] ${ride.driver || ""}> ${message}\n[Reply](suggest-command:@${replyTo} )`);
             });
         });
     }
@@ -167,7 +167,7 @@ module.exports = function (web, accountRepository, profileRepository, ridesRepos
                 const reservation = reservations.find(r => r.device.substring(1, 9) === passenger);
 
                 if (reservation) {
-                    device.sendMessageToDevice(reservation.device, "text", `[${rideId}] ${ride.driver}> ${message}\n[Reply](suggest-command:@${rideId} )`);
+                    device.sendMessageToDevice(reservation.device, "text", `[${rideId}] ${ride.driver || ""}> ${message}\n[Reply](suggest-command:@${rideId} )`);
                 } else {
                     context.reply("Cannot send message, no such passenger");
                 }
