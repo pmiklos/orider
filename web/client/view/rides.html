@@ -44,13 +44,14 @@
             </div>
             <div class="form-row" ng-if="isAccountPending()">
                 <div class="col">
-                    <small id="createRideHelp" class="text-muted">Complete <a ng-href="#!/my/account">your profile</a> to create new rides or reserve one</small>
+                    <small id="createRideHelp" class="text-muted">Complete <a ng-href="#!/my/account">your profile</a> to create new rides</small>
                 </div>
             </div>
         </form>
     </div>
     <div class="col" ng-show="hideCreateRideForm">
         <button class="btn btn-link" type="button" ng-click="toggleCreateRideForm(false)">Create Ride</button>
+        <small ng-if="isAccountPending()" id="createRideHelp" class="text-muted">Complete <a ng-href="#!/my/account">your profile</a> to reserve rides</small>
     </div>
 </div>
 
