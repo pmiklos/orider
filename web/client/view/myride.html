@@ -65,7 +65,7 @@
                             <td>-</td>
                         </tr>
                         <tr ng-repeat-start="reservation in reservations">
-                            <td rowspan="2">{{ reservation.name }}</div>
+                            <td rowspan="2" class="text-break">{{ reservation.name }}</div>
                             <td rowspan="2" ng-if="reservation.status === 'completed'">{{ reservation.completionScore * 100 | number:0 }}%</td>
                             <td rowspan="2" ng-if="reservation.status !== 'completed'">pending</td>
                             <td><i class="fa fa-sign-in"></i></td>
