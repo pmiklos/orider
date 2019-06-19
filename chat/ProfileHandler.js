@@ -4,35 +4,32 @@ const config = require("ocore/conf");
 const privateProfile = require('ocore/private_profile.js');
 const validation = require('ocore/validation.js');
 
-const ATTESTORS = new Map();
-
 String.prototype.toCamelCase = function () {
     return this.toLowerCase().replace(/^(.)/, function ($1) {
         return $1.toUpperCase();
     });
 };
 
-ATTESTORS.set(config.realnameAttestor, {
+const ATTESTORS = new Map();
+const REALNAME = {
     name: "Real Name Attestor",
     privateProfileRequest: "Please share your first and last name [Profile request](profile-request:first_name,last_name,id_type)",
-
     validate(profile) {
         return profile && typeof profile === "object" && typeof profile.first_name === "string" && typeof profile.last_name === "string" && typeof profile.id_type === "string"
     },
-
     firstName(profile) {
         return profile.first_name.toCamelCase();
     },
-
     lastName(profile) {
         return profile.last_name.toCamelCase();
     },
-
     isDriversLicense(profile) {
         return profile.id_type === "DRIVING_LICENSE";
     }
+};
 
-});
+if (config.realnameAttestor) {ATTESTORS.set(config.realnameAttestor, REALNAME);}
+if (config.realnameAttestorSmartID) {ATTESTORS.set(config.realnameAttestorSmartID, REALNAME);}
 
 function publicProfileChallenge(profileAddress, attestation) {
     const profile = attestation.profile;

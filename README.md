@@ -85,6 +85,9 @@ Since carpools involve one driver and at least one passenger, premade scripts ar
 
 Both commands require to have docker installed on your linux machine. See detials in [bin/docker-wallet.sh](./bin/docker-wallet.sh)
 
+## Testnet
+* Run `cp .env.testnet .env` to connect to TESTNET hub. Delete and import the database again if you already ran it on MAINNET.
+
 After launching the wallets use the [testnet faucet](https://obyte.org/testnet.html) to get some test bytes by pairing your wallet with the faucet bot using the pairing code below.
 
     AxBxXDnPOzE/AxLHmidAjwLPFtQ6dK3k70zM0yKVeDzC@obyte.org/bb-test#0000
