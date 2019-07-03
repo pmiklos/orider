@@ -55,7 +55,13 @@ function updateProfile(device, profile, callback) {
             return callback(null);
         }
 
-        callback(`Failed to update account for ${device}`);
+        db.query(`INSERT ${db.getIgnore()} INTO cp_accounts(profile_unit, first_name, last_name, has_drivers_license, device) VALUES (?, ?, ?, ?, ?)`, [profile.unit, profile.firstName, profile.lastName, profile.isDriversLicense, device], (insertResult) => {
+            if (insertResult.affectedRows === 1) {
+                return callback(null);
+            }
+
+            callback(`Failed to update account for ${device}`);
+        });
     });
 }
 
