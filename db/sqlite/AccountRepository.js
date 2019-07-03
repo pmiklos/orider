@@ -48,25 +48,27 @@ function upsert(device, account, callback) {
  * @param {boolean} profile.isDriversLicense
  * @param callback
  */
-function updateProfile(device, profile, callback) {
-    db.query(`UPDATE cp_accounts SET profile_unit = ?, first_name = ?, last_name = ?, has_drivers_license = ? WHERE device = ?`,
-        [profile.unit, profile.firstName, profile.lastName, profile.isDriversLicense, device], (updateResult) => {
-        if (updateResult.affectedRows === 1) {
-            return callback(null);
-        }
-
-        db.query(`INSERT ${db.getIgnore()} INTO cp_accounts(profile_unit, first_name, last_name, has_drivers_license, device) VALUES (?, ?, ?, ?, ?)`, [profile.unit, profile.firstName, profile.lastName, profile.isDriversLicense, device], (insertResult) => {
+function upsertProfile(device, profile, callback) {
+    db.query(`INSERT ${db.getIgnore()} INTO cp_accounts(device, profile_unit, first_name, last_name, has_drivers_license) VALUES (?, ?, ?, ?, ?)`,
+        [device, profile.unit, profile.firstName, profile.lastName, profile.isDriversLicense], insertResult => {
             if (insertResult.affectedRows === 1) {
                 return callback(null);
             }
 
-            callback(`Failed to update account for ${device}`);
+            db.query(`UPDATE cp_accounts SET profile_unit = ?, first_name = ?, last_name = ?, has_drivers_license = ? WHERE device = ?`,
+                [profile.unit, profile.firstName, profile.lastName, profile.isDriversLicense, device], (updateResult) => {
+                    if (updateResult.affectedRows === 1) {
+                        return callback(null);
+                    }
+
+                    callback(`Failed to update account for ${device}`);
+                });
+
         });
-    });
 }
 
 module.exports = {
     select,
     upsert,
-    updateProfile
+    upsertProfile
 };
