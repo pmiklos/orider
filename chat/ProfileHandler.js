@@ -94,7 +94,7 @@ module.exports = function (web, accountRepository, profileRepository) {
                             return context.reply('Profile not accepted. Please try again and share all requested fields!');
                         }
 
-                        accountRepository.updateProfile(device, {
+                        accountRepository.upsertProfile(device, {
                             unit: attestation.unit,
                             firstName: attestor.firstName(profile),
                             lastName: attestor.lastName(profile),
@@ -155,7 +155,7 @@ module.exports = function (web, accountRepository, profileRepository) {
                         return context.reply("Failed to save your real name.");
                     }
 
-                    accountRepository.updateProfile(device, {
+                    accountRepository.upsertProfile(device, {
                         unit: attestation.unit,
                         firstName: attestor.firstName(profile),
                         lastName: attestor.lastName(profile),
