@@ -22,11 +22,11 @@
   "license": "MIT",
   "dependencies": {
     "@google/maps": "^0.5.5",
-    "cookie-parser": "^1.4.3",
-    "express": "^4.16.4",
-    "headless-obyte": "github:byteball/headless-obyte#npm",
-    "jsonwebtoken": "^8.4.0",
-    "ocore": "github:byteball/ocore.git#npm",
+    "cookie-parser": "^1.4.4",
+    "express": "^4.17.0",
+    "headless-obyte": "github:byteball/headless-obyte",
+    "jsonwebtoken": "^8.5.1",
+    "ocore": "github:byteball/ocore.git",
     "request": "^2.88.0",
     "socket.io": "^2.2.0"
   },
