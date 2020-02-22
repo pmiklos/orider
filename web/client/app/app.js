@@ -23,8 +23,8 @@
     }
 
     app.config(function ($routeProvider, $compileProvider, $httpProvider) {
-        $compileProvider.imgSrcSanitizationWhitelist(/^\s*((https?|ftp|file|blob|chrome-extension|byteball|byteball-tn):|data:image\/)/);
-        $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|byteball|byteball-tn):/);
+        $compileProvider.imgSrcSanitizationWhitelist(/^\s*((https?|ftp|file|blob|chrome-extension|obyte|obyte-tn):|data:image\/)/);
+        $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|obyte|obyte-tn):/);
         $httpProvider.interceptors.push("HttpInterceptor");
 
         $routeProvider
