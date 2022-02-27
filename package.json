@@ -30,6 +30,9 @@
     "request": "^2.88.0",
     "socket.io": "^2.2.0"
   },
+  "resolutions": {
+    "level-rocksdb": "^4.0.0"
+  },
   "bugs": {
     "url": "https://github.com/pmiklos/byteball-carpool/issues"
   },
