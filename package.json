@@ -32,7 +32,8 @@
     "uuid": "^3.4.0"
   },
   "resolutions": {
-    "level-rocksdb": "^4.0.0"
+    "level-rocksdb": "^4.0.0",
+    "uuid": "^3.4.0"
   },
   "bugs": {
     "url": "https://github.com/pmiklos/byteball-carpool/issues"
