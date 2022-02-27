@@ -1,7 +1,7 @@
 "use strict";
 
 const db = require("ocore/db.js");
-const uuid = require("uuid/v4");
+const { v4: uuid } = require("uuid");
 
 function board(rideId, callback) {
     updateStatus(rideId, ['created'], 'boarding', callback);

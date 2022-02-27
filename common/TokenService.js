@@ -1,7 +1,7 @@
 "use strict";
 
 const jwt = require("jsonwebtoken");
-const uuid = require("uuid/v4");
+const { v4: uuid } = require("uuid");
 const config = require("ocore/conf");
 
 const secret = config.authSecret;

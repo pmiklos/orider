@@ -28,7 +28,8 @@
     "jsonwebtoken": "^8.5.1",
     "ocore": "github:byteball/ocore",
     "request": "^2.88.0",
-    "socket.io": "^2.2.0"
+    "socket.io": "^2.2.0",
+    "uuid": "^8.3.2"
   },
   "resolutions": {
     "level-rocksdb": "^4.0.0"

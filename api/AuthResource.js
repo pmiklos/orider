@@ -3,7 +3,7 @@
 const express = require("express");
 const cookieParser = require('cookie-parser');
 const config = require("ocore/conf");
-const uuid = require("uuid/v4");
+const { v4: uuid } = require("uuid");
 
 const AUTH_TIMEOUT_INTERVAL = '5 MINUTES';
 
