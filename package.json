@@ -25,7 +25,7 @@
     "cookie-parser": "^1.4.5",
     "express": "^4.17.0",
     "headless-obyte": "github:byteball/headless-obyte",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "ocore": "github:byteball/ocore",
     "request": "^2.88.0",
     "socket.io": "^2.2.0",
