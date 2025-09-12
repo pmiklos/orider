@@ -1,7 +1,7 @@
-FROM node:14.19.0-slim AS BUILD_IMAGE
+FROM node:18.17.1-slim AS BUILD_IMAGE
 
 RUN apt-get update \
-    && apt-get install -y python make gcc g++ git
+    && apt-get install -y python-is-python3 make gcc g++ git
 
 WORKDIR /usr/src/app
 
@@ -14,7 +14,7 @@ COPY . .
 # workaround for "Container ID 887432 cannot be mapped to a host ID" when using userns-remap
 RUN chown -R root:root /usr/src/app
 
-FROM node:14.19.0-slim
+FROM node:18.17.1-slim
 
 LABEL group="app.obyte"
 LABEL app="orider"
