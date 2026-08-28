@@ -257,7 +257,8 @@ module.exports = function (web, accountRepository, profileRepository, ridesRepos
            request: REQUEST_PROFILE
         });
         device.sendMessageToDevice(deviceAddress, "text",
-            "Please insert your profile address attested by the real name attestor. " +
+            "Please insert your wallet address, which is attested by the real name attestor " +
+            "or insert your private profile, which has first name, last name and ID type. " +
             "Tip: use your drivers license to become a verified driver.");
 
         callback();
